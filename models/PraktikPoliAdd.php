@@ -357,6 +357,7 @@ class PraktikPoliAdd extends PraktikPoli
     {
         $key = "";
         if (is_array($ar)) {
+            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -368,6 +369,9 @@ class PraktikPoliAdd extends PraktikPoli
      */
     protected function hideFieldsForAddEdit()
     {
+        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
+            $this->id->Visible = false;
+        }
     }
 
     // Lookup data
@@ -460,7 +464,7 @@ class PraktikPoliAdd extends PraktikPoli
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->dokter_id->setVisibility();
         $this->fasilitas_rumah_sakit_id->setVisibility();
         $this->jam_praktik->setVisibility();
@@ -497,8 +501,13 @@ class PraktikPoliAdd extends PraktikPoli
             $this->CurrentAction = Post("action"); // Get form action
             $this->setKey(Post($this->OldKeyName));
             $postBack = true;
-        } else { // Not post back
-            $this->CopyRecord = false;
+        } else {
+            // Load key values from QueryString
+            if (($keyValue = Get("id") ?? Route("id")) !== null) {
+                $this->id->setQueryStringValue($keyValue);
+            }
+            $this->OldKey = $this->getKey(true); // Get from CurrentValue
+            $this->CopyRecord = !EmptyValue($this->OldKey);
             if ($this->CopyRecord) {
                 $this->CurrentAction = "copy"; // Copy record
             } else {
@@ -623,16 +632,6 @@ class PraktikPoliAdd extends PraktikPoli
         // Load from form
         global $CurrentForm;
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->id->Visible = false; // Disable update for API request
-            } else {
-                $this->id->setFormValue($val);
-            }
-        }
-
         // Check field name 'dokter_id' first before field var 'x_dokter_id'
         $val = $CurrentForm->hasValue("dokter_id") ? $CurrentForm->getValue("dokter_id") : $CurrentForm->getValue("x_dokter_id");
         if (!$this->dokter_id->IsDetailKey) {
@@ -662,13 +661,15 @@ class PraktikPoliAdd extends PraktikPoli
                 $this->jam_praktik->setFormValue($val);
             }
         }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
 
     // Restore form values
     public function restoreFormValues()
     {
         global $CurrentForm;
-        $this->id->CurrentValue = $this->id->FormValue;
         $this->dokter_id->CurrentValue = $this->dokter_id->FormValue;
         $this->fasilitas_rumah_sakit_id->CurrentValue = $this->fasilitas_rumah_sakit_id->FormValue;
         $this->jam_praktik->CurrentValue = $this->jam_praktik->FormValue;
@@ -742,7 +743,17 @@ class PraktikPoliAdd extends PraktikPoli
     // Load old record
     protected function loadOldRecord()
     {
-        return false;
+        // Load old record
+        $this->OldRecordset = null;
+        $validKey = $this->OldKey != "";
+        if ($validKey) {
+            $this->CurrentFilter = $this->getRecordFilter();
+            $sql = $this->getCurrentSql();
+            $conn = $this->getConnection();
+            $this->OldRecordset = LoadRecordset($sql, $conn);
+        }
+        $this->loadRowValues($this->OldRecordset); // Load row values
+        return $validKey;
     }
 
     // Render row values based on field settings
@@ -815,11 +826,6 @@ class PraktikPoliAdd extends PraktikPoli
             $this->jam_praktik->ViewValue = $this->jam_praktik->CurrentValue;
             $this->jam_praktik->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // dokter_id
             $this->dokter_id->LinkCustomAttributes = "";
             $this->dokter_id->HrefValue = "";
@@ -835,12 +841,6 @@ class PraktikPoliAdd extends PraktikPoli
             $this->jam_praktik->HrefValue = "";
             $this->jam_praktik->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = HtmlEncode($this->id->CurrentValue);
-            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
-
             // dokter_id
             $this->dokter_id->EditCustomAttributes = "";
             $curVal = trim(strval($this->dokter_id->CurrentValue));
@@ -920,10 +920,6 @@ class PraktikPoliAdd extends PraktikPoli
 
             // Add refer script
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-
             // dokter_id
             $this->dokter_id->LinkCustomAttributes = "";
             $this->dokter_id->HrefValue = "";
@@ -954,14 +950,6 @@ class PraktikPoliAdd extends PraktikPoli
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
-        }
-        if ($this->id->Required) {
-            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-            }
-        }
-        if (!CheckInteger($this->id->FormValue)) {
-            $this->id->addErrorMessage($this->id->getErrorMessage(false));
         }
         if ($this->dokter_id->Required) {
             if (!$this->dokter_id->IsDetailKey && EmptyValue($this->dokter_id->FormValue)) {
@@ -1002,9 +990,6 @@ class PraktikPoliAdd extends PraktikPoli
         if ($rsold) {
         }
         $rsnew = [];
-
-        // id
-        $this->id->setDbValueDef($rsnew, $this->id->CurrentValue, 0, false);
 
         // dokter_id
         $this->dokter_id->setDbValueDef($rsnew, $this->dokter_id->CurrentValue, 0, false);

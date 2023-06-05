@@ -186,13 +186,13 @@ return function (App $app) {
     );
 
     // praktik_poli
-    $app->any('/praktikpolilist', PraktikPoliController::class . ':list')->add(PermissionMiddleware::class)->setName('praktikpolilist-praktik_poli-list'); // list
-    $app->any('/praktikpoliadd', PraktikPoliController::class . ':add')->add(PermissionMiddleware::class)->setName('praktikpoliadd-praktik_poli-add'); // add
+    $app->any('/praktikpolilist[/{id}]', PraktikPoliController::class . ':list')->add(PermissionMiddleware::class)->setName('praktikpolilist-praktik_poli-list'); // list
+    $app->any('/praktikpoliadd[/{id}]', PraktikPoliController::class . ':add')->add(PermissionMiddleware::class)->setName('praktikpoliadd-praktik_poli-add'); // add
     $app->group(
         '/praktik_poli',
         function (RouteCollectorProxy $group) {
-            $group->any('/' . Config("LIST_ACTION") . '', PraktikPoliController::class . ':list')->add(PermissionMiddleware::class)->setName('praktik_poli/list-praktik_poli-list-2'); // list
-            $group->any('/' . Config("ADD_ACTION") . '', PraktikPoliController::class . ':add')->add(PermissionMiddleware::class)->setName('praktik_poli/add-praktik_poli-add-2'); // add
+            $group->any('/' . Config("LIST_ACTION") . '[/{id}]', PraktikPoliController::class . ':list')->add(PermissionMiddleware::class)->setName('praktik_poli/list-praktik_poli-list-2'); // list
+            $group->any('/' . Config("ADD_ACTION") . '[/{id}]', PraktikPoliController::class . ':add')->add(PermissionMiddleware::class)->setName('praktik_poli/add-praktik_poli-add-2'); // add
         }
     );
 
