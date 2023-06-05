@@ -460,6 +460,7 @@ class DokterSearch extends Dokter
         $this->CurrentAction = Param("action"); // Set up current action
         $this->id->setVisibility();
         $this->nama_dokter->setVisibility();
+        $this->webusers_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -474,6 +475,7 @@ class DokterSearch extends Dokter
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->webusers_id);
 
         // Set up Breadcrumb
         $this->setupBreadcrumb();
@@ -540,6 +542,7 @@ class DokterSearch extends Dokter
         $srchUrl = "";
         $this->buildSearchUrl($srchUrl, $this->id); // id
         $this->buildSearchUrl($srchUrl, $this->nama_dokter); // nama_dokter
+        $this->buildSearchUrl($srchUrl, $this->webusers_id); // webusers_id
         if ($srchUrl != "") {
             $srchUrl .= "&";
         }
@@ -626,6 +629,9 @@ class DokterSearch extends Dokter
         if ($this->nama_dokter->AdvancedSearch->post()) {
             $hasValue = true;
         }
+        if ($this->webusers_id->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
         return $hasValue;
     }
 
@@ -644,6 +650,8 @@ class DokterSearch extends Dokter
         // id
 
         // nama_dokter
+
+        // webusers_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -652,6 +660,27 @@ class DokterSearch extends Dokter
             // nama_dokter
             $this->nama_dokter->ViewValue = $this->nama_dokter->CurrentValue;
             $this->nama_dokter->ViewCustomAttributes = "";
+
+            // webusers_id
+            $curVal = trim(strval($this->webusers_id->CurrentValue));
+            if ($curVal != "") {
+                $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
+                if ($this->webusers_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->webusers_id->ViewValue = $this->webusers_id->displayValue($arwrk);
+                    } else {
+                        $this->webusers_id->ViewValue = $this->webusers_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->webusers_id->ViewValue = null;
+            }
+            $this->webusers_id->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";
@@ -662,6 +691,11 @@ class DokterSearch extends Dokter
             $this->nama_dokter->LinkCustomAttributes = "";
             $this->nama_dokter->HrefValue = "";
             $this->nama_dokter->TooltipValue = "";
+
+            // webusers_id
+            $this->webusers_id->LinkCustomAttributes = "";
+            $this->webusers_id->HrefValue = "";
+            $this->webusers_id->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -677,6 +711,41 @@ class DokterSearch extends Dokter
             }
             $this->nama_dokter->EditValue = HtmlEncode($this->nama_dokter->AdvancedSearch->SearchValue);
             $this->nama_dokter->PlaceHolder = RemoveHtml($this->nama_dokter->caption());
+
+            // webusers_id
+            $this->webusers_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->webusers_id->AdvancedSearch->SearchValue));
+            if ($curVal != "") {
+                $this->webusers_id->AdvancedSearch->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
+            } else {
+                $this->webusers_id->AdvancedSearch->ViewValue = $this->webusers_id->Lookup !== null && is_array($this->webusers_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->webusers_id->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->webusers_id->EditValue = array_values($this->webusers_id->Lookup->Options);
+                if ($this->webusers_id->AdvancedSearch->ViewValue == "") {
+                    $this->webusers_id->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
+                }
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "`id`" . SearchString("=", $this->webusers_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->webusers_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->webusers_id->AdvancedSearch->ViewValue = $this->webusers_id->displayValue($arwrk);
+                } else {
+                    $this->webusers_id->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
+                }
+                $arwrk = $rswrk;
+                foreach ($arwrk as &$row)
+                    $row = $this->webusers_id->Lookup->renderViewRow($row);
+                $this->webusers_id->EditValue = $arwrk;
+            }
+            $this->webusers_id->PlaceHolder = RemoveHtml($this->webusers_id->caption());
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -716,6 +785,7 @@ class DokterSearch extends Dokter
     {
         $this->id->AdvancedSearch->load();
         $this->nama_dokter->AdvancedSearch->load();
+        $this->webusers_id->AdvancedSearch->load();
     }
 
     // Set up Breadcrumb
@@ -742,6 +812,8 @@ class DokterSearch extends Dokter
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_webusers_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

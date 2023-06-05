@@ -30,6 +30,7 @@ class Dokter extends DbTable
     // Fields
     public $id;
     public $nama_dokter;
+    public $webusers_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -83,6 +84,18 @@ class Dokter extends DbTable
         $this->nama_dokter->Sortable = true; // Allow sort
         $this->nama_dokter->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->nama_dokter->Param, "CustomMsg");
         $this->Fields['nama_dokter'] = &$this->nama_dokter;
+
+        // webusers_id
+        $this->webusers_id = new DbField('dokter', 'dokter', 'x_webusers_id', 'webusers_id', '`webusers_id`', '`webusers_id`', 20, 20, -1, false, '`webusers_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->webusers_id->Nullable = false; // NOT NULL field
+        $this->webusers_id->Required = true; // Required field
+        $this->webusers_id->Sortable = true; // Allow sort
+        $this->webusers_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->webusers_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->webusers_id->Lookup = new Lookup('webusers_id', 'webusers', false, 'id', ["username","rumah_sakit_id","",""], [], [], [], [], [], [], '', '');
+        $this->webusers_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->webusers_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->webusers_id->Param, "CustomMsg");
+        $this->Fields['webusers_id'] = &$this->webusers_id;
     }
 
     // Field Visibility
@@ -498,6 +511,7 @@ class Dokter extends DbTable
         }
         $this->id->DbValue = $row['id'];
         $this->nama_dokter->DbValue = $row['nama_dokter'];
+        $this->webusers_id->DbValue = $row['webusers_id'];
     }
 
     // Delete uploaded files
@@ -820,6 +834,7 @@ SORTHTML;
         }
         $this->id->setDbValue($row['id']);
         $this->nama_dokter->setDbValue($row['nama_dokter']);
+        $this->webusers_id->setDbValue($row['webusers_id']);
     }
 
     // Render list row values
@@ -836,6 +851,8 @@ SORTHTML;
 
         // nama_dokter
 
+        // webusers_id
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
         $this->id->ViewCustomAttributes = "";
@@ -843,6 +860,27 @@ SORTHTML;
         // nama_dokter
         $this->nama_dokter->ViewValue = $this->nama_dokter->CurrentValue;
         $this->nama_dokter->ViewCustomAttributes = "";
+
+        // webusers_id
+        $curVal = trim(strval($this->webusers_id->CurrentValue));
+        if ($curVal != "") {
+            $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
+            if ($this->webusers_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->webusers_id->ViewValue = $this->webusers_id->displayValue($arwrk);
+                } else {
+                    $this->webusers_id->ViewValue = $this->webusers_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->webusers_id->ViewValue = null;
+        }
+        $this->webusers_id->ViewCustomAttributes = "";
 
         // id
         $this->id->LinkCustomAttributes = "";
@@ -853,6 +891,11 @@ SORTHTML;
         $this->nama_dokter->LinkCustomAttributes = "";
         $this->nama_dokter->HrefValue = "";
         $this->nama_dokter->TooltipValue = "";
+
+        // webusers_id
+        $this->webusers_id->LinkCustomAttributes = "";
+        $this->webusers_id->HrefValue = "";
+        $this->webusers_id->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -884,6 +927,11 @@ SORTHTML;
         $this->nama_dokter->EditValue = $this->nama_dokter->CurrentValue;
         $this->nama_dokter->PlaceHolder = RemoveHtml($this->nama_dokter->caption());
 
+        // webusers_id
+        $this->webusers_id->EditAttrs["class"] = "form-control";
+        $this->webusers_id->EditCustomAttributes = "";
+        $this->webusers_id->PlaceHolder = RemoveHtml($this->webusers_id->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -914,9 +962,11 @@ SORTHTML;
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->nama_dokter);
+                    $doc->exportCaption($this->webusers_id);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->nama_dokter);
+                    $doc->exportCaption($this->webusers_id);
                 }
                 $doc->endExportRow();
             }
@@ -948,9 +998,11 @@ SORTHTML;
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->nama_dokter);
+                        $doc->exportField($this->webusers_id);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->nama_dokter);
+                        $doc->exportField($this->webusers_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }

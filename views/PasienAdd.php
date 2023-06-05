@@ -30,9 +30,7 @@ loadjs.ready("head", function () {
         ["status_perkawinan", [fields.status_perkawinan.visible && fields.status_perkawinan.required ? ew.Validators.required(fields.status_perkawinan.caption) : null], fields.status_perkawinan.isInvalid],
         ["no_bpjs", [fields.no_bpjs.visible && fields.no_bpjs.required ? ew.Validators.required(fields.no_bpjs.caption) : null], fields.no_bpjs.isInvalid],
         ["no_hp", [fields.no_hp.visible && fields.no_hp.required ? ew.Validators.required(fields.no_hp.caption) : null], fields.no_hp.isInvalid],
-        ["_password", [fields._password.visible && fields._password.required ? ew.Validators.required(fields._password.caption) : null], fields._password.isInvalid],
-        ["foto_profil", [fields.foto_profil.visible && fields.foto_profil.required ? ew.Validators.required(fields.foto_profil.caption) : null], fields.foto_profil.isInvalid],
-        ["foto_profil_par_id", [fields.foto_profil_par_id.visible && fields.foto_profil_par_id.required ? ew.Validators.required(fields.foto_profil_par_id.caption) : null], fields.foto_profil_par_id.isInvalid]
+        ["_password", [fields._password.visible && fields._password.required ? ew.Validators.required(fields._password.caption) : null], fields._password.isInvalid]
     ]);
 
     // Set invalid fields
@@ -364,30 +362,6 @@ loadjs.ready(["fpasienadd", "datetimepicker"], function() {
 </div>
 <?= $Page->_password->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->_password->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->foto_profil->Visible) { // foto_profil ?>
-    <div id="r_foto_profil" class="form-group row">
-        <label id="elh_pasien_foto_profil" for="x_foto_profil" class="<?= $Page->LeftColumnClass ?>"><?= $Page->foto_profil->caption() ?><?= $Page->foto_profil->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->foto_profil->cellAttributes() ?>>
-<span id="el_pasien_foto_profil">
-<input type="<?= $Page->foto_profil->getInputTextType() ?>" data-table="pasien" data-field="x_foto_profil" name="x_foto_profil" id="x_foto_profil" size="30" maxlength="255" placeholder="<?= HtmlEncode($Page->foto_profil->getPlaceHolder()) ?>" value="<?= $Page->foto_profil->EditValue ?>"<?= $Page->foto_profil->editAttributes() ?> aria-describedby="x_foto_profil_help">
-<?= $Page->foto_profil->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->foto_profil->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->foto_profil_par_id->Visible) { // foto_profil_par_id ?>
-    <div id="r_foto_profil_par_id" class="form-group row">
-        <label id="elh_pasien_foto_profil_par_id" for="x_foto_profil_par_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->foto_profil_par_id->caption() ?><?= $Page->foto_profil_par_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->foto_profil_par_id->cellAttributes() ?>>
-<span id="el_pasien_foto_profil_par_id">
-<input type="<?= $Page->foto_profil_par_id->getInputTextType() ?>" data-table="pasien" data-field="x_foto_profil_par_id" name="x_foto_profil_par_id" id="x_foto_profil_par_id" size="30" maxlength="255" placeholder="<?= HtmlEncode($Page->foto_profil_par_id->getPlaceHolder()) ?>" value="<?= $Page->foto_profil_par_id->EditValue ?>"<?= $Page->foto_profil_par_id->editAttributes() ?> aria-describedby="x_foto_profil_par_id_help">
-<?= $Page->foto_profil_par_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->foto_profil_par_id->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

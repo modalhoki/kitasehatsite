@@ -33,6 +33,7 @@ class RumahSakit extends DbTable
     public $alamat;
     public $daerah_id;
     public $foto_rumah_sakit;
+    public $jam_buka;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -113,6 +114,14 @@ class RumahSakit extends DbTable
         $this->foto_rumah_sakit->Sortable = true; // Allow sort
         $this->foto_rumah_sakit->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->foto_rumah_sakit->Param, "CustomMsg");
         $this->Fields['foto_rumah_sakit'] = &$this->foto_rumah_sakit;
+
+        // jam_buka
+        $this->jam_buka = new DbField('rumah_sakit', 'rumah_sakit', 'x_jam_buka', 'jam_buka', '`jam_buka`', '`jam_buka`', 200, 13, -1, false, '`jam_buka`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->jam_buka->Nullable = false; // NOT NULL field
+        $this->jam_buka->Required = true; // Required field
+        $this->jam_buka->Sortable = true; // Allow sort
+        $this->jam_buka->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->jam_buka->Param, "CustomMsg");
+        $this->Fields['jam_buka'] = &$this->jam_buka;
     }
 
     // Field Visibility
@@ -557,6 +566,7 @@ class RumahSakit extends DbTable
         $this->alamat->DbValue = $row['alamat'];
         $this->daerah_id->DbValue = $row['daerah_id'];
         $this->foto_rumah_sakit->DbValue = $row['foto_rumah_sakit'];
+        $this->jam_buka->DbValue = $row['jam_buka'];
     }
 
     // Delete uploaded files
@@ -890,6 +900,7 @@ SORTHTML;
         $this->alamat->setDbValue($row['alamat']);
         $this->daerah_id->setDbValue($row['daerah_id']);
         $this->foto_rumah_sakit->setDbValue($row['foto_rumah_sakit']);
+        $this->jam_buka->setDbValue($row['jam_buka']);
     }
 
     // Render list row values
@@ -911,6 +922,8 @@ SORTHTML;
         // daerah_id
 
         // foto_rumah_sakit
+
+        // jam_buka
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -949,6 +962,10 @@ SORTHTML;
         $this->foto_rumah_sakit->ViewValue = $this->foto_rumah_sakit->CurrentValue;
         $this->foto_rumah_sakit->ViewCustomAttributes = "";
 
+        // jam_buka
+        $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
+        $this->jam_buka->ViewCustomAttributes = "";
+
         // id
         $this->id->LinkCustomAttributes = "";
         $this->id->HrefValue = "";
@@ -981,6 +998,11 @@ SORTHTML;
             $this->foto_rumah_sakit->HrefValue = "";
         }
         $this->foto_rumah_sakit->TooltipValue = "";
+
+        // jam_buka
+        $this->jam_buka->LinkCustomAttributes = "";
+        $this->jam_buka->HrefValue = "";
+        $this->jam_buka->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1035,6 +1057,15 @@ SORTHTML;
         $this->foto_rumah_sakit->EditValue = $this->foto_rumah_sakit->CurrentValue;
         $this->foto_rumah_sakit->PlaceHolder = RemoveHtml($this->foto_rumah_sakit->caption());
 
+        // jam_buka
+        $this->jam_buka->EditAttrs["class"] = "form-control";
+        $this->jam_buka->EditCustomAttributes = "";
+        if (!$this->jam_buka->Raw) {
+            $this->jam_buka->CurrentValue = HtmlDecode($this->jam_buka->CurrentValue);
+        }
+        $this->jam_buka->EditValue = $this->jam_buka->CurrentValue;
+        $this->jam_buka->PlaceHolder = RemoveHtml($this->jam_buka->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1068,12 +1099,14 @@ SORTHTML;
                     $doc->exportCaption($this->alamat);
                     $doc->exportCaption($this->daerah_id);
                     $doc->exportCaption($this->foto_rumah_sakit);
+                    $doc->exportCaption($this->jam_buka);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->nama);
                     $doc->exportCaption($this->alamat);
                     $doc->exportCaption($this->daerah_id);
                     $doc->exportCaption($this->foto_rumah_sakit);
+                    $doc->exportCaption($this->jam_buka);
                 }
                 $doc->endExportRow();
             }
@@ -1108,12 +1141,14 @@ SORTHTML;
                         $doc->exportField($this->alamat);
                         $doc->exportField($this->daerah_id);
                         $doc->exportField($this->foto_rumah_sakit);
+                        $doc->exportField($this->jam_buka);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->nama);
                         $doc->exportField($this->alamat);
                         $doc->exportField($this->daerah_id);
                         $doc->exportField($this->foto_rumah_sakit);
+                        $doc->exportField($this->jam_buka);
                     }
                     $doc->endExportRow($rowCnt);
                 }

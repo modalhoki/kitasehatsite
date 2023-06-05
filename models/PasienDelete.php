@@ -387,7 +387,7 @@ class PasienDelete extends Pasien
         $this->no_hp->setVisibility();
         $this->_password->setVisibility();
         $this->foto_profil->setVisibility();
-        $this->foto_profil_par_id->setVisibility();
+        $this->foto_profil_par_id->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -700,10 +700,6 @@ class PasienDelete extends Pasien
             $this->foto_profil->ViewValue = $this->foto_profil->CurrentValue;
             $this->foto_profil->ViewCustomAttributes = "";
 
-            // foto_profil_par_id
-            $this->foto_profil_par_id->ViewValue = $this->foto_profil_par_id->CurrentValue;
-            $this->foto_profil_par_id->ViewCustomAttributes = "";
-
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -776,11 +772,6 @@ class PasienDelete extends Pasien
                 $this->foto_profil->HrefValue = "";
             }
             $this->foto_profil->TooltipValue = "";
-
-            // foto_profil_par_id
-            $this->foto_profil_par_id->LinkCustomAttributes = "";
-            $this->foto_profil_par_id->HrefValue = "";
-            $this->foto_profil_par_id->TooltipValue = "";
         }
 
         // Call Row Rendered event

@@ -50,6 +50,9 @@ $Page->showMessage();
 <?php if ($Page->nama_dokter->Visible) { // nama_dokter ?>
         <th class="<?= $Page->nama_dokter->headerCellClass() ?>"><span id="elh_dokter_nama_dokter" class="dokter_nama_dokter"><?= $Page->nama_dokter->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->webusers_id->Visible) { // webusers_id ?>
+        <th class="<?= $Page->webusers_id->headerCellClass() ?>"><span id="elh_dokter_webusers_id" class="dokter_webusers_id"><?= $Page->webusers_id->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -84,6 +87,14 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_dokter_nama_dokter" class="dokter_nama_dokter">
 <span<?= $Page->nama_dokter->viewAttributes() ?>>
 <?= $Page->nama_dokter->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->webusers_id->Visible) { // webusers_id ?>
+        <td <?= $Page->webusers_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_dokter_webusers_id" class="dokter_webusers_id">
+<span<?= $Page->webusers_id->viewAttributes() ?>>
+<?= $Page->webusers_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

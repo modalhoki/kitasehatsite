@@ -28,7 +28,8 @@ loadjs.ready("head", function () {
         fields = currentTable.fields;
     fdokterlistsrch.addFields([
         ["id", [], fields.id.isInvalid],
-        ["nama_dokter", [], fields.nama_dokter.isInvalid]
+        ["nama_dokter", [], fields.nama_dokter.isInvalid],
+        ["webusers_id", [], fields.webusers_id.isInvalid]
     ]);
 
     // Set invalid fields
@@ -181,6 +182,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->nama_dokter->Visible) { // nama_dokter ?>
         <th data-name="nama_dokter" class="<?= $Page->nama_dokter->headerCellClass() ?>"><div id="elh_dokter_nama_dokter" class="dokter_nama_dokter"><?= $Page->renderSort($Page->nama_dokter) ?></div></th>
 <?php } ?>
+<?php if ($Page->webusers_id->Visible) { // webusers_id ?>
+        <th data-name="webusers_id" class="<?= $Page->webusers_id->headerCellClass() ?>"><div id="elh_dokter_webusers_id" class="dokter_webusers_id"><?= $Page->renderSort($Page->webusers_id) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -261,6 +265,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_dokter_nama_dokter">
 <span<?= $Page->nama_dokter->viewAttributes() ?>>
 <?= $Page->nama_dokter->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->webusers_id->Visible) { // webusers_id ?>
+        <td data-name="webusers_id" <?= $Page->webusers_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_dokter_webusers_id">
+<span<?= $Page->webusers_id->viewAttributes() ?>>
+<?= $Page->webusers_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

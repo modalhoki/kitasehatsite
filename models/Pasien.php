@@ -178,7 +178,7 @@ class Pasien extends DbTable
 
         // foto_profil_par_id
         $this->foto_profil_par_id = new DbField('pasien', 'pasien', 'x_foto_profil_par_id', 'foto_profil_par_id', '`foto_profil_par_id`', '`foto_profil_par_id`', 200, 255, -1, false, '`foto_profil_par_id`', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->foto_profil_par_id->Sortable = true; // Allow sort
+        $this->foto_profil_par_id->Sortable = false; // Allow sort
         $this->foto_profil_par_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->foto_profil_par_id->Param, "CustomMsg");
         $this->Fields['foto_profil_par_id'] = &$this->foto_profil_par_id;
     }
@@ -1324,7 +1324,6 @@ SORTHTML;
                     $doc->exportCaption($this->no_hp);
                     $doc->exportCaption($this->_password);
                     $doc->exportCaption($this->foto_profil);
-                    $doc->exportCaption($this->foto_profil_par_id);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->nik);
@@ -1339,7 +1338,6 @@ SORTHTML;
                     $doc->exportCaption($this->no_hp);
                     $doc->exportCaption($this->_password);
                     $doc->exportCaption($this->foto_profil);
-                    $doc->exportCaption($this->foto_profil_par_id);
                 }
                 $doc->endExportRow();
             }
@@ -1382,7 +1380,6 @@ SORTHTML;
                         $doc->exportField($this->no_hp);
                         $doc->exportField($this->_password);
                         $doc->exportField($this->foto_profil);
-                        $doc->exportField($this->foto_profil_par_id);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->nik);
@@ -1397,7 +1394,6 @@ SORTHTML;
                         $doc->exportField($this->no_hp);
                         $doc->exportField($this->_password);
                         $doc->exportField($this->foto_profil);
-                        $doc->exportField($this->foto_profil_par_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }

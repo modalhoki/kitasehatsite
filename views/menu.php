@@ -22,7 +22,9 @@ $sideMenu->addMenuItem(1, "mi_antrean_bpjs", $MenuLanguage->MenuPhrase("1", "Men
 $sideMenu->addMenuItem(2, "mi_antrean_umum", $MenuLanguage->MenuPhrase("2", "MenuText"), $MenuRelativePath . "antreanumumlist", -1, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}antrean_umum'), false, false, "", "", false);
 $sideMenu->addMenuItem(10, "mci_Master", $MenuLanguage->MenuPhrase("10", "MenuText"), "", -1, "", true, false, true, "", "", false);
 $sideMenu->addMenuItem(3, "mi_daerah", $MenuLanguage->MenuPhrase("3", "MenuText"), $MenuRelativePath . "daerahlist", 10, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}daerah'), false, false, "", "", false);
-$sideMenu->addMenuItem(4, "mi_dokter", $MenuLanguage->MenuPhrase("4", "MenuText"), $MenuRelativePath . "dokterlist", 10, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}dokter'), false, false, "", "", false);
+$sideMenu->addMenuItem(36, "mci_Data_Dokter", $MenuLanguage->MenuPhrase("36", "MenuText"), "", 10, "", true, false, true, "", "", false);
+$sideMenu->addMenuItem(4, "mi_dokter", $MenuLanguage->MenuPhrase("4", "MenuText"), $MenuRelativePath . "dokterlist", 36, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}dokter'), false, false, "", "", false);
+$sideMenu->addMenuItem(23, "mi_praktik_poli", $MenuLanguage->MenuPhrase("23", "MenuText"), $MenuRelativePath . "praktikpolilist", 36, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}praktik_poli'), false, false, "", "", false);
 $sideMenu->addMenuItem(5, "mi_fasilitas", $MenuLanguage->MenuPhrase("5", "MenuText"), $MenuRelativePath . "fasilitaslist", 10, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}fasilitas'), false, false, "", "", false);
 $sideMenu->addMenuItem(22, "mci_Pasien", $MenuLanguage->MenuPhrase("22", "MenuText"), "", 10, "", true, false, true, "", "", false);
 $sideMenu->addMenuItem(7, "mi_pasien", $MenuLanguage->MenuPhrase("7", "MenuText"), $MenuRelativePath . "pasienlist", 22, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}pasien'), false, false, "", "", false);

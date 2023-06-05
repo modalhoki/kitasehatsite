@@ -39,8 +39,7 @@ loadjs.ready("head", function () {
         ["no_bpjs", [], fields.no_bpjs.isInvalid],
         ["no_hp", [], fields.no_hp.isInvalid],
         ["_password", [], fields._password.isInvalid],
-        ["foto_profil", [], fields.foto_profil.isInvalid],
-        ["foto_profil_par_id", [], fields.foto_profil_par_id.isInvalid]
+        ["foto_profil", [], fields.foto_profil.isInvalid]
     ]);
 
     // Set invalid fields
@@ -314,9 +313,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->foto_profil->Visible) { // foto_profil ?>
         <th data-name="foto_profil" class="<?= $Page->foto_profil->headerCellClass() ?>"><div id="elh_pasien_foto_profil" class="pasien_foto_profil"><?= $Page->renderSort($Page->foto_profil) ?></div></th>
 <?php } ?>
-<?php if ($Page->foto_profil_par_id->Visible) { // foto_profil_par_id ?>
-        <th data-name="foto_profil_par_id" class="<?= $Page->foto_profil_par_id->headerCellClass() ?>"><div id="elh_pasien_foto_profil_par_id" class="pasien_foto_profil_par_id"><?= $Page->renderSort($Page->foto_profil_par_id) ?></div></th>
-<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -490,14 +486,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <?= $Page->foto_profil->getViewValue() ?>
 <?php } ?>
 </span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->foto_profil_par_id->Visible) { // foto_profil_par_id ?>
-        <td data-name="foto_profil_par_id" <?= $Page->foto_profil_par_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_pasien_foto_profil_par_id">
-<span<?= $Page->foto_profil_par_id->viewAttributes() ?>>
-<?= $Page->foto_profil_par_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -193,17 +193,6 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->foto_profil_par_id->Visible) { // foto_profil_par_id ?>
-    <tr id="r_foto_profil_par_id">
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_pasien_foto_profil_par_id"><?= $Page->foto_profil_par_id->caption() ?></span></td>
-        <td data-name="foto_profil_par_id" <?= $Page->foto_profil_par_id->cellAttributes() ?>>
-<span id="el_pasien_foto_profil_par_id">
-<span<?= $Page->foto_profil_par_id->viewAttributes() ?>>
-<?= $Page->foto_profil_par_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 </table>
 <?php
     if (in_array("kontak_darurat", explode(",", $Page->getCurrentDetailTable())) && $kontak_darurat->DetailView) {

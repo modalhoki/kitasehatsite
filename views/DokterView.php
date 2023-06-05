@@ -67,6 +67,17 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->webusers_id->Visible) { // webusers_id ?>
+    <tr id="r_webusers_id">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_dokter_webusers_id"><?= $Page->webusers_id->caption() ?></span></td>
+        <td data-name="webusers_id" <?= $Page->webusers_id->cellAttributes() ?>>
+<span id="el_dokter_webusers_id">
+<span<?= $Page->webusers_id->viewAttributes() ?>>
+<?= $Page->webusers_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 <?php

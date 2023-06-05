@@ -31,7 +31,8 @@ loadjs.ready("head", function () {
         ["nama", [], fields.nama.isInvalid],
         ["alamat", [], fields.alamat.isInvalid],
         ["daerah_id", [], fields.daerah_id.isInvalid],
-        ["foto_rumah_sakit", [], fields.foto_rumah_sakit.isInvalid]
+        ["foto_rumah_sakit", [], fields.foto_rumah_sakit.isInvalid],
+        ["jam_buka", [], fields.jam_buka.isInvalid]
     ]);
 
     // Set invalid fields
@@ -239,6 +240,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->foto_rumah_sakit->Visible) { // foto_rumah_sakit ?>
         <th data-name="foto_rumah_sakit" class="<?= $Page->foto_rumah_sakit->headerCellClass() ?>"><div id="elh_rumah_sakit_foto_rumah_sakit" class="rumah_sakit_foto_rumah_sakit"><?= $Page->renderSort($Page->foto_rumah_sakit) ?></div></th>
 <?php } ?>
+<?php if ($Page->jam_buka->Visible) { // jam_buka ?>
+        <th data-name="jam_buka" class="<?= $Page->jam_buka->headerCellClass() ?>"><div id="elh_rumah_sakit_jam_buka" class="rumah_sakit_jam_buka"><?= $Page->renderSort($Page->jam_buka) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -348,6 +352,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <?= $Page->foto_rumah_sakit->getViewValue() ?>
 <?php } ?>
 </span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->jam_buka->Visible) { // jam_buka ?>
+        <td data-name="jam_buka" <?= $Page->jam_buka->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_rumah_sakit_jam_buka">
+<span<?= $Page->jam_buka->viewAttributes() ?>>
+<?= $Page->jam_buka->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

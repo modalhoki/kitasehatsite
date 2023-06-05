@@ -62,9 +62,6 @@ $Page->showMessage();
 <?php if ($Page->administrator_rumah_sakit->Visible) { // administrator_rumah_sakit ?>
         <th class="<?= $Page->administrator_rumah_sakit->headerCellClass() ?>"><span id="elh_webusers_administrator_rumah_sakit" class="webusers_administrator_rumah_sakit"><?= $Page->administrator_rumah_sakit->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->dokter_id->Visible) { // dokter_id ?>
-        <th class="<?= $Page->dokter_id->headerCellClass() ?>"><span id="elh_webusers_dokter_id" class="webusers_dokter_id"><?= $Page->dokter_id->caption() ?></span></th>
-<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -131,14 +128,6 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_webusers_administrator_rumah_sakit" class="webusers_administrator_rumah_sakit">
 <span<?= $Page->administrator_rumah_sakit->viewAttributes() ?>>
 <?= $Page->administrator_rumah_sakit->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->dokter_id->Visible) { // dokter_id ?>
-        <td <?= $Page->dokter_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_webusers_dokter_id" class="webusers_dokter_id">
-<span<?= $Page->dokter_id->viewAttributes() ?>>
-<?= $Page->dokter_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

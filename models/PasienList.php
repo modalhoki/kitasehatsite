@@ -581,7 +581,7 @@ class PasienList extends Pasien
         $this->no_hp->setVisibility();
         $this->_password->setVisibility();
         $this->foto_profil->setVisibility();
-        $this->foto_profil_par_id->setVisibility();
+        $this->foto_profil_par_id->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -1431,7 +1431,6 @@ class PasienList extends Pasien
             $this->updateSort($this->no_hp); // no_hp
             $this->updateSort($this->_password); // password
             $this->updateSort($this->foto_profil); // foto_profil
-            $this->updateSort($this->foto_profil_par_id); // foto_profil_par_id
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -2304,10 +2303,6 @@ class PasienList extends Pasien
             $this->foto_profil->ViewValue = $this->foto_profil->CurrentValue;
             $this->foto_profil->ViewCustomAttributes = "";
 
-            // foto_profil_par_id
-            $this->foto_profil_par_id->ViewValue = $this->foto_profil_par_id->CurrentValue;
-            $this->foto_profil_par_id->ViewCustomAttributes = "";
-
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -2398,14 +2393,6 @@ class PasienList extends Pasien
             if (!$this->isExport()) {
                 $this->foto_profil->ViewValue = $this->highlightValue($this->foto_profil);
             }
-
-            // foto_profil_par_id
-            $this->foto_profil_par_id->LinkCustomAttributes = "";
-            $this->foto_profil_par_id->HrefValue = "";
-            $this->foto_profil_par_id->TooltipValue = "";
-            if (!$this->isExport()) {
-                $this->foto_profil_par_id->ViewValue = $this->highlightValue($this->foto_profil_par_id);
-            }
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -2493,15 +2480,6 @@ class PasienList extends Pasien
             }
             $this->foto_profil->EditValue = HtmlEncode($this->foto_profil->AdvancedSearch->SearchValue);
             $this->foto_profil->PlaceHolder = RemoveHtml($this->foto_profil->caption());
-
-            // foto_profil_par_id
-            $this->foto_profil_par_id->EditAttrs["class"] = "form-control";
-            $this->foto_profil_par_id->EditCustomAttributes = "";
-            if (!$this->foto_profil_par_id->Raw) {
-                $this->foto_profil_par_id->AdvancedSearch->SearchValue = HtmlDecode($this->foto_profil_par_id->AdvancedSearch->SearchValue);
-            }
-            $this->foto_profil_par_id->EditValue = HtmlEncode($this->foto_profil_par_id->AdvancedSearch->SearchValue);
-            $this->foto_profil_par_id->PlaceHolder = RemoveHtml($this->foto_profil_par_id->caption());
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();

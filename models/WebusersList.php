@@ -574,7 +574,6 @@ class WebusersList extends Webusers
         $this->role->setVisibility();
         $this->rumah_sakit_id->setVisibility();
         $this->administrator_rumah_sakit->setVisibility();
-        $this->dokter_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -604,7 +603,6 @@ class WebusersList extends Webusers
         // Set up lookup cache
         $this->setupLookupOptions($this->rumah_sakit_id);
         $this->setupLookupOptions($this->administrator_rumah_sakit);
-        $this->setupLookupOptions($this->dokter_id);
 
         // Search filters
         $srchAdvanced = ""; // Advanced search filter
@@ -874,7 +872,6 @@ class WebusersList extends Webusers
         $filterList = Concat($filterList, $this->role->AdvancedSearch->toJson(), ","); // Field role
         $filterList = Concat($filterList, $this->rumah_sakit_id->AdvancedSearch->toJson(), ","); // Field rumah_sakit_id
         $filterList = Concat($filterList, $this->administrator_rumah_sakit->AdvancedSearch->toJson(), ","); // Field administrator_rumah_sakit
-        $filterList = Concat($filterList, $this->dokter_id->AdvancedSearch->toJson(), ","); // Field dokter_id
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -962,14 +959,6 @@ class WebusersList extends Webusers
         $this->administrator_rumah_sakit->AdvancedSearch->SearchValue2 = @$filter["y_administrator_rumah_sakit"];
         $this->administrator_rumah_sakit->AdvancedSearch->SearchOperator2 = @$filter["w_administrator_rumah_sakit"];
         $this->administrator_rumah_sakit->AdvancedSearch->save();
-
-        // Field dokter_id
-        $this->dokter_id->AdvancedSearch->SearchValue = @$filter["x_dokter_id"];
-        $this->dokter_id->AdvancedSearch->SearchOperator = @$filter["z_dokter_id"];
-        $this->dokter_id->AdvancedSearch->SearchCondition = @$filter["v_dokter_id"];
-        $this->dokter_id->AdvancedSearch->SearchValue2 = @$filter["y_dokter_id"];
-        $this->dokter_id->AdvancedSearch->SearchOperator2 = @$filter["w_dokter_id"];
-        $this->dokter_id->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1148,7 +1137,6 @@ class WebusersList extends Webusers
             $this->updateSort($this->role); // role
             $this->updateSort($this->rumah_sakit_id); // rumah_sakit_id
             $this->updateSort($this->administrator_rumah_sakit); // administrator_rumah_sakit
-            $this->updateSort($this->dokter_id); // dokter_id
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1194,7 +1182,6 @@ class WebusersList extends Webusers
                 $this->role->setSort("");
                 $this->rumah_sakit_id->setSort("");
                 $this->administrator_rumah_sakit->setSort("");
-                $this->dokter_id->setSort("");
             }
 
             // Reset start position
@@ -1624,7 +1611,6 @@ class WebusersList extends Webusers
         $this->role->setDbValue($row['role']);
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
         $this->administrator_rumah_sakit->setDbValue($row['administrator_rumah_sakit']);
-        $this->dokter_id->setDbValue($row['dokter_id']);
     }
 
     // Return a row with default values
@@ -1637,7 +1623,6 @@ class WebusersList extends Webusers
         $row['role'] = null;
         $row['rumah_sakit_id'] = null;
         $row['administrator_rumah_sakit'] = null;
-        $row['dokter_id'] = null;
         return $row;
     }
 
@@ -1686,8 +1671,6 @@ class WebusersList extends Webusers
         // rumah_sakit_id
 
         // administrator_rumah_sakit
-
-        // dokter_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1755,27 +1738,6 @@ class WebusersList extends Webusers
             }
             $this->administrator_rumah_sakit->ViewCustomAttributes = "";
 
-            // dokter_id
-            $curVal = trim(strval($this->dokter_id->CurrentValue));
-            if ($curVal != "") {
-                $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-                if ($this->dokter_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                    } else {
-                        $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->dokter_id->ViewValue = null;
-            }
-            $this->dokter_id->ViewCustomAttributes = "";
-
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -1805,11 +1767,6 @@ class WebusersList extends Webusers
             $this->administrator_rumah_sakit->LinkCustomAttributes = "";
             $this->administrator_rumah_sakit->HrefValue = "";
             $this->administrator_rumah_sakit->TooltipValue = "";
-
-            // dokter_id
-            $this->dokter_id->LinkCustomAttributes = "";
-            $this->dokter_id->HrefValue = "";
-            $this->dokter_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1895,8 +1852,6 @@ class WebusersList extends Webusers
                 case "x_rumah_sakit_id":
                     break;
                 case "x_administrator_rumah_sakit":
-                    break;
-                case "x_dokter_id":
                     break;
                 default:
                     $lookupFilter = "";

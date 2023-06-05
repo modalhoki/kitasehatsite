@@ -111,17 +111,6 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->dokter_id->Visible) { // dokter_id ?>
-    <tr id="r_dokter_id">
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_webusers_dokter_id"><?= $Page->dokter_id->caption() ?></span></td>
-        <td data-name="dokter_id" <?= $Page->dokter_id->cellAttributes() ?>>
-<span id="el_webusers_dokter_id">
-<span<?= $Page->dokter_id->viewAttributes() ?>>
-<?= $Page->dokter_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 </table>
 </form>
 <?php

@@ -523,6 +523,7 @@ class RumahSakitView extends RumahSakit
         $this->alamat->setVisibility();
         $this->daerah_id->setVisibility();
         $this->foto_rumah_sakit->setVisibility();
+        $this->jam_buka->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -828,6 +829,7 @@ class RumahSakitView extends RumahSakit
         $this->alamat->setDbValue($row['alamat']);
         $this->daerah_id->setDbValue($row['daerah_id']);
         $this->foto_rumah_sakit->setDbValue($row['foto_rumah_sakit']);
+        $this->jam_buka->setDbValue($row['jam_buka']);
     }
 
     // Return a row with default values
@@ -839,6 +841,7 @@ class RumahSakitView extends RumahSakit
         $row['alamat'] = null;
         $row['daerah_id'] = null;
         $row['foto_rumah_sakit'] = null;
+        $row['jam_buka'] = null;
         return $row;
     }
 
@@ -869,6 +872,8 @@ class RumahSakitView extends RumahSakit
         // daerah_id
 
         // foto_rumah_sakit
+
+        // jam_buka
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -907,6 +912,10 @@ class RumahSakitView extends RumahSakit
             $this->foto_rumah_sakit->ViewValue = $this->foto_rumah_sakit->CurrentValue;
             $this->foto_rumah_sakit->ViewCustomAttributes = "";
 
+            // jam_buka
+            $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
+            $this->jam_buka->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -939,6 +948,11 @@ class RumahSakitView extends RumahSakit
                 $this->foto_rumah_sakit->HrefValue = "";
             }
             $this->foto_rumah_sakit->TooltipValue = "";
+
+            // jam_buka
+            $this->jam_buka->LinkCustomAttributes = "";
+            $this->jam_buka->HrefValue = "";
+            $this->jam_buka->TooltipValue = "";
         }
 
         // Call Row Rendered event

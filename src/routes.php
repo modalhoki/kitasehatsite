@@ -185,6 +185,17 @@ return function (App $app) {
         }
     );
 
+    // praktik_poli
+    $app->any('/praktikpolilist', PraktikPoliController::class . ':list')->add(PermissionMiddleware::class)->setName('praktikpolilist-praktik_poli-list'); // list
+    $app->any('/praktikpoliadd', PraktikPoliController::class . ':add')->add(PermissionMiddleware::class)->setName('praktikpoliadd-praktik_poli-add'); // add
+    $app->group(
+        '/praktik_poli',
+        function (RouteCollectorProxy $group) {
+            $group->any('/' . Config("LIST_ACTION") . '', PraktikPoliController::class . ':list')->add(PermissionMiddleware::class)->setName('praktik_poli/list-praktik_poli-list-2'); // list
+            $group->any('/' . Config("ADD_ACTION") . '', PraktikPoliController::class . ':add')->add(PermissionMiddleware::class)->setName('praktik_poli/add-praktik_poli-add-2'); // add
+        }
+    );
+
     // error
     $app->any('/error', OthersController::class . ':error')->add(PermissionMiddleware::class)->setName('error');
 

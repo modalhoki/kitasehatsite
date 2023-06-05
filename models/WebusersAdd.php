@@ -470,7 +470,6 @@ class WebusersAdd extends Webusers
         $this->role->setVisibility();
         $this->rumah_sakit_id->setVisibility();
         $this->administrator_rumah_sakit->setVisibility();
-        $this->dokter_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -487,7 +486,6 @@ class WebusersAdd extends Webusers
         // Set up lookup cache
         $this->setupLookupOptions($this->rumah_sakit_id);
         $this->setupLookupOptions($this->administrator_rumah_sakit);
-        $this->setupLookupOptions($this->dokter_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -632,8 +630,6 @@ class WebusersAdd extends Webusers
         $this->rumah_sakit_id->OldValue = $this->rumah_sakit_id->CurrentValue;
         $this->administrator_rumah_sakit->CurrentValue = null;
         $this->administrator_rumah_sakit->OldValue = $this->administrator_rumah_sakit->CurrentValue;
-        $this->dokter_id->CurrentValue = null;
-        $this->dokter_id->OldValue = $this->dokter_id->CurrentValue;
     }
 
     // Load form values
@@ -692,16 +688,6 @@ class WebusersAdd extends Webusers
             }
         }
 
-        // Check field name 'dokter_id' first before field var 'x_dokter_id'
-        $val = $CurrentForm->hasValue("dokter_id") ? $CurrentForm->getValue("dokter_id") : $CurrentForm->getValue("x_dokter_id");
-        if (!$this->dokter_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->dokter_id->Visible = false; // Disable update for API request
-            } else {
-                $this->dokter_id->setFormValue($val);
-            }
-        }
-
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -715,7 +701,6 @@ class WebusersAdd extends Webusers
         $this->role->CurrentValue = $this->role->FormValue;
         $this->rumah_sakit_id->CurrentValue = $this->rumah_sakit_id->FormValue;
         $this->administrator_rumah_sakit->CurrentValue = $this->administrator_rumah_sakit->FormValue;
-        $this->dokter_id->CurrentValue = $this->dokter_id->FormValue;
     }
 
     /**
@@ -780,7 +765,6 @@ class WebusersAdd extends Webusers
         $this->role->setDbValue($row['role']);
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
         $this->administrator_rumah_sakit->setDbValue($row['administrator_rumah_sakit']);
-        $this->dokter_id->setDbValue($row['dokter_id']);
     }
 
     // Return a row with default values
@@ -794,7 +778,6 @@ class WebusersAdd extends Webusers
         $row['role'] = $this->role->CurrentValue;
         $row['rumah_sakit_id'] = $this->rumah_sakit_id->CurrentValue;
         $row['administrator_rumah_sakit'] = $this->administrator_rumah_sakit->CurrentValue;
-        $row['dokter_id'] = $this->dokter_id->CurrentValue;
         return $row;
     }
 
@@ -837,8 +820,6 @@ class WebusersAdd extends Webusers
         // rumah_sakit_id
 
         // administrator_rumah_sakit
-
-        // dokter_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -906,27 +887,6 @@ class WebusersAdd extends Webusers
             }
             $this->administrator_rumah_sakit->ViewCustomAttributes = "";
 
-            // dokter_id
-            $curVal = trim(strval($this->dokter_id->CurrentValue));
-            if ($curVal != "") {
-                $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-                if ($this->dokter_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                    } else {
-                        $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->dokter_id->ViewValue = null;
-            }
-            $this->dokter_id->ViewCustomAttributes = "";
-
             // username
             $this->_username->LinkCustomAttributes = "";
             $this->_username->HrefValue = "";
@@ -951,11 +911,6 @@ class WebusersAdd extends Webusers
             $this->administrator_rumah_sakit->LinkCustomAttributes = "";
             $this->administrator_rumah_sakit->HrefValue = "";
             $this->administrator_rumah_sakit->TooltipValue = "";
-
-            // dokter_id
-            $this->dokter_id->LinkCustomAttributes = "";
-            $this->dokter_id->HrefValue = "";
-            $this->dokter_id->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // username
             $this->_username->EditAttrs["class"] = "form-control";
@@ -1052,39 +1007,6 @@ class WebusersAdd extends Webusers
                 $this->administrator_rumah_sakit->PlaceHolder = RemoveHtml($this->administrator_rumah_sakit->caption());
             }
 
-            // dokter_id
-            $this->dokter_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->dokter_id->CurrentValue));
-            if ($curVal != "") {
-                $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-            } else {
-                $this->dokter_id->ViewValue = $this->dokter_id->Lookup !== null && is_array($this->dokter_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->dokter_id->ViewValue !== null) { // Load from cache
-                $this->dokter_id->EditValue = array_values($this->dokter_id->Lookup->Options);
-                if ($this->dokter_id->ViewValue == "") {
-                    $this->dokter_id->ViewValue = $Language->phrase("PleaseSelect");
-                }
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = "`id`" . SearchString("=", $this->dokter_id->CurrentValue, DATATYPE_NUMBER, "");
-                }
-                $sqlWrk = $this->dokter_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                } else {
-                    $this->dokter_id->ViewValue = $Language->phrase("PleaseSelect");
-                }
-                $arwrk = $rswrk;
-                $this->dokter_id->EditValue = $arwrk;
-            }
-            $this->dokter_id->PlaceHolder = RemoveHtml($this->dokter_id->caption());
-
             // Add refer script
 
             // username
@@ -1106,10 +1028,6 @@ class WebusersAdd extends Webusers
             // administrator_rumah_sakit
             $this->administrator_rumah_sakit->LinkCustomAttributes = "";
             $this->administrator_rumah_sakit->HrefValue = "";
-
-            // dokter_id
-            $this->dokter_id->LinkCustomAttributes = "";
-            $this->dokter_id->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1159,11 +1077,6 @@ class WebusersAdd extends Webusers
         if ($this->administrator_rumah_sakit->Required) {
             if (!$this->administrator_rumah_sakit->IsDetailKey && EmptyValue($this->administrator_rumah_sakit->FormValue)) {
                 $this->administrator_rumah_sakit->addErrorMessage(str_replace("%s", $this->administrator_rumah_sakit->caption(), $this->administrator_rumah_sakit->RequiredErrorMessage));
-            }
-        }
-        if ($this->dokter_id->Required) {
-            if (!$this->dokter_id->IsDetailKey && EmptyValue($this->dokter_id->FormValue)) {
-                $this->dokter_id->addErrorMessage(str_replace("%s", $this->dokter_id->caption(), $this->dokter_id->RequiredErrorMessage));
             }
         }
 
@@ -1233,9 +1146,6 @@ class WebusersAdd extends Webusers
 
         // administrator_rumah_sakit
         $this->administrator_rumah_sakit->setDbValueDef($rsnew, $this->administrator_rumah_sakit->CurrentValue, null, false);
-
-        // dokter_id
-        $this->dokter_id->setDbValueDef($rsnew, $this->dokter_id->CurrentValue, null, false);
 
         // id
 
@@ -1317,8 +1227,6 @@ class WebusersAdd extends Webusers
                 case "x_rumah_sakit_id":
                     break;
                 case "x_administrator_rumah_sakit":
-                    break;
-                case "x_dokter_id":
                     break;
                 default:
                     $lookupFilter = "";

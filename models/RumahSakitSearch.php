@@ -463,6 +463,7 @@ class RumahSakitSearch extends RumahSakit
         $this->alamat->setVisibility();
         $this->daerah_id->setVisibility();
         $this->foto_rumah_sakit->setVisibility();
+        $this->jam_buka->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -547,6 +548,7 @@ class RumahSakitSearch extends RumahSakit
         $this->buildSearchUrl($srchUrl, $this->alamat); // alamat
         $this->buildSearchUrl($srchUrl, $this->daerah_id); // daerah_id
         $this->buildSearchUrl($srchUrl, $this->foto_rumah_sakit); // foto_rumah_sakit
+        $this->buildSearchUrl($srchUrl, $this->jam_buka); // jam_buka
         if ($srchUrl != "") {
             $srchUrl .= "&";
         }
@@ -642,6 +644,9 @@ class RumahSakitSearch extends RumahSakit
         if ($this->foto_rumah_sakit->AdvancedSearch->post()) {
             $hasValue = true;
         }
+        if ($this->jam_buka->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
         return $hasValue;
     }
 
@@ -666,6 +671,8 @@ class RumahSakitSearch extends RumahSakit
         // daerah_id
 
         // foto_rumah_sakit
+
+        // jam_buka
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -704,6 +711,10 @@ class RumahSakitSearch extends RumahSakit
             $this->foto_rumah_sakit->ViewValue = $this->foto_rumah_sakit->CurrentValue;
             $this->foto_rumah_sakit->ViewCustomAttributes = "";
 
+            // jam_buka
+            $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
+            $this->jam_buka->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -736,6 +747,11 @@ class RumahSakitSearch extends RumahSakit
                 $this->foto_rumah_sakit->HrefValue = "";
             }
             $this->foto_rumah_sakit->TooltipValue = "";
+
+            // jam_buka
+            $this->jam_buka->LinkCustomAttributes = "";
+            $this->jam_buka->HrefValue = "";
+            $this->jam_buka->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -802,6 +818,15 @@ class RumahSakitSearch extends RumahSakit
             }
             $this->foto_rumah_sakit->EditValue = HtmlEncode($this->foto_rumah_sakit->AdvancedSearch->SearchValue);
             $this->foto_rumah_sakit->PlaceHolder = RemoveHtml($this->foto_rumah_sakit->caption());
+
+            // jam_buka
+            $this->jam_buka->EditAttrs["class"] = "form-control";
+            $this->jam_buka->EditCustomAttributes = "";
+            if (!$this->jam_buka->Raw) {
+                $this->jam_buka->AdvancedSearch->SearchValue = HtmlDecode($this->jam_buka->AdvancedSearch->SearchValue);
+            }
+            $this->jam_buka->EditValue = HtmlEncode($this->jam_buka->AdvancedSearch->SearchValue);
+            $this->jam_buka->PlaceHolder = RemoveHtml($this->jam_buka->caption());
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -844,6 +869,7 @@ class RumahSakitSearch extends RumahSakit
         $this->alamat->AdvancedSearch->load();
         $this->daerah_id->AdvancedSearch->load();
         $this->foto_rumah_sakit->AdvancedSearch->load();
+        $this->jam_buka->AdvancedSearch->load();
     }
 
     // Set up Breadcrumb

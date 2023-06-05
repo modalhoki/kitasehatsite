@@ -83,9 +83,6 @@ $Page->showMessage();
 <?php if ($Page->foto_profil->Visible) { // foto_profil ?>
         <th class="<?= $Page->foto_profil->headerCellClass() ?>"><span id="elh_pasien_foto_profil" class="pasien_foto_profil"><?= $Page->foto_profil->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->foto_profil_par_id->Visible) { // foto_profil_par_id ?>
-        <th class="<?= $Page->foto_profil_par_id->headerCellClass() ?>"><span id="elh_pasien_foto_profil_par_id" class="pasien_foto_profil_par_id"><?= $Page->foto_profil_par_id->caption() ?></span></th>
-<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -213,14 +210,6 @@ while (!$Page->Recordset->EOF) {
 <?= $Page->foto_profil->getViewValue() ?>
 <?php } ?>
 </span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->foto_profil_par_id->Visible) { // foto_profil_par_id ?>
-        <td <?= $Page->foto_profil_par_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_pasien_foto_profil_par_id" class="pasien_foto_profil_par_id">
-<span<?= $Page->foto_profil_par_id->viewAttributes() ?>>
-<?= $Page->foto_profil_par_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -105,6 +105,17 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->jam_buka->Visible) { // jam_buka ?>
+    <tr id="r_jam_buka">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_rumah_sakit_jam_buka"><?= $Page->jam_buka->caption() ?></span></td>
+        <td data-name="jam_buka" <?= $Page->jam_buka->cellAttributes() ?>>
+<span id="el_rumah_sakit_jam_buka">
+<span<?= $Page->jam_buka->viewAttributes() ?>>
+<?= $Page->jam_buka->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 <?php
     if (in_array("fasilitas_rumah_sakit", explode(",", $Page->getCurrentDetailTable())) && $fasilitas_rumah_sakit->DetailView) {

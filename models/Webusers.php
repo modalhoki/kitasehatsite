@@ -34,7 +34,6 @@ class Webusers extends DbTable
     public $role;
     public $rumah_sakit_id;
     public $administrator_rumah_sakit;
-    public $dokter_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -130,16 +129,6 @@ class Webusers extends DbTable
         $this->administrator_rumah_sakit->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->administrator_rumah_sakit->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->administrator_rumah_sakit->Param, "CustomMsg");
         $this->Fields['administrator_rumah_sakit'] = &$this->administrator_rumah_sakit;
-
-        // dokter_id
-        $this->dokter_id = new DbField('webusers', 'webusers', 'x_dokter_id', 'dokter_id', '`dokter_id`', '`dokter_id`', 20, 20, -1, false, '`dokter_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->dokter_id->Sortable = true; // Allow sort
-        $this->dokter_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->dokter_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->dokter_id->Lookup = new Lookup('dokter_id', 'dokter', false, 'id', ["nama_dokter","","",""], [], [], [], [], [], [], '', '');
-        $this->dokter_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->dokter_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->dokter_id->Param, "CustomMsg");
-        $this->Fields['dokter_id'] = &$this->dokter_id;
     }
 
     // Field Visibility
@@ -573,7 +562,6 @@ class Webusers extends DbTable
         $this->role->DbValue = $row['role'];
         $this->rumah_sakit_id->DbValue = $row['rumah_sakit_id'];
         $this->administrator_rumah_sakit->DbValue = $row['administrator_rumah_sakit'];
-        $this->dokter_id->DbValue = $row['dokter_id'];
     }
 
     // Delete uploaded files
@@ -900,7 +888,6 @@ SORTHTML;
         $this->role->setDbValue($row['role']);
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
         $this->administrator_rumah_sakit->setDbValue($row['administrator_rumah_sakit']);
-        $this->dokter_id->setDbValue($row['dokter_id']);
     }
 
     // Render list row values
@@ -924,8 +911,6 @@ SORTHTML;
         // rumah_sakit_id
 
         // administrator_rumah_sakit
-
-        // dokter_id
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -993,27 +978,6 @@ SORTHTML;
         }
         $this->administrator_rumah_sakit->ViewCustomAttributes = "";
 
-        // dokter_id
-        $curVal = trim(strval($this->dokter_id->CurrentValue));
-        if ($curVal != "") {
-            $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-            if ($this->dokter_id->ViewValue === null) { // Lookup from database
-                $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                } else {
-                    $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
-                }
-            }
-        } else {
-            $this->dokter_id->ViewValue = null;
-        }
-        $this->dokter_id->ViewCustomAttributes = "";
-
         // id
         $this->id->LinkCustomAttributes = "";
         $this->id->HrefValue = "";
@@ -1043,11 +1007,6 @@ SORTHTML;
         $this->administrator_rumah_sakit->LinkCustomAttributes = "";
         $this->administrator_rumah_sakit->HrefValue = "";
         $this->administrator_rumah_sakit->TooltipValue = "";
-
-        // dokter_id
-        $this->dokter_id->LinkCustomAttributes = "";
-        $this->dokter_id->HrefValue = "";
-        $this->dokter_id->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1130,11 +1089,6 @@ SORTHTML;
             $this->administrator_rumah_sakit->PlaceHolder = RemoveHtml($this->administrator_rumah_sakit->caption());
         }
 
-        // dokter_id
-        $this->dokter_id->EditAttrs["class"] = "form-control";
-        $this->dokter_id->EditCustomAttributes = "";
-        $this->dokter_id->PlaceHolder = RemoveHtml($this->dokter_id->caption());
-
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1169,7 +1123,6 @@ SORTHTML;
                     $doc->exportCaption($this->role);
                     $doc->exportCaption($this->rumah_sakit_id);
                     $doc->exportCaption($this->administrator_rumah_sakit);
-                    $doc->exportCaption($this->dokter_id);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->_username);
@@ -1177,7 +1130,6 @@ SORTHTML;
                     $doc->exportCaption($this->role);
                     $doc->exportCaption($this->rumah_sakit_id);
                     $doc->exportCaption($this->administrator_rumah_sakit);
-                    $doc->exportCaption($this->dokter_id);
                 }
                 $doc->endExportRow();
             }
@@ -1213,7 +1165,6 @@ SORTHTML;
                         $doc->exportField($this->role);
                         $doc->exportField($this->rumah_sakit_id);
                         $doc->exportField($this->administrator_rumah_sakit);
-                        $doc->exportField($this->dokter_id);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->_username);
@@ -1221,7 +1172,6 @@ SORTHTML;
                         $doc->exportField($this->role);
                         $doc->exportField($this->rumah_sakit_id);
                         $doc->exportField($this->administrator_rumah_sakit);
-                        $doc->exportField($this->dokter_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }

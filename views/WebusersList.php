@@ -153,9 +153,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->administrator_rumah_sakit->Visible) { // administrator_rumah_sakit ?>
         <th data-name="administrator_rumah_sakit" class="<?= $Page->administrator_rumah_sakit->headerCellClass() ?>"><div id="elh_webusers_administrator_rumah_sakit" class="webusers_administrator_rumah_sakit"><?= $Page->renderSort($Page->administrator_rumah_sakit) ?></div></th>
 <?php } ?>
-<?php if ($Page->dokter_id->Visible) { // dokter_id ?>
-        <th data-name="dokter_id" class="<?= $Page->dokter_id->headerCellClass() ?>"><div id="elh_webusers_dokter_id" class="webusers_dokter_id"><?= $Page->renderSort($Page->dokter_id) ?></div></th>
-<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -268,14 +265,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_webusers_administrator_rumah_sakit">
 <span<?= $Page->administrator_rumah_sakit->viewAttributes() ?>>
 <?= $Page->administrator_rumah_sakit->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->dokter_id->Visible) { // dokter_id ?>
-        <td data-name="dokter_id" <?= $Page->dokter_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_webusers_dokter_id">
-<span<?= $Page->dokter_id->viewAttributes() ?>>
-<?= $Page->dokter_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

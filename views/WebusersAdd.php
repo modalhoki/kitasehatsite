@@ -24,8 +24,7 @@ loadjs.ready("head", function () {
         ["_password", [fields._password.visible && fields._password.required ? ew.Validators.required(fields._password.caption) : null], fields._password.isInvalid],
         ["role", [fields.role.visible && fields.role.required ? ew.Validators.required(fields.role.caption) : null], fields.role.isInvalid],
         ["rumah_sakit_id", [fields.rumah_sakit_id.visible && fields.rumah_sakit_id.required ? ew.Validators.required(fields.rumah_sakit_id.caption) : null], fields.rumah_sakit_id.isInvalid],
-        ["administrator_rumah_sakit", [fields.administrator_rumah_sakit.visible && fields.administrator_rumah_sakit.required ? ew.Validators.required(fields.administrator_rumah_sakit.caption) : null], fields.administrator_rumah_sakit.isInvalid],
-        ["dokter_id", [fields.dokter_id.visible && fields.dokter_id.required ? ew.Validators.required(fields.dokter_id.caption) : null], fields.dokter_id.isInvalid]
+        ["administrator_rumah_sakit", [fields.administrator_rumah_sakit.visible && fields.administrator_rumah_sakit.required ? ew.Validators.required(fields.administrator_rumah_sakit.caption) : null], fields.administrator_rumah_sakit.isInvalid]
     ]);
 
     // Set invalid fields
@@ -95,7 +94,6 @@ loadjs.ready("head", function () {
     fwebusersadd.lists.role = <?= $Page->role->toClientList($Page) ?>;
     fwebusersadd.lists.rumah_sakit_id = <?= $Page->rumah_sakit_id->toClientList($Page) ?>;
     fwebusersadd.lists.administrator_rumah_sakit = <?= $Page->administrator_rumah_sakit->toClientList($Page) ?>;
-    fwebusersadd.lists.dokter_id = <?= $Page->dokter_id->toClientList($Page) ?>;
     loadjs.done("fwebusersadd");
 });
 </script>
@@ -262,25 +260,6 @@ loadjs.ready("head", function() {
 </script>
 </span>
 <?php } ?>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->dokter_id->Visible) { // dokter_id ?>
-    <div id="r_dokter_id" class="form-group row">
-        <label id="elh_webusers_dokter_id" for="x_dokter_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->dokter_id->caption() ?><?= $Page->dokter_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->dokter_id->cellAttributes() ?>>
-<span id="el_webusers_dokter_id">
-<div class="input-group ew-lookup-list" aria-describedby="x_dokter_id_help">
-    <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x_dokter_id"><?= EmptyValue(strval($Page->dokter_id->ViewValue)) ? $Language->phrase("PleaseSelect") : $Page->dokter_id->ViewValue ?></div>
-    <div class="input-group-append">
-        <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Page->dokter_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Page->dokter_id->ReadOnly || $Page->dokter_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x_dokter_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
-    </div>
-</div>
-<div class="invalid-feedback"><?= $Page->dokter_id->getErrorMessage() ?></div>
-<?= $Page->dokter_id->getCustomMessage() ?>
-<?= $Page->dokter_id->Lookup->getParamTag($Page, "p_x_dokter_id") ?>
-<input type="hidden" is="selection-list" data-table="webusers" data-field="x_dokter_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->dokter_id->displayValueSeparatorAttribute() ?>" name="x_dokter_id" id="x_dokter_id" value="<?= $Page->dokter_id->CurrentValue ?>"<?= $Page->dokter_id->editAttributes() ?>>
-</span>
 </div></div>
     </div>
 <?php } ?>

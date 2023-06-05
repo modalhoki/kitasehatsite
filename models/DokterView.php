@@ -520,6 +520,7 @@ class DokterView extends Dokter
         $this->CurrentAction = Param("action"); // Set up current action
         $this->id->setVisibility();
         $this->nama_dokter->setVisibility();
+        $this->webusers_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -534,6 +535,7 @@ class DokterView extends Dokter
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->webusers_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -735,6 +737,7 @@ class DokterView extends Dokter
         }
         $this->id->setDbValue($row['id']);
         $this->nama_dokter->setDbValue($row['nama_dokter']);
+        $this->webusers_id->setDbValue($row['webusers_id']);
     }
 
     // Return a row with default values
@@ -743,6 +746,7 @@ class DokterView extends Dokter
         $row = [];
         $row['id'] = null;
         $row['nama_dokter'] = null;
+        $row['webusers_id'] = null;
         return $row;
     }
 
@@ -767,6 +771,8 @@ class DokterView extends Dokter
         // id
 
         // nama_dokter
+
+        // webusers_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -775,6 +781,27 @@ class DokterView extends Dokter
             // nama_dokter
             $this->nama_dokter->ViewValue = $this->nama_dokter->CurrentValue;
             $this->nama_dokter->ViewCustomAttributes = "";
+
+            // webusers_id
+            $curVal = trim(strval($this->webusers_id->CurrentValue));
+            if ($curVal != "") {
+                $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
+                if ($this->webusers_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->webusers_id->ViewValue = $this->webusers_id->displayValue($arwrk);
+                    } else {
+                        $this->webusers_id->ViewValue = $this->webusers_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->webusers_id->ViewValue = null;
+            }
+            $this->webusers_id->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";
@@ -785,6 +812,11 @@ class DokterView extends Dokter
             $this->nama_dokter->LinkCustomAttributes = "";
             $this->nama_dokter->HrefValue = "";
             $this->nama_dokter->TooltipValue = "";
+
+            // webusers_id
+            $this->webusers_id->LinkCustomAttributes = "";
+            $this->webusers_id->HrefValue = "";
+            $this->webusers_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -817,6 +849,8 @@ class DokterView extends Dokter
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_webusers_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

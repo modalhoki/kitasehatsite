@@ -82,7 +82,7 @@ class FasilitasRumahSakit extends DbTable
         $this->rumah_sakit_id->Nullable = false; // NOT NULL field
         $this->rumah_sakit_id->Required = true; // Required field
         $this->rumah_sakit_id->Sortable = true; // Allow sort
-        $this->rumah_sakit_id->Lookup = new Lookup('rumah_sakit_id', 'rumah_sakit', false, 'id', ["nama","alamat","",""], [], [], [], [], [], [], '', '');
+        $this->rumah_sakit_id->Lookup = new Lookup('rumah_sakit_id', 'rumah_sakit', false, 'id', ["nama","daerah_id","",""], [], [], [], [], [], [], '', '');
         $this->rumah_sakit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->rumah_sakit_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->rumah_sakit_id->Param, "CustomMsg");
         $this->Fields['rumah_sakit_id'] = &$this->rumah_sakit_id;

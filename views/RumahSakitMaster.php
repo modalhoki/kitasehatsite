@@ -69,6 +69,17 @@ $rumah_sakit = Container("rumah_sakit");
 </td>
         </tr>
 <?php } ?>
+<?php if ($rumah_sakit->jam_buka->Visible) { // jam_buka ?>
+        <tr id="r_jam_buka">
+            <td class="<?= $rumah_sakit->TableLeftColumnClass ?>"><?= $rumah_sakit->jam_buka->caption() ?></td>
+            <td <?= $rumah_sakit->jam_buka->cellAttributes() ?>>
+<span id="el_rumah_sakit_jam_buka">
+<span<?= $rumah_sakit->jam_buka->viewAttributes() ?>>
+<?= $rumah_sakit->jam_buka->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
     </tbody>
 </table>
 </div>

@@ -157,17 +157,6 @@ $pasien = Container("pasien");
 </td>
         </tr>
 <?php } ?>
-<?php if ($pasien->foto_profil_par_id->Visible) { // foto_profil_par_id ?>
-        <tr id="r_foto_profil_par_id">
-            <td class="<?= $pasien->TableLeftColumnClass ?>"><?= $pasien->foto_profil_par_id->caption() ?></td>
-            <td <?= $pasien->foto_profil_par_id->cellAttributes() ?>>
-<span id="el_pasien_foto_profil_par_id">
-<span<?= $pasien->foto_profil_par_id->viewAttributes() ?>>
-<?= $pasien->foto_profil_par_id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
     </tbody>
 </table>
 </div>

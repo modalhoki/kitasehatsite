@@ -476,8 +476,8 @@ class PasienAdd extends Pasien
         $this->no_bpjs->setVisibility();
         $this->no_hp->setVisibility();
         $this->_password->setVisibility();
-        $this->foto_profil->setVisibility();
-        $this->foto_profil_par_id->setVisibility();
+        $this->foto_profil->Visible = false;
+        $this->foto_profil_par_id->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -784,26 +784,6 @@ class PasienAdd extends Pasien
             }
         }
 
-        // Check field name 'foto_profil' first before field var 'x_foto_profil'
-        $val = $CurrentForm->hasValue("foto_profil") ? $CurrentForm->getValue("foto_profil") : $CurrentForm->getValue("x_foto_profil");
-        if (!$this->foto_profil->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->foto_profil->Visible = false; // Disable update for API request
-            } else {
-                $this->foto_profil->setFormValue($val);
-            }
-        }
-
-        // Check field name 'foto_profil_par_id' first before field var 'x_foto_profil_par_id'
-        $val = $CurrentForm->hasValue("foto_profil_par_id") ? $CurrentForm->getValue("foto_profil_par_id") : $CurrentForm->getValue("x_foto_profil_par_id");
-        if (!$this->foto_profil_par_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->foto_profil_par_id->Visible = false; // Disable update for API request
-            } else {
-                $this->foto_profil_par_id->setFormValue($val);
-            }
-        }
-
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -824,8 +804,6 @@ class PasienAdd extends Pasien
         $this->no_bpjs->CurrentValue = $this->no_bpjs->FormValue;
         $this->no_hp->CurrentValue = $this->no_hp->FormValue;
         $this->_password->CurrentValue = $this->_password->FormValue;
-        $this->foto_profil->CurrentValue = $this->foto_profil->FormValue;
-        $this->foto_profil_par_id->CurrentValue = $this->foto_profil_par_id->FormValue;
     }
 
     /**
@@ -1042,10 +1020,6 @@ class PasienAdd extends Pasien
             $this->foto_profil->ViewValue = $this->foto_profil->CurrentValue;
             $this->foto_profil->ViewCustomAttributes = "";
 
-            // foto_profil_par_id
-            $this->foto_profil_par_id->ViewValue = $this->foto_profil_par_id->CurrentValue;
-            $this->foto_profil_par_id->ViewCustomAttributes = "";
-
             // nik
             $this->nik->LinkCustomAttributes = "";
             $this->nik->HrefValue = "";
@@ -1100,24 +1074,6 @@ class PasienAdd extends Pasien
             $this->_password->LinkCustomAttributes = "";
             $this->_password->HrefValue = "";
             $this->_password->TooltipValue = "";
-
-            // foto_profil
-            $this->foto_profil->LinkCustomAttributes = "";
-            if (!EmptyValue($this->foto_profil->CurrentValue)) {
-                $this->foto_profil->HrefValue = $this->foto_profil->CurrentValue; // Add prefix/suffix
-                $this->foto_profil->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->foto_profil->HrefValue = FullUrl($this->foto_profil->HrefValue, "href");
-                }
-            } else {
-                $this->foto_profil->HrefValue = "";
-            }
-            $this->foto_profil->TooltipValue = "";
-
-            // foto_profil_par_id
-            $this->foto_profil_par_id->LinkCustomAttributes = "";
-            $this->foto_profil_par_id->HrefValue = "";
-            $this->foto_profil_par_id->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // nik
             $this->nik->EditAttrs["class"] = "form-control";
@@ -1191,24 +1147,6 @@ class PasienAdd extends Pasien
             $this->_password->EditCustomAttributes = "";
             $this->_password->PlaceHolder = RemoveHtml($this->_password->caption());
 
-            // foto_profil
-            $this->foto_profil->EditAttrs["class"] = "form-control";
-            $this->foto_profil->EditCustomAttributes = "";
-            if (!$this->foto_profil->Raw) {
-                $this->foto_profil->CurrentValue = HtmlDecode($this->foto_profil->CurrentValue);
-            }
-            $this->foto_profil->EditValue = HtmlEncode($this->foto_profil->CurrentValue);
-            $this->foto_profil->PlaceHolder = RemoveHtml($this->foto_profil->caption());
-
-            // foto_profil_par_id
-            $this->foto_profil_par_id->EditAttrs["class"] = "form-control";
-            $this->foto_profil_par_id->EditCustomAttributes = "";
-            if (!$this->foto_profil_par_id->Raw) {
-                $this->foto_profil_par_id->CurrentValue = HtmlDecode($this->foto_profil_par_id->CurrentValue);
-            }
-            $this->foto_profil_par_id->EditValue = HtmlEncode($this->foto_profil_par_id->CurrentValue);
-            $this->foto_profil_par_id->PlaceHolder = RemoveHtml($this->foto_profil_par_id->caption());
-
             // Add refer script
 
             // nik
@@ -1254,22 +1192,6 @@ class PasienAdd extends Pasien
             // password
             $this->_password->LinkCustomAttributes = "";
             $this->_password->HrefValue = "";
-
-            // foto_profil
-            $this->foto_profil->LinkCustomAttributes = "";
-            if (!EmptyValue($this->foto_profil->CurrentValue)) {
-                $this->foto_profil->HrefValue = $this->foto_profil->CurrentValue; // Add prefix/suffix
-                $this->foto_profil->LinkAttrs["target"] = ""; // Add target
-                if ($this->isExport()) {
-                    $this->foto_profil->HrefValue = FullUrl($this->foto_profil->HrefValue, "href");
-                }
-            } else {
-                $this->foto_profil->HrefValue = "";
-            }
-
-            // foto_profil_par_id
-            $this->foto_profil_par_id->LinkCustomAttributes = "";
-            $this->foto_profil_par_id->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1350,16 +1272,6 @@ class PasienAdd extends Pasien
         }
         if (!$this->_password->Raw && Config("REMOVE_XSS") && CheckPassword($this->_password->FormValue)) {
             $this->_password->addErrorMessage($Language->phrase("InvalidPasswordChars"));
-        }
-        if ($this->foto_profil->Required) {
-            if (!$this->foto_profil->IsDetailKey && EmptyValue($this->foto_profil->FormValue)) {
-                $this->foto_profil->addErrorMessage(str_replace("%s", $this->foto_profil->caption(), $this->foto_profil->RequiredErrorMessage));
-            }
-        }
-        if ($this->foto_profil_par_id->Required) {
-            if (!$this->foto_profil_par_id->IsDetailKey && EmptyValue($this->foto_profil_par_id->FormValue)) {
-                $this->foto_profil_par_id->addErrorMessage(str_replace("%s", $this->foto_profil_par_id->caption(), $this->foto_profil_par_id->RequiredErrorMessage));
-            }
         }
 
         // Validate detail grid
@@ -1442,12 +1354,6 @@ class PasienAdd extends Pasien
         if (!IsMaskedPassword($this->_password->CurrentValue)) {
             $this->_password->setDbValueDef($rsnew, $this->_password->CurrentValue, "", false);
         }
-
-        // foto_profil
-        $this->foto_profil->setDbValueDef($rsnew, $this->foto_profil->CurrentValue, null, false);
-
-        // foto_profil_par_id
-        $this->foto_profil_par_id->setDbValueDef($rsnew, $this->foto_profil_par_id->CurrentValue, null, false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);

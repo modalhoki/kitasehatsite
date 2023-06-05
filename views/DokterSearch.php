@@ -23,7 +23,8 @@ loadjs.ready("head", function () {
         fields = currentTable.fields;
     fdoktersearch.addFields([
         ["id", [ew.Validators.integer], fields.id.isInvalid],
-        ["nama_dokter", [], fields.nama_dokter.isInvalid]
+        ["nama_dokter", [], fields.nama_dokter.isInvalid],
+        ["webusers_id", [], fields.webusers_id.isInvalid]
     ]);
 
     // Set invalid fields
@@ -62,6 +63,7 @@ loadjs.ready("head", function () {
     fdoktersearch.validateRequired = <?= Config("CLIENT_VALIDATE") ? "true" : "false" ?>;
 
     // Dynamic selection lists
+    fdoktersearch.lists.webusers_id = <?= $Page->webusers_id->toClientList($Page) ?>;
     loadjs.done("fdoktersearch");
 });
 </script>
@@ -111,6 +113,29 @@ $Page->showMessage();
             <span id="el_dokter_nama_dokter" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->nama_dokter->getInputTextType() ?>" data-table="dokter" data-field="x_nama_dokter" name="x_nama_dokter" id="x_nama_dokter" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->nama_dokter->getPlaceHolder()) ?>" value="<?= $Page->nama_dokter->EditValue ?>"<?= $Page->nama_dokter->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->nama_dokter->getErrorMessage(false) ?></div>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->webusers_id->Visible) { // webusers_id ?>
+    <div id="r_webusers_id" class="form-group row">
+        <label for="x_webusers_id" class="<?= $Page->LeftColumnClass ?>"><span id="elh_dokter_webusers_id"><?= $Page->webusers_id->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_webusers_id" id="z_webusers_id" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->webusers_id->cellAttributes() ?>>
+            <span id="el_dokter_webusers_id" class="ew-search-field ew-search-field-single">
+<div class="input-group ew-lookup-list">
+    <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x_webusers_id"><?= EmptyValue(strval($Page->webusers_id->AdvancedSearch->ViewValue)) ? $Language->phrase("PleaseSelect") : $Page->webusers_id->AdvancedSearch->ViewValue ?></div>
+    <div class="input-group-append">
+        <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Page->webusers_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Page->webusers_id->ReadOnly || $Page->webusers_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x_webusers_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
+    </div>
+</div>
+<div class="invalid-feedback"><?= $Page->webusers_id->getErrorMessage(false) ?></div>
+<?= $Page->webusers_id->Lookup->getParamTag($Page, "p_x_webusers_id") ?>
+<input type="hidden" is="selection-list" data-table="dokter" data-field="x_webusers_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->webusers_id->displayValueSeparatorAttribute() ?>" name="x_webusers_id" id="x_webusers_id" value="<?= $Page->webusers_id->AdvancedSearch->SearchValue ?>"<?= $Page->webusers_id->editAttributes() ?>>
 </span>
         </div></div>
     </div>

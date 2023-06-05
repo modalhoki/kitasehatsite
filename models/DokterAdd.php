@@ -466,6 +466,7 @@ class DokterAdd extends Dokter
         $this->CurrentAction = Param("action"); // Set up current action
         $this->id->Visible = false;
         $this->nama_dokter->setVisibility();
+        $this->webusers_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -480,6 +481,7 @@ class DokterAdd extends Dokter
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->webusers_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -616,6 +618,8 @@ class DokterAdd extends Dokter
         $this->id->OldValue = $this->id->CurrentValue;
         $this->nama_dokter->CurrentValue = null;
         $this->nama_dokter->OldValue = $this->nama_dokter->CurrentValue;
+        $this->webusers_id->CurrentValue = null;
+        $this->webusers_id->OldValue = $this->webusers_id->CurrentValue;
     }
 
     // Load form values
@@ -634,6 +638,16 @@ class DokterAdd extends Dokter
             }
         }
 
+        // Check field name 'webusers_id' first before field var 'x_webusers_id'
+        $val = $CurrentForm->hasValue("webusers_id") ? $CurrentForm->getValue("webusers_id") : $CurrentForm->getValue("x_webusers_id");
+        if (!$this->webusers_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->webusers_id->Visible = false; // Disable update for API request
+            } else {
+                $this->webusers_id->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -643,6 +657,7 @@ class DokterAdd extends Dokter
     {
         global $CurrentForm;
         $this->nama_dokter->CurrentValue = $this->nama_dokter->FormValue;
+        $this->webusers_id->CurrentValue = $this->webusers_id->FormValue;
     }
 
     /**
@@ -694,6 +709,7 @@ class DokterAdd extends Dokter
         }
         $this->id->setDbValue($row['id']);
         $this->nama_dokter->setDbValue($row['nama_dokter']);
+        $this->webusers_id->setDbValue($row['webusers_id']);
     }
 
     // Return a row with default values
@@ -703,6 +719,7 @@ class DokterAdd extends Dokter
         $row = [];
         $row['id'] = $this->id->CurrentValue;
         $row['nama_dokter'] = $this->nama_dokter->CurrentValue;
+        $row['webusers_id'] = $this->webusers_id->CurrentValue;
         return $row;
     }
 
@@ -737,6 +754,8 @@ class DokterAdd extends Dokter
         // id
 
         // nama_dokter
+
+        // webusers_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -746,10 +765,36 @@ class DokterAdd extends Dokter
             $this->nama_dokter->ViewValue = $this->nama_dokter->CurrentValue;
             $this->nama_dokter->ViewCustomAttributes = "";
 
+            // webusers_id
+            $curVal = trim(strval($this->webusers_id->CurrentValue));
+            if ($curVal != "") {
+                $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
+                if ($this->webusers_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->webusers_id->ViewValue = $this->webusers_id->displayValue($arwrk);
+                    } else {
+                        $this->webusers_id->ViewValue = $this->webusers_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->webusers_id->ViewValue = null;
+            }
+            $this->webusers_id->ViewCustomAttributes = "";
+
             // nama_dokter
             $this->nama_dokter->LinkCustomAttributes = "";
             $this->nama_dokter->HrefValue = "";
             $this->nama_dokter->TooltipValue = "";
+
+            // webusers_id
+            $this->webusers_id->LinkCustomAttributes = "";
+            $this->webusers_id->HrefValue = "";
+            $this->webusers_id->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // nama_dokter
             $this->nama_dokter->EditAttrs["class"] = "form-control";
@@ -760,11 +805,50 @@ class DokterAdd extends Dokter
             $this->nama_dokter->EditValue = HtmlEncode($this->nama_dokter->CurrentValue);
             $this->nama_dokter->PlaceHolder = RemoveHtml($this->nama_dokter->caption());
 
+            // webusers_id
+            $this->webusers_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->webusers_id->CurrentValue));
+            if ($curVal != "") {
+                $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
+            } else {
+                $this->webusers_id->ViewValue = $this->webusers_id->Lookup !== null && is_array($this->webusers_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->webusers_id->ViewValue !== null) { // Load from cache
+                $this->webusers_id->EditValue = array_values($this->webusers_id->Lookup->Options);
+                if ($this->webusers_id->ViewValue == "") {
+                    $this->webusers_id->ViewValue = $Language->phrase("PleaseSelect");
+                }
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "`id`" . SearchString("=", $this->webusers_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->webusers_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->webusers_id->ViewValue = $this->webusers_id->displayValue($arwrk);
+                } else {
+                    $this->webusers_id->ViewValue = $Language->phrase("PleaseSelect");
+                }
+                $arwrk = $rswrk;
+                foreach ($arwrk as &$row)
+                    $row = $this->webusers_id->Lookup->renderViewRow($row);
+                $this->webusers_id->EditValue = $arwrk;
+            }
+            $this->webusers_id->PlaceHolder = RemoveHtml($this->webusers_id->caption());
+
             // Add refer script
 
             // nama_dokter
             $this->nama_dokter->LinkCustomAttributes = "";
             $this->nama_dokter->HrefValue = "";
+
+            // webusers_id
+            $this->webusers_id->LinkCustomAttributes = "";
+            $this->webusers_id->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -788,6 +872,11 @@ class DokterAdd extends Dokter
         if ($this->nama_dokter->Required) {
             if (!$this->nama_dokter->IsDetailKey && EmptyValue($this->nama_dokter->FormValue)) {
                 $this->nama_dokter->addErrorMessage(str_replace("%s", $this->nama_dokter->caption(), $this->nama_dokter->RequiredErrorMessage));
+            }
+        }
+        if ($this->webusers_id->Required) {
+            if (!$this->webusers_id->IsDetailKey && EmptyValue($this->webusers_id->FormValue)) {
+                $this->webusers_id->addErrorMessage(str_replace("%s", $this->webusers_id->caption(), $this->webusers_id->RequiredErrorMessage));
             }
         }
 
@@ -817,6 +906,9 @@ class DokterAdd extends Dokter
 
         // nama_dokter
         $this->nama_dokter->setDbValueDef($rsnew, $this->nama_dokter->CurrentValue, "", false);
+
+        // webusers_id
+        $this->webusers_id->setDbValueDef($rsnew, $this->webusers_id->CurrentValue, 0, false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
@@ -881,6 +973,8 @@ class DokterAdd extends Dokter
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_webusers_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

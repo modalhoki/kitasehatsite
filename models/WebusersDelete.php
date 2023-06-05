@@ -380,7 +380,6 @@ class WebusersDelete extends Webusers
         $this->role->setVisibility();
         $this->rumah_sakit_id->setVisibility();
         $this->administrator_rumah_sakit->setVisibility();
-        $this->dokter_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -397,7 +396,6 @@ class WebusersDelete extends Webusers
         // Set up lookup cache
         $this->setupLookupOptions($this->rumah_sakit_id);
         $this->setupLookupOptions($this->administrator_rumah_sakit);
-        $this->setupLookupOptions($this->dokter_id);
 
         // Set up Breadcrumb
         $this->setupBreadcrumb();
@@ -571,7 +569,6 @@ class WebusersDelete extends Webusers
         $this->role->setDbValue($row['role']);
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
         $this->administrator_rumah_sakit->setDbValue($row['administrator_rumah_sakit']);
-        $this->dokter_id->setDbValue($row['dokter_id']);
     }
 
     // Return a row with default values
@@ -584,7 +581,6 @@ class WebusersDelete extends Webusers
         $row['role'] = null;
         $row['rumah_sakit_id'] = null;
         $row['administrator_rumah_sakit'] = null;
-        $row['dokter_id'] = null;
         return $row;
     }
 
@@ -611,8 +607,6 @@ class WebusersDelete extends Webusers
         // rumah_sakit_id
 
         // administrator_rumah_sakit
-
-        // dokter_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -680,27 +674,6 @@ class WebusersDelete extends Webusers
             }
             $this->administrator_rumah_sakit->ViewCustomAttributes = "";
 
-            // dokter_id
-            $curVal = trim(strval($this->dokter_id->CurrentValue));
-            if ($curVal != "") {
-                $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-                if ($this->dokter_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                    } else {
-                        $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->dokter_id->ViewValue = null;
-            }
-            $this->dokter_id->ViewCustomAttributes = "";
-
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -730,11 +703,6 @@ class WebusersDelete extends Webusers
             $this->administrator_rumah_sakit->LinkCustomAttributes = "";
             $this->administrator_rumah_sakit->HrefValue = "";
             $this->administrator_rumah_sakit->TooltipValue = "";
-
-            // dokter_id
-            $this->dokter_id->LinkCustomAttributes = "";
-            $this->dokter_id->HrefValue = "";
-            $this->dokter_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -865,8 +833,6 @@ class WebusersDelete extends Webusers
                 case "x_rumah_sakit_id":
                     break;
                 case "x_administrator_rumah_sakit":
-                    break;
-                case "x_dokter_id":
                     break;
                 default:
                     $lookupFilter = "";
