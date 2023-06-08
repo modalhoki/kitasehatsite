@@ -25,7 +25,7 @@ pipeline {
         stage('Run the container') {
             steps {
                 echo 'Running the container'
-                sh 'docker run -d --name kitasehat-webportal -p 3002:80 ghcr.io/modalhoki/kitasehat-webportal:latest'
+                sh 'docker run -d --name kitasehat-webportal -p 3002:80 ghcr.io/modalhoki/kitasehat-webportal:latest --restart always'
             }
         }
 
