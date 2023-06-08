@@ -1,6 +1,6 @@
 FROM php:7.4.33-apache
 
-WORKDIR /var/www/html/
+WORKDIR /var/www/html/kitasehat/
 
 COPY kitasehat.conf /etc/apache2/sites-available/000-default.conf
 
@@ -16,5 +16,5 @@ COPY . .
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN composer update
 
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html
+RUN chown -R www-data:www-data /var/www/html/kitasehat && \
+    chmod -R 755 /var/www/html/kitasehat
