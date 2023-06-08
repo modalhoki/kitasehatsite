@@ -35,5 +35,12 @@ pipeline {
                 sh 'docker ps'
             }
         }
+
+        stage('Clear docker cache') {
+            steps {
+                echo 'Clearing docker cache'
+                sh 'docker builder prune -a -f'
+            }
+        }
     }
 }
