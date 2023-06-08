@@ -4,8 +4,8 @@ WORKDIR /var/www/html/kitasehat/
 
 COPY kitasehat.conf /etc/apache2/sites-available/000-default.conf
 
-RUN apt update && apt upgrade -y 
-RUN apt install -y git && \
+RUN apt update && apt upgrade -y && \
+    apt install -y git && \
     apt install -y libzip-dev zip && \
     docker-php-ext-install zip && \
     a2enmod rewrite && \
@@ -13,8 +13,7 @@ RUN apt install -y git && \
     docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
 COPY . .
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN composer update
-
-RUN chown -R www-data:www-data /var/www/html/kitasehat && \
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    composer update && \
+    chown -R www-data:www-data /var/www/html/kitasehat && \
     chmod -R 755 /var/www/html/kitasehat
