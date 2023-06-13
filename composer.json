@@ -23,7 +23,7 @@
 		"php-di/php-di": "^6.2.1",
 		"doctrine/dbal": "^2.12.1",
 		"monolog/monolog": "^2.1.0",
-		"firebase/php-jwt": "^5.2.0",
+		"firebase/php-jwt": ">=6.5.0",
 		"phpmailer/phpmailer": "^6.1.7",
 		"ezyang/htmlpurifier": "^4.13.0",
 		"mobiledetect/mobiledetectlib": "^2.8.34",
