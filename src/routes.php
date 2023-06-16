@@ -196,6 +196,36 @@ return function (App $app) {
         }
     );
 
+    // audittrail
+    $app->any('/audittraillist[/{id}]', AudittrailController::class . ':list')->add(PermissionMiddleware::class)->setName('audittraillist-audittrail-list'); // list
+    $app->any('/audittrailadd[/{id}]', AudittrailController::class . ':add')->add(PermissionMiddleware::class)->setName('audittrailadd-audittrail-add'); // add
+    $app->any('/audittrailview[/{id}]', AudittrailController::class . ':view')->add(PermissionMiddleware::class)->setName('audittrailview-audittrail-view'); // view
+    $app->any('/audittrailedit[/{id}]', AudittrailController::class . ':edit')->add(PermissionMiddleware::class)->setName('audittrailedit-audittrail-edit'); // edit
+    $app->any('/audittraildelete[/{id}]', AudittrailController::class . ':delete')->add(PermissionMiddleware::class)->setName('audittraildelete-audittrail-delete'); // delete
+    $app->group(
+        '/audittrail',
+        function (RouteCollectorProxy $group) {
+            $group->any('/' . Config("LIST_ACTION") . '[/{id}]', AudittrailController::class . ':list')->add(PermissionMiddleware::class)->setName('audittrail/list-audittrail-list-2'); // list
+            $group->any('/' . Config("ADD_ACTION") . '[/{id}]', AudittrailController::class . ':add')->add(PermissionMiddleware::class)->setName('audittrail/add-audittrail-add-2'); // add
+            $group->any('/' . Config("VIEW_ACTION") . '[/{id}]', AudittrailController::class . ':view')->add(PermissionMiddleware::class)->setName('audittrail/view-audittrail-view-2'); // view
+            $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', AudittrailController::class . ':edit')->add(PermissionMiddleware::class)->setName('audittrail/edit-audittrail-edit-2'); // edit
+            $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', AudittrailController::class . ':delete')->add(PermissionMiddleware::class)->setName('audittrail/delete-audittrail-delete-2'); // delete
+        }
+    );
+
+    // data_durasi
+    $app->any('/datadurasilist[/{id}]', DataDurasiController::class . ':list')->add(PermissionMiddleware::class)->setName('datadurasilist-data_durasi-list'); // list
+    $app->any('/datadurasiadd[/{id}]', DataDurasiController::class . ':add')->add(PermissionMiddleware::class)->setName('datadurasiadd-data_durasi-add'); // add
+    $app->any('/datadurasiview[/{id}]', DataDurasiController::class . ':view')->add(PermissionMiddleware::class)->setName('datadurasiview-data_durasi-view'); // view
+    $app->group(
+        '/data_durasi',
+        function (RouteCollectorProxy $group) {
+            $group->any('/' . Config("LIST_ACTION") . '[/{id}]', DataDurasiController::class . ':list')->add(PermissionMiddleware::class)->setName('data_durasi/list-data_durasi-list-2'); // list
+            $group->any('/' . Config("ADD_ACTION") . '[/{id}]', DataDurasiController::class . ':add')->add(PermissionMiddleware::class)->setName('data_durasi/add-data_durasi-add-2'); // add
+            $group->any('/' . Config("VIEW_ACTION") . '[/{id}]', DataDurasiController::class . ':view')->add(PermissionMiddleware::class)->setName('data_durasi/view-data_durasi-view-2'); // view
+        }
+    );
+
     // error
     $app->any('/error', OthersController::class . ':error')->add(PermissionMiddleware::class)->setName('error');
 

@@ -62,6 +62,9 @@ return [
     "webusers" => \DI\create(Webusers::class),
     "kontak_darurat" => \DI\create(KontakDarurat::class),
     "praktik_poli" => \DI\create(PraktikPoli::class),
+    "image_slider" => \DI\create(ImageSlider::class),
+    "audittrail" => \DI\create(Audittrail::class),
+    "data_durasi" => \DI\create(DataDurasi::class),
 
     // User table
     "usertable" => \DI\get("webusers"),

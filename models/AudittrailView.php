@@ -7,7 +7,7 @@ use Doctrine\DBAL\ParameterType;
 /**
  * Page class
  */
-class AntreanUmumView extends AntreanUmum
+class AudittrailView extends Audittrail
 {
     use MessagesTrait;
 
@@ -18,10 +18,10 @@ class AntreanUmumView extends AntreanUmum
     public $ProjectID = PROJECT_ID;
 
     // Table name
-    public $TableName = 'antrean_umum';
+    public $TableName = 'audittrail';
 
     // Page object name
-    public $PageObjName = "AntreanUmumView";
+    public $PageObjName = "AudittrailView";
 
     // Rendering View
     public $RenderingView = false;
@@ -57,14 +57,6 @@ class AntreanUmumView extends AntreanUmum
     public $GridEditUrl;
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
-
-    // Audit Trail
-    public $AuditTrailOnAdd = false;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
 
     // Page headings
     public $Heading = "";
@@ -167,9 +159,9 @@ class AntreanUmumView extends AntreanUmum
         // Parent constuctor
         parent::__construct();
 
-        // Table object (antrean_umum)
-        if (!isset($GLOBALS["antrean_umum"]) || get_class($GLOBALS["antrean_umum"]) == PROJECT_NAMESPACE . "antrean_umum") {
-            $GLOBALS["antrean_umum"] = &$this;
+        // Table object (audittrail)
+        if (!isset($GLOBALS["audittrail"]) || get_class($GLOBALS["audittrail"]) == PROJECT_NAMESPACE . "audittrail") {
+            $GLOBALS["audittrail"] = &$this;
         }
 
         // Page URL
@@ -187,7 +179,7 @@ class AntreanUmumView extends AntreanUmum
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'antrean_umum');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'audittrail');
         }
 
         // Start timer
@@ -285,7 +277,7 @@ class AntreanUmumView extends AntreanUmum
             }
             $class = PROJECT_NAMESPACE . Config("EXPORT_CLASSES." . $this->CustomExport);
             if (class_exists($class)) {
-                $doc = new $class(Container("antrean_umum"));
+                $doc = new $class(Container("audittrail"));
                 $doc->Text = @$content;
                 if ($this->isExport("email")) {
                     echo $this->exportEmail($doc->Text);
@@ -329,7 +321,7 @@ class AntreanUmumView extends AntreanUmum
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "antreanumumview") {
+                    if ($pageName == "audittrailview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -527,13 +519,15 @@ class AntreanUmumView extends AntreanUmum
         $this->IsModal = Param("modal") == "1";
         $this->CurrentAction = Param("action"); // Set up current action
         $this->id->setVisibility();
-        $this->nomor_antrean->setVisibility();
-        $this->waktu->setVisibility();
-        $this->pasien_id->setVisibility();
-        $this->fasilitas_id->setVisibility();
-        $this->rumah_sakit_id->setVisibility();
-        $this->status->setVisibility();
-        $this->keluhan_awal->setVisibility();
+        $this->datetime->setVisibility();
+        $this->script->setVisibility();
+        $this->user->setVisibility();
+        $this->_action->setVisibility();
+        $this->_table->setVisibility();
+        $this->field->setVisibility();
+        $this->keyvalue->setVisibility();
+        $this->oldvalue->setVisibility();
+        $this->newvalue->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -548,9 +542,6 @@ class AntreanUmumView extends AntreanUmum
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->pasien_id);
-        $this->setupLookupOptions($this->fasilitas_id);
-        $this->setupLookupOptions($this->rumah_sakit_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -572,7 +563,7 @@ class AntreanUmumView extends AntreanUmum
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "antreanumumlist"; // Return to list
+                $returnUrl = "audittraillist"; // Return to list
             }
 
             // Get action
@@ -595,12 +586,12 @@ class AntreanUmumView extends AntreanUmum
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "antreanumumlist"; // No matching record, return to list
+                        $returnUrl = "audittraillist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "antreanumumlist"; // Not page request, return to list
+            $returnUrl = "audittraillist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -654,6 +645,16 @@ class AntreanUmumView extends AntreanUmum
         $options = &$this->OtherOptions;
         $option = $options["action"];
 
+        // Add
+        $item = &$option->add("add");
+        $addcaption = HtmlTitle($Language->phrase("ViewPageAddLink"));
+        if ($this->IsModal) {
+            $item->Body = "<a class=\"ew-action ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,url:'" . HtmlEncode(GetUrl($this->AddUrl)) . "'});\">" . $Language->phrase("ViewPageAddLink") . "</a>";
+        } else {
+            $item->Body = "<a class=\"ew-action ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("ViewPageAddLink") . "</a>";
+        }
+        $item->Visible = ($this->AddUrl != "" && $Security->canAdd());
+
         // Edit
         $item = &$option->add("edit");
         $editcaption = HtmlTitle($Language->phrase("ViewPageEditLink"));
@@ -663,6 +664,25 @@ class AntreanUmumView extends AntreanUmum
             $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
         }
         $item->Visible = ($this->EditUrl != "" && $Security->canEdit());
+
+        // Copy
+        $item = &$option->add("copy");
+        $copycaption = HtmlTitle($Language->phrase("ViewPageCopyLink"));
+        if ($this->IsModal) {
+            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'AddBtn',url:'" . HtmlEncode(GetUrl($this->CopyUrl)) . "'});\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
+        } else {
+            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
+        }
+        $item->Visible = ($this->CopyUrl != "" && $Security->canAdd());
+
+        // Delete
+        $item = &$option->add("delete");
+        if ($this->IsModal) { // Handle as inline delete
+            $item->Body = "<a onclick=\"return ew.confirmDelete(this);\" class=\"ew-action ew-delete\" title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" href=\"" . HtmlEncode(UrlAddQuery(GetUrl($this->DeleteUrl), "action=1")) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
+        } else {
+            $item->Body = "<a class=\"ew-action ew-delete\" title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
+        }
+        $item->Visible = ($this->DeleteUrl != "" && $Security->canDelete());
 
         // Set up action default
         $option = $options["action"];
@@ -721,17 +741,16 @@ class AntreanUmumView extends AntreanUmum
         if (!$rs) {
             return;
         }
-        if ($this->AuditTrailOnView) {
-            $this->writeAuditTrailOnView($row);
-        }
         $this->id->setDbValue($row['id']);
-        $this->nomor_antrean->setDbValue($row['nomor_antrean']);
-        $this->waktu->setDbValue($row['waktu']);
-        $this->pasien_id->setDbValue($row['pasien_id']);
-        $this->fasilitas_id->setDbValue($row['fasilitas_id']);
-        $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
-        $this->status->setDbValue($row['status']);
-        $this->keluhan_awal->setDbValue($row['keluhan_awal']);
+        $this->datetime->setDbValue($row['datetime']);
+        $this->script->setDbValue($row['script']);
+        $this->user->setDbValue($row['user']);
+        $this->_action->setDbValue($row['action']);
+        $this->_table->setDbValue($row['table']);
+        $this->field->setDbValue($row['field']);
+        $this->keyvalue->setDbValue($row['keyvalue']);
+        $this->oldvalue->setDbValue($row['oldvalue']);
+        $this->newvalue->setDbValue($row['newvalue']);
     }
 
     // Return a row with default values
@@ -739,13 +758,15 @@ class AntreanUmumView extends AntreanUmum
     {
         $row = [];
         $row['id'] = null;
-        $row['nomor_antrean'] = null;
-        $row['waktu'] = null;
-        $row['pasien_id'] = null;
-        $row['fasilitas_id'] = null;
-        $row['rumah_sakit_id'] = null;
-        $row['status'] = null;
-        $row['keluhan_awal'] = null;
+        $row['datetime'] = null;
+        $row['script'] = null;
+        $row['user'] = null;
+        $row['action'] = null;
+        $row['table'] = null;
+        $row['field'] = null;
+        $row['keyvalue'] = null;
+        $row['oldvalue'] = null;
+        $row['newvalue'] = null;
         return $row;
     }
 
@@ -769,149 +790,114 @@ class AntreanUmumView extends AntreanUmum
 
         // id
 
-        // nomor_antrean
+        // datetime
 
-        // waktu
+        // script
 
-        // pasien_id
+        // user
 
-        // fasilitas_id
+        // action
 
-        // rumah_sakit_id
+        // table
 
-        // status
+        // field
 
-        // keluhan_awal
+        // keyvalue
+
+        // oldvalue
+
+        // newvalue
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
             $this->id->ViewCustomAttributes = "";
 
-            // nomor_antrean
-            $this->nomor_antrean->ViewValue = $this->nomor_antrean->CurrentValue;
-            $this->nomor_antrean->ViewValue = FormatNumber($this->nomor_antrean->ViewValue, 0, -2, -2, -2);
-            $this->nomor_antrean->ViewCustomAttributes = "";
+            // datetime
+            $this->datetime->ViewValue = $this->datetime->CurrentValue;
+            $this->datetime->ViewValue = FormatDateTime($this->datetime->ViewValue, 0);
+            $this->datetime->ViewCustomAttributes = "";
 
-            // waktu
-            $this->waktu->ViewValue = $this->waktu->CurrentValue;
-            $this->waktu->ViewValue = FormatDateTime($this->waktu->ViewValue, 0);
-            $this->waktu->ViewCustomAttributes = "";
+            // script
+            $this->script->ViewValue = $this->script->CurrentValue;
+            $this->script->ViewCustomAttributes = "";
 
-            // pasien_id
-            $curVal = trim(strval($this->pasien_id->CurrentValue));
-            if ($curVal != "") {
-                $this->pasien_id->ViewValue = $this->pasien_id->lookupCacheOption($curVal);
-                if ($this->pasien_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->pasien_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->pasien_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->pasien_id->ViewValue = $this->pasien_id->displayValue($arwrk);
-                    } else {
-                        $this->pasien_id->ViewValue = $this->pasien_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->pasien_id->ViewValue = null;
-            }
-            $this->pasien_id->ViewCustomAttributes = "";
+            // user
+            $this->user->ViewValue = $this->user->CurrentValue;
+            $this->user->ViewCustomAttributes = "";
 
-            // fasilitas_id
-            $curVal = trim(strval($this->fasilitas_id->CurrentValue));
-            if ($curVal != "") {
-                $this->fasilitas_id->ViewValue = $this->fasilitas_id->lookupCacheOption($curVal);
-                if ($this->fasilitas_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->fasilitas_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->fasilitas_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->fasilitas_id->ViewValue = $this->fasilitas_id->displayValue($arwrk);
-                    } else {
-                        $this->fasilitas_id->ViewValue = $this->fasilitas_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->fasilitas_id->ViewValue = null;
-            }
-            $this->fasilitas_id->ViewCustomAttributes = "";
+            // action
+            $this->_action->ViewValue = $this->_action->CurrentValue;
+            $this->_action->ViewCustomAttributes = "";
 
-            // rumah_sakit_id
-            $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
-            $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
-            if ($curVal != "") {
-                $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
-                if ($this->rumah_sakit_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->displayValue($arwrk);
-                    } else {
-                        $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->rumah_sakit_id->ViewValue = null;
-            }
-            $this->rumah_sakit_id->ViewCustomAttributes = "";
+            // table
+            $this->_table->ViewValue = $this->_table->CurrentValue;
+            $this->_table->ViewCustomAttributes = "";
 
-            // status
-            if (strval($this->status->CurrentValue) != "") {
-                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
-            } else {
-                $this->status->ViewValue = null;
-            }
-            $this->status->ViewCustomAttributes = "";
+            // field
+            $this->field->ViewValue = $this->field->CurrentValue;
+            $this->field->ViewCustomAttributes = "";
 
-            // keluhan_awal
-            $this->keluhan_awal->ViewValue = $this->keluhan_awal->CurrentValue;
-            $this->keluhan_awal->ViewCustomAttributes = "";
+            // keyvalue
+            $this->keyvalue->ViewValue = $this->keyvalue->CurrentValue;
+            $this->keyvalue->ViewCustomAttributes = "";
+
+            // oldvalue
+            $this->oldvalue->ViewValue = $this->oldvalue->CurrentValue;
+            $this->oldvalue->ViewCustomAttributes = "";
+
+            // newvalue
+            $this->newvalue->ViewValue = $this->newvalue->CurrentValue;
+            $this->newvalue->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
 
-            // nomor_antrean
-            $this->nomor_antrean->LinkCustomAttributes = "";
-            $this->nomor_antrean->HrefValue = "";
-            $this->nomor_antrean->TooltipValue = "";
+            // datetime
+            $this->datetime->LinkCustomAttributes = "";
+            $this->datetime->HrefValue = "";
+            $this->datetime->TooltipValue = "";
 
-            // waktu
-            $this->waktu->LinkCustomAttributes = "";
-            $this->waktu->HrefValue = "";
-            $this->waktu->TooltipValue = "";
+            // script
+            $this->script->LinkCustomAttributes = "";
+            $this->script->HrefValue = "";
+            $this->script->TooltipValue = "";
 
-            // pasien_id
-            $this->pasien_id->LinkCustomAttributes = "";
-            $this->pasien_id->HrefValue = "";
-            $this->pasien_id->TooltipValue = "";
+            // user
+            $this->user->LinkCustomAttributes = "";
+            $this->user->HrefValue = "";
+            $this->user->TooltipValue = "";
 
-            // fasilitas_id
-            $this->fasilitas_id->LinkCustomAttributes = "";
-            $this->fasilitas_id->HrefValue = "";
-            $this->fasilitas_id->TooltipValue = "";
+            // action
+            $this->_action->LinkCustomAttributes = "";
+            $this->_action->HrefValue = "";
+            $this->_action->TooltipValue = "";
 
-            // rumah_sakit_id
-            $this->rumah_sakit_id->LinkCustomAttributes = "";
-            $this->rumah_sakit_id->HrefValue = "";
-            $this->rumah_sakit_id->TooltipValue = "";
+            // table
+            $this->_table->LinkCustomAttributes = "";
+            $this->_table->HrefValue = "";
+            $this->_table->TooltipValue = "";
 
-            // status
-            $this->status->LinkCustomAttributes = "";
-            $this->status->HrefValue = "";
-            $this->status->TooltipValue = "";
+            // field
+            $this->field->LinkCustomAttributes = "";
+            $this->field->HrefValue = "";
+            $this->field->TooltipValue = "";
 
-            // keluhan_awal
-            $this->keluhan_awal->LinkCustomAttributes = "";
-            $this->keluhan_awal->HrefValue = "";
-            $this->keluhan_awal->TooltipValue = "";
+            // keyvalue
+            $this->keyvalue->LinkCustomAttributes = "";
+            $this->keyvalue->HrefValue = "";
+            $this->keyvalue->TooltipValue = "";
+
+            // oldvalue
+            $this->oldvalue->LinkCustomAttributes = "";
+            $this->oldvalue->HrefValue = "";
+            $this->oldvalue->TooltipValue = "";
+
+            // newvalue
+            $this->newvalue->LinkCustomAttributes = "";
+            $this->newvalue->HrefValue = "";
+            $this->newvalue->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -926,7 +912,7 @@ class AntreanUmumView extends AntreanUmum
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("antreanumumlist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("audittraillist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }
@@ -944,14 +930,6 @@ class AntreanUmumView extends AntreanUmum
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_pasien_id":
-                    break;
-                case "x_fasilitas_id":
-                    break;
-                case "x_rumah_sakit_id":
-                    break;
-                case "x_status":
-                    break;
                 default:
                     $lookupFilter = "";
                     break;

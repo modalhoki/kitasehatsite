@@ -31,4 +31,6 @@ $sideMenu->addMenuItem(7, "mi_pasien", $MenuLanguage->MenuPhrase("7", "MenuText"
 $sideMenu->addMenuItem(11, "mi_kontak_darurat", $MenuLanguage->MenuPhrase("11", "MenuText"), $MenuRelativePath . "kontakdaruratlist?cmd=resetall", 22, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}kontak_darurat'), false, false, "", "", false);
 $sideMenu->addMenuItem(8, "mi_rumah_sakit", $MenuLanguage->MenuPhrase("8", "MenuText"), $MenuRelativePath . "rumahsakitlist", 10, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}rumah_sakit'), false, false, "", "", false);
 $sideMenu->addMenuItem(9, "mi_webusers", $MenuLanguage->MenuPhrase("9", "MenuText"), $MenuRelativePath . "webuserslist", 10, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}webusers'), false, false, "", "", false);
+$sideMenu->addMenuItem(38, "mi_audittrail", $MenuLanguage->MenuPhrase("38", "MenuText"), $MenuRelativePath . "audittraillist", 10, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}audittrail'), false, false, "", "", false);
+$sideMenu->addMenuItem(39, "mi_data_durasi", $MenuLanguage->MenuPhrase("39", "MenuText"), $MenuRelativePath . "datadurasilist", 10, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}data_durasi'), false, false, "", "", false);
 echo $sideMenu->toScript();

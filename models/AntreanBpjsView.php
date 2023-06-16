@@ -58,6 +58,14 @@ class AntreanBpjsView extends AntreanBpjs
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
 
+    // Audit Trail
+    public $AuditTrailOnAdd = false;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -712,6 +720,9 @@ class AntreanBpjsView extends AntreanBpjs
         $this->rowSelected($row);
         if (!$rs) {
             return;
+        }
+        if ($this->AuditTrailOnView) {
+            $this->writeAuditTrailOnView($row);
         }
         $this->id->setDbValue($row['id']);
         $this->nomor_antrean->setDbValue($row['nomor_antrean']);

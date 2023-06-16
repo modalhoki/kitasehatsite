@@ -29,7 +29,13 @@ $USER_LEVEL_PRIVS = [["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}antrean_bpjs","-2",
     ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}kontak_darurat","-2","0"],
     ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}kontak_darurat","0","0"],
     ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}praktik_poli","-2","0"],
-    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}praktik_poli","0","0"]];
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}praktik_poli","0","0"],
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}image_slider","-2","0"],
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}image_slider","0","0"],
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}audittrail","-2","0"],
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}audittrail","0","0"],
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}data_durasi","-2","0"],
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}data_durasi","0","0"]];
 // User level table info
 $USER_LEVEL_TABLES = [["antrean_bpjs","antrean_bpjs","Antrean BPJS",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","antreanbpjslist"],
     ["antrean_umum","antrean_umum","Antrean Umum",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","antreanumumlist"],
@@ -41,4 +47,7 @@ $USER_LEVEL_TABLES = [["antrean_bpjs","antrean_bpjs","Antrean BPJS",true,"{6882E
     ["rumah_sakit","rumah_sakit","Rumah Sakit",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","rumahsakitlist"],
     ["webusers","webusers","webusers",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","webuserslist"],
     ["kontak_darurat","kontak_darurat","Kontak Darurat Pasien",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","kontakdaruratlist"],
-    ["praktik_poli","praktik_poli","Data Praktik Poli",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","praktikpolilist"]];
+    ["praktik_poli","praktik_poli","Data Praktik Poli",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","praktikpolilist"],
+    ["image_slider","image_slider","image slider",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}",""],
+    ["audittrail","audittrail","audittrail",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","audittraillist"],
+    ["data_durasi","data_durasi","data durasi",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","datadurasilist"]];

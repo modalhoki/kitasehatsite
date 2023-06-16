@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2023/6/8" version="17.0.5" id="en" name="English" desc="English" author="e.World Technology Limited">
+<ew-language date="2023/6/16" version="17.0.5" id="en" name="English" desc="English" author="e.World Technology Limited">
   <!--
     *** Important Notes:
     1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -925,6 +925,9 @@
   <project>
     <phrase id="bodytitle" value="Kitasehat" />
     <phrase id="footertext" value="&amp;copy;2023 Sistem Informasi ITS. All rights reserved." />
+    <menu id="37">
+      <phrase id="menutext" value="image slider" />
+    </menu>
     <menu id="1">
       <phrase id="menutext" value="Antrean BPJS" />
     </menu>
@@ -966,6 +969,12 @@
     </menu>
     <menu id="9">
       <phrase id="menutext" value="webusers" />
+    </menu>
+    <menu id="38">
+      <phrase id="menutext" value="audittrail" />
+    </menu>
+    <menu id="39">
+      <phrase id="menutext" value="data durasi" />
     </menu>
     <table id="antrean_bpjs">
       <phrase id="tblcaption" value="Antrean BPJS" />
@@ -1034,7 +1043,7 @@
         <phrase id="fldtagcaption4" value="DIBATALKAN" />
       </field>
       <field id="keluhan_awal">
-        <phrase id="fldcaption" value="keluhan awal" />
+        <phrase id="fldcaption" value="Keluhan Awal" />
       </field>
     </table>
     <table id="daerah">
@@ -1050,7 +1059,7 @@
         <phrase id="fldtagcaption2" value="KOTA" />
       </field>
       <field id="nama_daerah">
-        <phrase id="fldcaption" value="Daerah" />
+        <phrase id="fldcaption" value="Keluhan Awal" />
       </field>
     </table>
     <table id="dokter">
@@ -1249,7 +1258,7 @@
         <phrase id="fldcaption" value="Rumah Sakit" />
       </field>
       <field id="administrator_rumah_sakit">
-        <phrase id="fldcaption" value="Administrator Rumah Sakit" />
+        <phrase id="fldcaption" value="Foto" />
       </field>
     </table>
     <table id="kontak_darurat">
@@ -1280,6 +1289,63 @@
       </field>
       <field id="jam_praktik">
         <phrase id="fldcaption" value="Jam Praktik" />
+      </field>
+    </table>
+    <table id="image_slider">
+      <phrase id="tblcaption" value="image slider" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="image_link">
+        <phrase id="fldcaption" value="image link" />
+      </field>
+    </table>
+    <table id="audittrail">
+      <phrase id="tblcaption" value="audittrail" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="datetime">
+        <phrase id="fldcaption" value="datetime" />
+      </field>
+      <field id="script">
+        <phrase id="fldcaption" value="script" />
+      </field>
+      <field id="user">
+        <phrase id="fldcaption" value="user" />
+      </field>
+      <field id="_action">
+        <phrase id="fldcaption" value="action" />
+      </field>
+      <field id="_table">
+        <phrase id="fldcaption" value="table" />
+      </field>
+      <field id="field">
+        <phrase id="fldcaption" value="field" />
+      </field>
+      <field id="keyvalue">
+        <phrase id="fldcaption" value="keyvalue" />
+      </field>
+      <field id="oldvalue">
+        <phrase id="fldcaption" value="oldvalue" />
+      </field>
+      <field id="newvalue">
+        <phrase id="fldcaption" value="newvalue" />
+      </field>
+    </table>
+    <table id="data_durasi">
+      <phrase id="tblcaption" value="data durasi" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="waktu_daftar">
+        <phrase id="fldcaption" value="waktu daftar" />
+      </field>
+      <field id="waktu_edit">
+        <phrase id="fldcaption" value="waktu edit" />
+      </field>
+      <field id="durasi">
+        <phrase id="fldcaption" value="durasi" />
       </field>
     </table>
   </project>

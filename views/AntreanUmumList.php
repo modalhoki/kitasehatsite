@@ -73,6 +73,7 @@ loadjs.ready("head", function () {
     // Dynamic selection lists
     fantrean_umumlistsrch.lists.pasien_id = <?= $Page->pasien_id->toClientList($Page) ?>;
     fantrean_umumlistsrch.lists.fasilitas_id = <?= $Page->fasilitas_id->toClientList($Page) ?>;
+    fantrean_umumlistsrch.lists.status = <?= $Page->status->toClientList($Page) ?>;
 
     // Filters
     fantrean_umumlistsrch.filterList = <?= $Page->getFilterList() ?>;
@@ -200,6 +201,51 @@ $Page->renderRow();
 <div class="invalid-feedback"><?= $Page->fasilitas_id->getErrorMessage(false) ?></div>
 <?= $Page->fasilitas_id->Lookup->getParamTag($Page, "p_x_fasilitas_id") ?>
 <input type="hidden" is="selection-list" data-table="antrean_umum" data-field="x_fasilitas_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->fasilitas_id->displayValueSeparatorAttribute() ?>" name="x_fasilitas_id" id="x_fasilitas_id" value="<?= $Page->fasilitas_id->AdvancedSearch->SearchValue ?>"<?= $Page->fasilitas_id->editAttributes() ?>>
+</span>
+    </div>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow == 0) { ?>
+</div>
+    <?php } ?>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <?php
+        $Page->SearchColumnCount++;
+        if (($Page->SearchColumnCount - 1) % $Page->SearchFieldsPerRow == 0) {
+            $Page->SearchRowCount++;
+    ?>
+<div id="xsr_<?= $Page->SearchRowCount ?>" class="ew-row d-sm-flex">
+    <?php
+        }
+     ?>
+    <div id="xsc_status" class="ew-cell form-group">
+        <label class="ew-search-caption ew-label"><?= $Page->status->caption() ?></label>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_status" id="z_status" value="=">
+</span>
+        <span id="el_antrean_umum_status" class="ew-search-field">
+<template id="tp_x_status">
+    <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" data-table="antrean_umum" data-field="x_status" name="x_status" id="x_status"<?= $Page->status->editAttributes() ?>>
+        <label class="custom-control-label"></label>
+    </div>
+</template>
+<div id="dsl_x_status" class="ew-item-list"></div>
+<input type="hidden"
+    is="selection-list"
+    id="x_status"
+    name="x_status"
+    value="<?= HtmlEncode($Page->status->AdvancedSearch->SearchValue) ?>"
+    data-type="select-one"
+    data-template="tp_x_status"
+    data-target="dsl_x_status"
+    data-repeatcolumn="5"
+    class="form-control<?= $Page->status->isInvalidClass() ?>"
+    data-table="antrean_umum"
+    data-field="x_status"
+    data-value-separator="<?= $Page->status->displayValueSeparatorAttribute() ?>"
+    <?= $Page->status->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->status->getErrorMessage(false) ?></div>
 </span>
     </div>
     <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow == 0) { ?>

@@ -7,7 +7,7 @@ use Doctrine\DBAL\ParameterType;
 /**
  * Page class
  */
-class AntreanUmumList extends AntreanUmum
+class DataDurasiList extends DataDurasi
 {
     use MessagesTrait;
 
@@ -18,16 +18,16 @@ class AntreanUmumList extends AntreanUmum
     public $ProjectID = PROJECT_ID;
 
     // Table name
-    public $TableName = 'antrean_umum';
+    public $TableName = 'data_durasi';
 
     // Page object name
-    public $PageObjName = "AntreanUmumList";
+    public $PageObjName = "DataDurasiList";
 
     // Rendering View
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fantrean_umumlist";
+    public $FormName = "fdata_durasilist";
     public $FormActionName = "k_action";
     public $FormBlankRowName = "k_blankrow";
     public $FormKeyCountName = "key_count";
@@ -63,14 +63,6 @@ class AntreanUmumList extends AntreanUmum
     public $GridEditUrl;
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
-
-    // Audit Trail
-    public $AuditTrailOnAdd = false;
-    public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
-    public $AuditTrailOnView = false;
-    public $AuditTrailOnViewData = false;
-    public $AuditTrailOnSearch = false;
 
     // Page headings
     public $Heading = "";
@@ -173,9 +165,9 @@ class AntreanUmumList extends AntreanUmum
         // Parent constuctor
         parent::__construct();
 
-        // Table object (antrean_umum)
-        if (!isset($GLOBALS["antrean_umum"]) || get_class($GLOBALS["antrean_umum"]) == PROJECT_NAMESPACE . "antrean_umum") {
-            $GLOBALS["antrean_umum"] = &$this;
+        // Table object (data_durasi)
+        if (!isset($GLOBALS["data_durasi"]) || get_class($GLOBALS["data_durasi"]) == PROJECT_NAMESPACE . "data_durasi") {
+            $GLOBALS["data_durasi"] = &$this;
         }
 
         // Page URL
@@ -189,16 +181,16 @@ class AntreanUmumList extends AntreanUmum
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "antreanumumadd";
+        $this->AddUrl = "datadurasiadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "antreanumumdelete";
-        $this->MultiUpdateUrl = "antreanumumupdate";
+        $this->MultiDeleteUrl = "datadurasidelete";
+        $this->MultiUpdateUrl = "datadurasiupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'antrean_umum');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'data_durasi');
         }
 
         // Start timer
@@ -238,7 +230,7 @@ class AntreanUmumList extends AntreanUmum
 
         // Filter options
         $this->FilterOptions = new ListOptions("div");
-        $this->FilterOptions->TagClassName = "ew-filter-option fantrean_umumlistsrch";
+        $this->FilterOptions->TagClassName = "ew-filter-option fdata_durasilistsrch";
 
         // List actions
         $this->ListActions = new ListActions();
@@ -313,7 +305,7 @@ class AntreanUmumList extends AntreanUmum
             }
             $class = PROJECT_NAMESPACE . Config("EXPORT_CLASSES." . $this->CustomExport);
             if (class_exists($class)) {
-                $doc = new $class(Container("antrean_umum"));
+                $doc = new $class(Container("data_durasi"));
                 $doc->Text = @$content;
                 if ($this->isExport("email")) {
                     echo $this->exportEmail($doc->Text);
@@ -576,14 +568,10 @@ class AntreanUmumList extends AntreanUmum
 
         // Set up list options
         $this->setupListOptions();
-        $this->id->Visible = false;
-        $this->nomor_antrean->setVisibility();
-        $this->waktu->setVisibility();
-        $this->pasien_id->setVisibility();
-        $this->fasilitas_id->setVisibility();
-        $this->rumah_sakit_id->setVisibility();
-        $this->status->setVisibility();
-        $this->keluhan_awal->Visible = false;
+        $this->id->setVisibility();
+        $this->waktu_daftar->setVisibility();
+        $this->waktu_edit->setVisibility();
+        $this->durasi->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -611,9 +599,6 @@ class AntreanUmumList extends AntreanUmum
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->pasien_id);
-        $this->setupLookupOptions($this->fasilitas_id);
-        $this->setupLookupOptions($this->rumah_sakit_id);
 
         // Search filters
         $srchAdvanced = ""; // Advanced search filter
@@ -663,36 +648,8 @@ class AntreanUmumList extends AntreanUmum
                 $this->OtherOptions->hideAllOptions();
             }
 
-            // Get default search criteria
-            AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
-
-            // Get and validate search values for advanced search
-            $this->loadSearchValues(); // Get search values
-
-            // Process filter list
-            if ($this->processFilterList()) {
-                $this->terminate();
-                return;
-            }
-            if (!$this->validateSearch()) {
-                // Nothing to do
-            }
-
-            // Restore search parms from Session if not searching / reset / export
-            if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
-                $this->restoreSearchParms();
-            }
-
-            // Call Recordset SearchValidated event
-            $this->recordsetSearchValidated();
-
             // Set up sorting order
             $this->setupSortOrder();
-
-            // Get search criteria for advanced search
-            if (!$this->hasInvalidFields()) {
-                $srchAdvanced = $this->advancedSearchWhere();
-            }
         }
 
         // Restore display records
@@ -706,35 +663,6 @@ class AntreanUmumList extends AntreanUmum
         // Load Sorting Order
         if ($this->Command != "json") {
             $this->loadSortOrder();
-        }
-
-        // Load search default if no existing search criteria
-        if (!$this->checkSearchParms()) {
-            // Load advanced search from default
-            if ($this->loadAdvancedSearchDefault()) {
-                $srchAdvanced = $this->advancedSearchWhere();
-            }
-        }
-
-        // Restore search settings from Session
-        if (!$this->hasInvalidFields()) {
-            $this->loadAdvancedSearch();
-        }
-
-        // Build search criteria
-        AddFilter($this->SearchWhere, $srchAdvanced);
-        AddFilter($this->SearchWhere, $srchBasic);
-
-        // Call Recordset_Searching event
-        $this->recordsetSearching($this->SearchWhere);
-
-        // Save search criteria
-        if ($this->Command == "search" && !$this->RestoreSearch) {
-            $this->setSearchWhere($this->SearchWhere); // Save to Session
-            $this->StartRecord = 1; // Reset start record counter
-            $this->setStartRecordNumber($this->StartRecord);
-        } elseif ($this->Command != "json") {
-            $this->SearchWhere = $this->getSearchWhere();
         }
 
         // Build filter
@@ -780,13 +708,6 @@ class AntreanUmumList extends AntreanUmum
                 } else {
                     $this->setWarningMessage($Language->phrase("NoRecord"));
                 }
-            }
-
-            // Audit trail on search
-            if ($this->AuditTrailOnSearch && $this->Command == "search" && !$this->RestoreSearch) {
-                $searchParm = ServerVar("QUERY_STRING");
-                $searchSql = $this->getSessionWhere();
-                $this->writeAuditTrailOnSearch($searchParm, $searchSql);
             }
         }
 
@@ -883,294 +804,6 @@ class AntreanUmumList extends AntreanUmum
         return $wrkFilter;
     }
 
-    // Get list of filters
-    public function getFilterList()
-    {
-        global $UserProfile;
-
-        // Initialize
-        $filterList = "";
-        $savedFilterList = "";
-        $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->nomor_antrean->AdvancedSearch->toJson(), ","); // Field nomor_antrean
-        $filterList = Concat($filterList, $this->waktu->AdvancedSearch->toJson(), ","); // Field waktu
-        $filterList = Concat($filterList, $this->pasien_id->AdvancedSearch->toJson(), ","); // Field pasien_id
-        $filterList = Concat($filterList, $this->fasilitas_id->AdvancedSearch->toJson(), ","); // Field fasilitas_id
-        $filterList = Concat($filterList, $this->rumah_sakit_id->AdvancedSearch->toJson(), ","); // Field rumah_sakit_id
-        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
-        $filterList = Concat($filterList, $this->keluhan_awal->AdvancedSearch->toJson(), ","); // Field keluhan_awal
-
-        // Return filter list in JSON
-        if ($filterList != "") {
-            $filterList = "\"data\":{" . $filterList . "}";
-        }
-        if ($savedFilterList != "") {
-            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
-        }
-        return ($filterList != "") ? "{" . $filterList . "}" : "null";
-    }
-
-    // Process filter list
-    protected function processFilterList()
-    {
-        global $UserProfile;
-        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
-            $filters = Post("filters");
-            $UserProfile->setSearchFilters(CurrentUserName(), "fantrean_umumlistsrch", $filters);
-            WriteJson([["success" => true]]); // Success
-            return true;
-        } elseif (Post("cmd") == "resetfilter") {
-            $this->restoreFilterList();
-        }
-        return false;
-    }
-
-    // Restore list of filters
-    protected function restoreFilterList()
-    {
-        // Return if not reset filter
-        if (Post("cmd") !== "resetfilter") {
-            return false;
-        }
-        $filter = json_decode(Post("filter"), true);
-        $this->Command = "search";
-
-        // Field id
-        $this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
-        $this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
-        $this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
-        $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
-        $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
-        $this->id->AdvancedSearch->save();
-
-        // Field nomor_antrean
-        $this->nomor_antrean->AdvancedSearch->SearchValue = @$filter["x_nomor_antrean"];
-        $this->nomor_antrean->AdvancedSearch->SearchOperator = @$filter["z_nomor_antrean"];
-        $this->nomor_antrean->AdvancedSearch->SearchCondition = @$filter["v_nomor_antrean"];
-        $this->nomor_antrean->AdvancedSearch->SearchValue2 = @$filter["y_nomor_antrean"];
-        $this->nomor_antrean->AdvancedSearch->SearchOperator2 = @$filter["w_nomor_antrean"];
-        $this->nomor_antrean->AdvancedSearch->save();
-
-        // Field waktu
-        $this->waktu->AdvancedSearch->SearchValue = @$filter["x_waktu"];
-        $this->waktu->AdvancedSearch->SearchOperator = @$filter["z_waktu"];
-        $this->waktu->AdvancedSearch->SearchCondition = @$filter["v_waktu"];
-        $this->waktu->AdvancedSearch->SearchValue2 = @$filter["y_waktu"];
-        $this->waktu->AdvancedSearch->SearchOperator2 = @$filter["w_waktu"];
-        $this->waktu->AdvancedSearch->save();
-
-        // Field pasien_id
-        $this->pasien_id->AdvancedSearch->SearchValue = @$filter["x_pasien_id"];
-        $this->pasien_id->AdvancedSearch->SearchOperator = @$filter["z_pasien_id"];
-        $this->pasien_id->AdvancedSearch->SearchCondition = @$filter["v_pasien_id"];
-        $this->pasien_id->AdvancedSearch->SearchValue2 = @$filter["y_pasien_id"];
-        $this->pasien_id->AdvancedSearch->SearchOperator2 = @$filter["w_pasien_id"];
-        $this->pasien_id->AdvancedSearch->save();
-
-        // Field fasilitas_id
-        $this->fasilitas_id->AdvancedSearch->SearchValue = @$filter["x_fasilitas_id"];
-        $this->fasilitas_id->AdvancedSearch->SearchOperator = @$filter["z_fasilitas_id"];
-        $this->fasilitas_id->AdvancedSearch->SearchCondition = @$filter["v_fasilitas_id"];
-        $this->fasilitas_id->AdvancedSearch->SearchValue2 = @$filter["y_fasilitas_id"];
-        $this->fasilitas_id->AdvancedSearch->SearchOperator2 = @$filter["w_fasilitas_id"];
-        $this->fasilitas_id->AdvancedSearch->save();
-
-        // Field rumah_sakit_id
-        $this->rumah_sakit_id->AdvancedSearch->SearchValue = @$filter["x_rumah_sakit_id"];
-        $this->rumah_sakit_id->AdvancedSearch->SearchOperator = @$filter["z_rumah_sakit_id"];
-        $this->rumah_sakit_id->AdvancedSearch->SearchCondition = @$filter["v_rumah_sakit_id"];
-        $this->rumah_sakit_id->AdvancedSearch->SearchValue2 = @$filter["y_rumah_sakit_id"];
-        $this->rumah_sakit_id->AdvancedSearch->SearchOperator2 = @$filter["w_rumah_sakit_id"];
-        $this->rumah_sakit_id->AdvancedSearch->save();
-
-        // Field status
-        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
-        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
-        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
-        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
-        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
-        $this->status->AdvancedSearch->save();
-
-        // Field keluhan_awal
-        $this->keluhan_awal->AdvancedSearch->SearchValue = @$filter["x_keluhan_awal"];
-        $this->keluhan_awal->AdvancedSearch->SearchOperator = @$filter["z_keluhan_awal"];
-        $this->keluhan_awal->AdvancedSearch->SearchCondition = @$filter["v_keluhan_awal"];
-        $this->keluhan_awal->AdvancedSearch->SearchValue2 = @$filter["y_keluhan_awal"];
-        $this->keluhan_awal->AdvancedSearch->SearchOperator2 = @$filter["w_keluhan_awal"];
-        $this->keluhan_awal->AdvancedSearch->save();
-    }
-
-    // Advanced search WHERE clause based on QueryString
-    protected function advancedSearchWhere($default = false)
-    {
-        global $Security;
-        $where = "";
-        if (!$Security->canSearch()) {
-            return "";
-        }
-        $this->buildSearchSql($where, $this->id, $default, false); // id
-        $this->buildSearchSql($where, $this->nomor_antrean, $default, false); // nomor_antrean
-        $this->buildSearchSql($where, $this->waktu, $default, false); // waktu
-        $this->buildSearchSql($where, $this->pasien_id, $default, false); // pasien_id
-        $this->buildSearchSql($where, $this->fasilitas_id, $default, false); // fasilitas_id
-        $this->buildSearchSql($where, $this->rumah_sakit_id, $default, false); // rumah_sakit_id
-        $this->buildSearchSql($where, $this->status, $default, false); // status
-        $this->buildSearchSql($where, $this->keluhan_awal, $default, false); // keluhan_awal
-
-        // Set up search parm
-        if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
-            $this->Command = "search";
-        }
-        if (!$default && $this->Command == "search") {
-            $this->id->AdvancedSearch->save(); // id
-            $this->nomor_antrean->AdvancedSearch->save(); // nomor_antrean
-            $this->waktu->AdvancedSearch->save(); // waktu
-            $this->pasien_id->AdvancedSearch->save(); // pasien_id
-            $this->fasilitas_id->AdvancedSearch->save(); // fasilitas_id
-            $this->rumah_sakit_id->AdvancedSearch->save(); // rumah_sakit_id
-            $this->status->AdvancedSearch->save(); // status
-            $this->keluhan_awal->AdvancedSearch->save(); // keluhan_awal
-        }
-        return $where;
-    }
-
-    // Build search SQL
-    protected function buildSearchSql(&$where, &$fld, $default, $multiValue)
-    {
-        $fldParm = $fld->Param;
-        $fldVal = ($default) ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
-        $fldOpr = ($default) ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
-        $fldCond = ($default) ? $fld->AdvancedSearch->SearchConditionDefault : $fld->AdvancedSearch->SearchCondition;
-        $fldVal2 = ($default) ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
-        $fldOpr2 = ($default) ? $fld->AdvancedSearch->SearchOperator2Default : $fld->AdvancedSearch->SearchOperator2;
-        $wrk = "";
-        if (is_array($fldVal)) {
-            $fldVal = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal);
-        }
-        if (is_array($fldVal2)) {
-            $fldVal2 = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal2);
-        }
-        $fldOpr = strtoupper(trim($fldOpr));
-        if ($fldOpr == "") {
-            $fldOpr = "=";
-        }
-        $fldOpr2 = strtoupper(trim($fldOpr2));
-        if ($fldOpr2 == "") {
-            $fldOpr2 = "=";
-        }
-        if (Config("SEARCH_MULTI_VALUE_OPTION") == 1 || !IsMultiSearchOperator($fldOpr)) {
-            $multiValue = false;
-        }
-        if ($multiValue) {
-            $wrk1 = ($fldVal != "") ? GetMultiSearchSql($fld, $fldOpr, $fldVal, $this->Dbid) : ""; // Field value 1
-            $wrk2 = ($fldVal2 != "") ? GetMultiSearchSql($fld, $fldOpr2, $fldVal2, $this->Dbid) : ""; // Field value 2
-            $wrk = $wrk1; // Build final SQL
-            if ($wrk2 != "") {
-                $wrk = ($wrk != "") ? "($wrk) $fldCond ($wrk2)" : $wrk2;
-            }
-        } else {
-            $fldVal = $this->convertSearchValue($fld, $fldVal);
-            $fldVal2 = $this->convertSearchValue($fld, $fldVal2);
-            $wrk = GetSearchSql($fld, $fldVal, $fldOpr, $fldCond, $fldVal2, $fldOpr2, $this->Dbid);
-        }
-        AddFilter($where, $wrk);
-    }
-
-    // Convert search value
-    protected function convertSearchValue(&$fld, $fldVal)
-    {
-        if ($fldVal == Config("NULL_VALUE") || $fldVal == Config("NOT_NULL_VALUE")) {
-            return $fldVal;
-        }
-        $value = $fldVal;
-        if ($fld->isBoolean()) {
-            if ($fldVal != "") {
-                $value = (SameText($fldVal, "1") || SameText($fldVal, "y") || SameText($fldVal, "t")) ? $fld->TrueValue : $fld->FalseValue;
-            }
-        } elseif ($fld->DataType == DATATYPE_DATE || $fld->DataType == DATATYPE_TIME) {
-            if ($fldVal != "") {
-                $value = UnFormatDateTime($fldVal, $fld->DateTimeFormat);
-            }
-        }
-        return $value;
-    }
-
-    // Check if search parm exists
-    protected function checkSearchParms()
-    {
-        if ($this->id->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->nomor_antrean->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->waktu->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->pasien_id->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->fasilitas_id->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->rumah_sakit_id->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->status->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->keluhan_awal->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        return false;
-    }
-
-    // Clear all search parameters
-    protected function resetSearchParms()
-    {
-        // Clear search WHERE clause
-        $this->SearchWhere = "";
-        $this->setSearchWhere($this->SearchWhere);
-
-        // Clear advanced search parameters
-        $this->resetAdvancedSearchParms();
-    }
-
-    // Load advanced search default values
-    protected function loadAdvancedSearchDefault()
-    {
-        return false;
-    }
-
-    // Clear all advanced search parameters
-    protected function resetAdvancedSearchParms()
-    {
-                $this->id->AdvancedSearch->unsetSession();
-                $this->nomor_antrean->AdvancedSearch->unsetSession();
-                $this->waktu->AdvancedSearch->unsetSession();
-                $this->pasien_id->AdvancedSearch->unsetSession();
-                $this->fasilitas_id->AdvancedSearch->unsetSession();
-                $this->rumah_sakit_id->AdvancedSearch->unsetSession();
-                $this->status->AdvancedSearch->unsetSession();
-                $this->keluhan_awal->AdvancedSearch->unsetSession();
-    }
-
-    // Restore all search parameters
-    protected function restoreSearchParms()
-    {
-        $this->RestoreSearch = true;
-
-        // Restore advanced search values
-                $this->id->AdvancedSearch->load();
-                $this->nomor_antrean->AdvancedSearch->load();
-                $this->waktu->AdvancedSearch->load();
-                $this->pasien_id->AdvancedSearch->load();
-                $this->fasilitas_id->AdvancedSearch->load();
-                $this->rumah_sakit_id->AdvancedSearch->load();
-                $this->status->AdvancedSearch->load();
-                $this->keluhan_awal->AdvancedSearch->load();
-    }
-
     // Set up sort parameters
     protected function setupSortOrder()
     {
@@ -1178,12 +811,10 @@ class AntreanUmumList extends AntreanUmum
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->nomor_antrean); // nomor_antrean
-            $this->updateSort($this->waktu); // waktu
-            $this->updateSort($this->pasien_id); // pasien_id
-            $this->updateSort($this->fasilitas_id); // fasilitas_id
-            $this->updateSort($this->rumah_sakit_id); // rumah_sakit_id
-            $this->updateSort($this->status); // status
+            $this->updateSort($this->id); // id
+            $this->updateSort($this->waktu_daftar); // waktu_daftar
+            $this->updateSort($this->waktu_edit); // waktu_edit
+            $this->updateSort($this->durasi); // durasi
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1193,14 +824,10 @@ class AntreanUmumList extends AntreanUmum
     {
         $orderBy = $this->getSessionOrderBy(); // Get ORDER BY from Session
         if ($orderBy == "") {
-            $this->DefaultSort = "`id` ASC";
+            $this->DefaultSort = "";
             if ($this->getSqlOrderBy() != "") {
                 $useDefaultSort = true;
-                if ($this->id->getSort() != "") {
-                    $useDefaultSort = false;
-                }
                 if ($useDefaultSort) {
-                    $this->id->setSort("ASC");
                     $orderBy = $this->getSqlOrderBy();
                     $this->setSessionOrderBy($orderBy);
                 } else {
@@ -1218,23 +845,14 @@ class AntreanUmumList extends AntreanUmum
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
-            // Reset search criteria
-            if ($this->Command == "reset" || $this->Command == "resetall") {
-                $this->resetSearchParms();
-            }
-
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->nomor_antrean->setSort("");
-                $this->waktu->setSort("");
-                $this->pasien_id->setSort("");
-                $this->fasilitas_id->setSort("");
-                $this->rumah_sakit_id->setSort("");
-                $this->status->setSort("");
-                $this->keluhan_awal->setSort("");
+                $this->waktu_daftar->setSort("");
+                $this->waktu_edit->setSort("");
+                $this->durasi->setSort("");
             }
 
             // Reset start position
@@ -1260,10 +878,10 @@ class AntreanUmumList extends AntreanUmum
         $item->Visible = $Security->canView();
         $item->OnLeft = false;
 
-        // "edit"
-        $item = &$this->ListOptions->add("edit");
+        // "copy"
+        $item = &$this->ListOptions->add("copy");
         $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canEdit();
+        $item->Visible = $Security->canAdd();
         $item->OnLeft = false;
 
         // List actions
@@ -1318,11 +936,11 @@ class AntreanUmumList extends AntreanUmum
                 $opt->Body = "";
             }
 
-            // "edit"
-            $opt = $this->ListOptions["edit"];
-            $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
-                $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+            // "copy"
+            $opt = $this->ListOptions["copy"];
+            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
+            if ($Security->canAdd()) {
+                $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
             } else {
                 $opt->Body = "";
             }
@@ -1373,6 +991,13 @@ class AntreanUmumList extends AntreanUmum
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
+        $option = $options["addedit"];
+
+        // Add
+        $item = &$option->add("add");
+        $addcaption = HtmlTitle($Language->phrase("AddLink"));
+        $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
+        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
         $option = $options["action"];
 
         // Set up options default
@@ -1390,11 +1015,11 @@ class AntreanUmumList extends AntreanUmum
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fantrean_umumlistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = true;
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fdata_durasilistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Visible = false;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fantrean_umumlistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = true;
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fdata_durasilistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Visible = false;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1417,7 +1042,7 @@ class AntreanUmumList extends AntreanUmum
                 $item = &$option->add("custom_" . $listaction->Action);
                 $caption = $listaction->Caption;
                 $icon = ($listaction->Icon != "") ? '<i class="' . HtmlEncode($listaction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<a class="ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" href="#" onclick="return ew.submitAction(event,jQuery.extend({f:document.fantrean_umumlist},' . $listaction->toJson(true) . '));">' . $icon . '</a>';
+                $item->Body = '<a class="ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" href="#" onclick="return ew.submitAction(event,jQuery.extend({f:document.fdata_durasilist},' . $listaction->toJson(true) . '));">' . $icon . '</a>';
                 $item->Visible = $listaction->Allow;
             }
         }
@@ -1529,78 +1154,6 @@ class AntreanUmumList extends AntreanUmum
         global $Security, $Language;
     }
 
-    // Load search values for validation
-    protected function loadSearchValues()
-    {
-        // Load search values
-        $hasValue = false;
-
-        // id
-        if (!$this->isAddOrEdit() && $this->id->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->id->AdvancedSearch->SearchValue != "" || $this->id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // nomor_antrean
-        if (!$this->isAddOrEdit() && $this->nomor_antrean->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->nomor_antrean->AdvancedSearch->SearchValue != "" || $this->nomor_antrean->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // waktu
-        if (!$this->isAddOrEdit() && $this->waktu->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->waktu->AdvancedSearch->SearchValue != "" || $this->waktu->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // pasien_id
-        if (!$this->isAddOrEdit() && $this->pasien_id->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->pasien_id->AdvancedSearch->SearchValue != "" || $this->pasien_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // fasilitas_id
-        if (!$this->isAddOrEdit() && $this->fasilitas_id->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->fasilitas_id->AdvancedSearch->SearchValue != "" || $this->fasilitas_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // rumah_sakit_id
-        if (!$this->isAddOrEdit() && $this->rumah_sakit_id->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->rumah_sakit_id->AdvancedSearch->SearchValue != "" || $this->rumah_sakit_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // status
-        if (!$this->isAddOrEdit() && $this->status->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->status->AdvancedSearch->SearchValue != "" || $this->status->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // keluhan_awal
-        if (!$this->isAddOrEdit() && $this->keluhan_awal->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->keluhan_awal->AdvancedSearch->SearchValue != "" || $this->keluhan_awal->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-        return $hasValue;
-    }
-
     // Load recordset
     public function loadRecordset($offset = -1, $rowcnt = -1)
     {
@@ -1670,13 +1223,9 @@ class AntreanUmumList extends AntreanUmum
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->nomor_antrean->setDbValue($row['nomor_antrean']);
-        $this->waktu->setDbValue($row['waktu']);
-        $this->pasien_id->setDbValue($row['pasien_id']);
-        $this->fasilitas_id->setDbValue($row['fasilitas_id']);
-        $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
-        $this->status->setDbValue($row['status']);
-        $this->keluhan_awal->setDbValue($row['keluhan_awal']);
+        $this->waktu_daftar->setDbValue($row['waktu_daftar']);
+        $this->waktu_edit->setDbValue($row['waktu_edit']);
+        $this->durasi->setDbValue($row['durasi']);
     }
 
     // Return a row with default values
@@ -1684,13 +1233,9 @@ class AntreanUmumList extends AntreanUmum
     {
         $row = [];
         $row['id'] = null;
-        $row['nomor_antrean'] = null;
-        $row['waktu'] = null;
-        $row['pasien_id'] = null;
-        $row['fasilitas_id'] = null;
-        $row['rumah_sakit_id'] = null;
-        $row['status'] = null;
-        $row['keluhan_awal'] = null;
+        $row['waktu_daftar'] = null;
+        $row['waktu_edit'] = null;
+        $row['durasi'] = null;
         return $row;
     }
 
@@ -1730,272 +1275,56 @@ class AntreanUmumList extends AntreanUmum
 
         // id
 
-        // nomor_antrean
+        // waktu_daftar
 
-        // waktu
+        // waktu_edit
 
-        // pasien_id
-
-        // fasilitas_id
-
-        // rumah_sakit_id
-
-        // status
-
-        // keluhan_awal
+        // durasi
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
             $this->id->ViewCustomAttributes = "";
 
-            // nomor_antrean
-            $this->nomor_antrean->ViewValue = $this->nomor_antrean->CurrentValue;
-            $this->nomor_antrean->ViewValue = FormatNumber($this->nomor_antrean->ViewValue, 0, -2, -2, -2);
-            $this->nomor_antrean->ViewCustomAttributes = "";
+            // waktu_daftar
+            $this->waktu_daftar->ViewValue = $this->waktu_daftar->CurrentValue;
+            $this->waktu_daftar->ViewValue = FormatDateTime($this->waktu_daftar->ViewValue, 0);
+            $this->waktu_daftar->ViewCustomAttributes = "";
 
-            // waktu
-            $this->waktu->ViewValue = $this->waktu->CurrentValue;
-            $this->waktu->ViewValue = FormatDateTime($this->waktu->ViewValue, 0);
-            $this->waktu->ViewCustomAttributes = "";
+            // waktu_edit
+            $this->waktu_edit->ViewValue = $this->waktu_edit->CurrentValue;
+            $this->waktu_edit->ViewValue = FormatDateTime($this->waktu_edit->ViewValue, 0);
+            $this->waktu_edit->ViewCustomAttributes = "";
 
-            // pasien_id
-            $curVal = trim(strval($this->pasien_id->CurrentValue));
-            if ($curVal != "") {
-                $this->pasien_id->ViewValue = $this->pasien_id->lookupCacheOption($curVal);
-                if ($this->pasien_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->pasien_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->pasien_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->pasien_id->ViewValue = $this->pasien_id->displayValue($arwrk);
-                    } else {
-                        $this->pasien_id->ViewValue = $this->pasien_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->pasien_id->ViewValue = null;
-            }
-            $this->pasien_id->ViewCustomAttributes = "";
+            // durasi
+            $this->durasi->ViewValue = $this->durasi->CurrentValue;
+            $this->durasi->ViewValue = FormatNumber($this->durasi->ViewValue, 0, -2, -2, -2);
+            $this->durasi->ViewCustomAttributes = "";
 
-            // fasilitas_id
-            $curVal = trim(strval($this->fasilitas_id->CurrentValue));
-            if ($curVal != "") {
-                $this->fasilitas_id->ViewValue = $this->fasilitas_id->lookupCacheOption($curVal);
-                if ($this->fasilitas_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->fasilitas_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->fasilitas_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->fasilitas_id->ViewValue = $this->fasilitas_id->displayValue($arwrk);
-                    } else {
-                        $this->fasilitas_id->ViewValue = $this->fasilitas_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->fasilitas_id->ViewValue = null;
-            }
-            $this->fasilitas_id->ViewCustomAttributes = "";
+            // id
+            $this->id->LinkCustomAttributes = "";
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
 
-            // rumah_sakit_id
-            $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
-            $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
-            if ($curVal != "") {
-                $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
-                if ($this->rumah_sakit_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->displayValue($arwrk);
-                    } else {
-                        $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->rumah_sakit_id->ViewValue = null;
-            }
-            $this->rumah_sakit_id->ViewCustomAttributes = "";
+            // waktu_daftar
+            $this->waktu_daftar->LinkCustomAttributes = "";
+            $this->waktu_daftar->HrefValue = "";
+            $this->waktu_daftar->TooltipValue = "";
 
-            // status
-            if (strval($this->status->CurrentValue) != "") {
-                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
-            } else {
-                $this->status->ViewValue = null;
-            }
-            $this->status->ViewCustomAttributes = "";
+            // waktu_edit
+            $this->waktu_edit->LinkCustomAttributes = "";
+            $this->waktu_edit->HrefValue = "";
+            $this->waktu_edit->TooltipValue = "";
 
-            // keluhan_awal
-            $this->keluhan_awal->ViewValue = $this->keluhan_awal->CurrentValue;
-            $this->keluhan_awal->ViewCustomAttributes = "";
-
-            // nomor_antrean
-            $this->nomor_antrean->LinkCustomAttributes = "";
-            $this->nomor_antrean->HrefValue = "";
-            $this->nomor_antrean->TooltipValue = "";
-
-            // waktu
-            $this->waktu->LinkCustomAttributes = "";
-            $this->waktu->HrefValue = "";
-            $this->waktu->TooltipValue = "";
-
-            // pasien_id
-            $this->pasien_id->LinkCustomAttributes = "";
-            $this->pasien_id->HrefValue = "";
-            $this->pasien_id->TooltipValue = "";
-
-            // fasilitas_id
-            $this->fasilitas_id->LinkCustomAttributes = "";
-            $this->fasilitas_id->HrefValue = "";
-            $this->fasilitas_id->TooltipValue = "";
-
-            // rumah_sakit_id
-            $this->rumah_sakit_id->LinkCustomAttributes = "";
-            $this->rumah_sakit_id->HrefValue = "";
-            $this->rumah_sakit_id->TooltipValue = "";
-
-            // status
-            $this->status->LinkCustomAttributes = "";
-            $this->status->HrefValue = "";
-            $this->status->TooltipValue = "";
-        } elseif ($this->RowType == ROWTYPE_SEARCH) {
-            // nomor_antrean
-            $this->nomor_antrean->EditAttrs["class"] = "form-control";
-            $this->nomor_antrean->EditCustomAttributes = "";
-            $this->nomor_antrean->EditValue = HtmlEncode($this->nomor_antrean->AdvancedSearch->SearchValue);
-            $this->nomor_antrean->PlaceHolder = RemoveHtml($this->nomor_antrean->caption());
-
-            // waktu
-            $this->waktu->EditAttrs["class"] = "form-control";
-            $this->waktu->EditCustomAttributes = "";
-            $this->waktu->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->waktu->AdvancedSearch->SearchValue, 0), 8));
-            $this->waktu->PlaceHolder = RemoveHtml($this->waktu->caption());
-
-            // pasien_id
-            $this->pasien_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->pasien_id->AdvancedSearch->SearchValue));
-            if ($curVal != "") {
-                $this->pasien_id->AdvancedSearch->ViewValue = $this->pasien_id->lookupCacheOption($curVal);
-            } else {
-                $this->pasien_id->AdvancedSearch->ViewValue = $this->pasien_id->Lookup !== null && is_array($this->pasien_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->pasien_id->AdvancedSearch->ViewValue !== null) { // Load from cache
-                $this->pasien_id->EditValue = array_values($this->pasien_id->Lookup->Options);
-                if ($this->pasien_id->AdvancedSearch->ViewValue == "") {
-                    $this->pasien_id->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
-                }
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = "`id`" . SearchString("=", $this->pasien_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
-                }
-                $sqlWrk = $this->pasien_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->pasien_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->pasien_id->AdvancedSearch->ViewValue = $this->pasien_id->displayValue($arwrk);
-                } else {
-                    $this->pasien_id->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
-                }
-                $arwrk = $rswrk;
-                foreach ($arwrk as &$row)
-                    $row = $this->pasien_id->Lookup->renderViewRow($row);
-                $this->pasien_id->EditValue = $arwrk;
-            }
-            $this->pasien_id->PlaceHolder = RemoveHtml($this->pasien_id->caption());
-
-            // fasilitas_id
-            $this->fasilitas_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->fasilitas_id->AdvancedSearch->SearchValue));
-            if ($curVal != "") {
-                $this->fasilitas_id->AdvancedSearch->ViewValue = $this->fasilitas_id->lookupCacheOption($curVal);
-            } else {
-                $this->fasilitas_id->AdvancedSearch->ViewValue = $this->fasilitas_id->Lookup !== null && is_array($this->fasilitas_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->fasilitas_id->AdvancedSearch->ViewValue !== null) { // Load from cache
-                $this->fasilitas_id->EditValue = array_values($this->fasilitas_id->Lookup->Options);
-                if ($this->fasilitas_id->AdvancedSearch->ViewValue == "") {
-                    $this->fasilitas_id->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
-                }
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = "`id`" . SearchString("=", $this->fasilitas_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
-                }
-                $sqlWrk = $this->fasilitas_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->fasilitas_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->fasilitas_id->AdvancedSearch->ViewValue = $this->fasilitas_id->displayValue($arwrk);
-                } else {
-                    $this->fasilitas_id->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
-                }
-                $arwrk = $rswrk;
-                $this->fasilitas_id->EditValue = $arwrk;
-            }
-            $this->fasilitas_id->PlaceHolder = RemoveHtml($this->fasilitas_id->caption());
-
-            // rumah_sakit_id
-            $this->rumah_sakit_id->EditAttrs["class"] = "form-control";
-            $this->rumah_sakit_id->EditCustomAttributes = "";
-            $this->rumah_sakit_id->EditValue = HtmlEncode($this->rumah_sakit_id->AdvancedSearch->SearchValue);
-            $this->rumah_sakit_id->PlaceHolder = RemoveHtml($this->rumah_sakit_id->caption());
-
-            // status
-            $this->status->EditCustomAttributes = "";
-            $this->status->EditValue = $this->status->options(false);
-            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
-        }
-        if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
-            $this->setupFieldTitles();
+            // durasi
+            $this->durasi->LinkCustomAttributes = "";
+            $this->durasi->HrefValue = "";
+            $this->durasi->TooltipValue = "";
         }
 
         // Call Row Rendered event
         if ($this->RowType != ROWTYPE_AGGREGATEINIT) {
             $this->rowRendered();
         }
-    }
-
-    // Validate search
-    protected function validateSearch()
-    {
-        // Check if validation required
-        if (!Config("SERVER_VALIDATE")) {
-            return true;
-        }
-
-        // Return validate result
-        $validateSearch = !$this->hasInvalidFields();
-
-        // Call Form_CustomValidate event
-        $formCustomError = "";
-        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
-        if ($formCustomError != "") {
-            $this->setFailureMessage($formCustomError);
-        }
-        return $validateSearch;
-    }
-
-    // Load advanced search
-    public function loadAdvancedSearch()
-    {
-        $this->id->AdvancedSearch->load();
-        $this->nomor_antrean->AdvancedSearch->load();
-        $this->waktu->AdvancedSearch->load();
-        $this->pasien_id->AdvancedSearch->load();
-        $this->fasilitas_id->AdvancedSearch->load();
-        $this->rumah_sakit_id->AdvancedSearch->load();
-        $this->status->AdvancedSearch->load();
-        $this->keluhan_awal->AdvancedSearch->load();
     }
 
     // Set up search options
@@ -2005,31 +1334,6 @@ class AntreanUmumList extends AntreanUmum
         $pageUrl = $this->pageUrl();
         $this->SearchOptions = new ListOptions("div");
         $this->SearchOptions->TagClassName = "ew-search-option";
-
-        // Search button
-        $item = &$this->SearchOptions->add("searchtoggle");
-        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" href=\"#\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"fantrean_umumlistsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
-        $item->Visible = true;
-
-        // Show all button
-        $item = &$this->SearchOptions->add("showall");
-        $item->Body = "<a class=\"btn btn-default ew-show-all\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
-
-        // Advanced search button
-        $item = &$this->SearchOptions->add("advancedsearch");
-        if (IsMobile()) {
-            $item->Body = "<a class=\"btn btn-default ew-advanced-search\" title=\"" . $Language->phrase("AdvancedSearch") . "\" data-caption=\"" . $Language->phrase("AdvancedSearch") . "\" href=\"antreanumumsearch\">" . $Language->phrase("AdvancedSearchBtn") . "</a>";
-        } else {
-            $item->Body = "<a class=\"btn btn-default ew-advanced-search\" title=\"" . $Language->phrase("AdvancedSearch") . "\" data-table=\"antrean_umum\" data-caption=\"" . $Language->phrase("AdvancedSearch") . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'SearchBtn',url:'antreanumumsearch'});\">" . $Language->phrase("AdvancedSearchBtn") . "</a>";
-        }
-        $item->Visible = true;
-
-        // Search highlight button
-        $item = &$this->SearchOptions->add("searchhighlight");
-        $item->Body = "<a class=\"btn btn-default ew-highlight active\" href=\"#\" role=\"button\" title=\"" . $Language->phrase("Highlight") . "\" data-caption=\"" . $Language->phrase("Highlight") . "\" data-toggle=\"button\" data-form=\"fantrean_umumlistsrch\" data-name=\"" . $this->highlightName() . "\">" . $Language->phrase("HighlightBtn") . "</a>";
-        $item->Visible = ($this->SearchWhere != "" && $this->TotalRecords > 0);
 
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
@@ -2074,14 +1378,6 @@ class AntreanUmumList extends AntreanUmum
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_pasien_id":
-                    break;
-                case "x_fasilitas_id":
-                    break;
-                case "x_rumah_sakit_id":
-                    break;
-                case "x_status":
-                    break;
                 default:
                     $lookupFilter = "";
                     break;
