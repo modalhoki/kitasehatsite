@@ -20,7 +20,6 @@ loadjs.ready("head", function () {
     if (!ew.vars.tables.fasilitas_rumah_sakit)
         ew.vars.tables.fasilitas_rumah_sakit = currentTable;
     ffasilitas_rumah_sakitedit.addFields([
-        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
         ["hari_buka", [fields.hari_buka.visible && fields.hari_buka.required ? ew.Validators.required(fields.hari_buka.caption) : null], fields.hari_buka.isInvalid],
         ["jam_buka", [fields.jam_buka.visible && fields.jam_buka.required ? ew.Validators.required(fields.jam_buka.caption) : null], fields.jam_buka.isInvalid]
     ]);
@@ -115,18 +114,6 @@ $Page->showMessage();
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->rumah_sakit_id->getSessionValue()) ?>">
 <?php } ?>
 <div class="ew-edit-div"><!-- page* -->
-<?php if ($Page->id->Visible) { // id ?>
-    <div id="r_id" class="form-group row">
-        <label id="elh_fasilitas_rumah_sakit_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->id->caption() ?><?= $Page->id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->id->cellAttributes() ?>>
-<span id="el_fasilitas_rumah_sakit_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->hari_buka->Visible) { // hari_buka ?>
     <div id="r_hari_buka" class="form-group row">
         <label id="elh_fasilitas_rumah_sakit_hari_buka" for="x_hari_buka" class="<?= $Page->LeftColumnClass ?>"><?= $Page->hari_buka->caption() ?><?= $Page->hari_buka->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -152,6 +139,7 @@ $Page->showMessage();
     </div>
 <?php } ?>
 </div><!-- /page* -->
+    <input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
 <?php if (!$Page->IsModal) { ?>
 <div class="form-group row"><!-- buttons .form-group -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->

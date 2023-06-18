@@ -467,7 +467,7 @@ class FasilitasRumahSakitEdit extends FasilitasRumahSakit
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->rumah_sakit_id->Visible = false;
         $this->fasilitas_id->Visible = false;
         $this->hari_buka->setVisibility();
@@ -657,12 +657,6 @@ class FasilitasRumahSakitEdit extends FasilitasRumahSakit
         // Load from form
         global $CurrentForm;
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
-        }
-
         // Check field name 'hari_buka' first before field var 'x_hari_buka'
         $val = $CurrentForm->hasValue("hari_buka") ? $CurrentForm->getValue("hari_buka") : $CurrentForm->getValue("x_hari_buka");
         if (!$this->hari_buka->IsDetailKey) {
@@ -681,6 +675,12 @@ class FasilitasRumahSakitEdit extends FasilitasRumahSakit
             } else {
                 $this->jam_buka->setFormValue($val);
             }
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -852,11 +852,6 @@ class FasilitasRumahSakitEdit extends FasilitasRumahSakit
             $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
             $this->jam_buka->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // hari_buka
             $this->hari_buka->LinkCustomAttributes = "";
             $this->hari_buka->HrefValue = "";
@@ -867,12 +862,6 @@ class FasilitasRumahSakitEdit extends FasilitasRumahSakit
             $this->jam_buka->HrefValue = "";
             $this->jam_buka->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->ViewCustomAttributes = "";
-
             // hari_buka
             $this->hari_buka->EditAttrs["class"] = "form-control";
             $this->hari_buka->EditCustomAttributes = "";
@@ -892,10 +881,6 @@ class FasilitasRumahSakitEdit extends FasilitasRumahSakit
             $this->jam_buka->PlaceHolder = RemoveHtml($this->jam_buka->caption());
 
             // Edit refer script
-
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
 
             // hari_buka
             $this->hari_buka->LinkCustomAttributes = "";
@@ -923,11 +908,6 @@ class FasilitasRumahSakitEdit extends FasilitasRumahSakit
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
-        }
-        if ($this->id->Required) {
-            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-            }
         }
         if ($this->hari_buka->Required) {
             if (!$this->hari_buka->IsDetailKey && EmptyValue($this->hari_buka->FormValue)) {
