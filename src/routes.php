@@ -99,6 +99,7 @@ return function (App $app) {
     // fasilitas_rumah_sakit
     $app->any('/fasilitasrumahsakitlist[/{id}]', FasilitasRumahSakitController::class . ':list')->add(PermissionMiddleware::class)->setName('fasilitasrumahsakitlist-fasilitas_rumah_sakit-list'); // list
     $app->any('/fasilitasrumahsakitadd[/{id}]', FasilitasRumahSakitController::class . ':add')->add(PermissionMiddleware::class)->setName('fasilitasrumahsakitadd-fasilitas_rumah_sakit-add'); // add
+    $app->any('/fasilitasrumahsakitedit[/{id}]', FasilitasRumahSakitController::class . ':edit')->add(PermissionMiddleware::class)->setName('fasilitasrumahsakitedit-fasilitas_rumah_sakit-edit'); // edit
     $app->any('/fasilitasrumahsakitdelete[/{id}]', FasilitasRumahSakitController::class . ':delete')->add(PermissionMiddleware::class)->setName('fasilitasrumahsakitdelete-fasilitas_rumah_sakit-delete'); // delete
     $app->any('/fasilitasrumahsakitpreview', FasilitasRumahSakitController::class . ':preview')->add(PermissionMiddleware::class)->setName('fasilitasrumahsakitpreview-fasilitas_rumah_sakit-preview'); // preview
     $app->group(
@@ -106,6 +107,7 @@ return function (App $app) {
         function (RouteCollectorProxy $group) {
             $group->any('/' . Config("LIST_ACTION") . '[/{id}]', FasilitasRumahSakitController::class . ':list')->add(PermissionMiddleware::class)->setName('fasilitas_rumah_sakit/list-fasilitas_rumah_sakit-list-2'); // list
             $group->any('/' . Config("ADD_ACTION") . '[/{id}]', FasilitasRumahSakitController::class . ':add')->add(PermissionMiddleware::class)->setName('fasilitas_rumah_sakit/add-fasilitas_rumah_sakit-add-2'); // add
+            $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', FasilitasRumahSakitController::class . ':edit')->add(PermissionMiddleware::class)->setName('fasilitas_rumah_sakit/edit-fasilitas_rumah_sakit-edit-2'); // edit
             $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', FasilitasRumahSakitController::class . ':delete')->add(PermissionMiddleware::class)->setName('fasilitas_rumah_sakit/delete-fasilitas_rumah_sakit-delete-2'); // delete
             $group->any('/' . Config("PREVIEW_ACTION") . '', FasilitasRumahSakitController::class . ':preview')->add(PermissionMiddleware::class)->setName('fasilitas_rumah_sakit/preview-fasilitas_rumah_sakit-preview-2'); // preview
         }

@@ -539,6 +539,12 @@ class FasilitasRumahSakitPreview extends FasilitasRumahSakit
         $item->OnLeft = false;
         $item->Visible = false;
 
+        // "edit"
+        $item = &$this->ListOptions->add("edit");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canEdit();
+        $item->OnLeft = false;
+
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
@@ -566,6 +572,21 @@ class FasilitasRumahSakitPreview extends FasilitasRumahSakit
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
         $masterKeyUrl = $this->masterKeyUrl();
+
+        // "edit"
+        $opt = $this->ListOptions["edit"];
+        if ($Security->canEdit()) {
+            $editCaption = $Language->phrase("EditLink");
+            $editTitle = HtmlTitle($editCaption);
+            $editUrl = $this->getEditUrl($masterKeyUrl);
+            if ($this->UseModalLinks && !IsMobile()) {
+                $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editTitle . "\" data-caption=\"" . $editTitle . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'SaveBtn',url:'" . HtmlEncode($editUrl) . "'});\">" . $editCaption . "</a>";
+            } else {
+                $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editTitle . "\" data-caption=\"" . $editTitle . "\" href=\"" . HtmlEncode($editUrl) . "\">" . $editCaption . "</a>";
+            }
+        } else {
+            $opt->Body = "";
+        }
 
         // "delete"
         $opt = $this->ListOptions["delete"];
