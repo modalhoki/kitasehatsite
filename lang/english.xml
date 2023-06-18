@@ -1095,10 +1095,10 @@
         <phrase id="fldcaption" value="Fasilitas/Layanan" />
       </field>
       <field id="hari_buka">
-        <phrase id="fldcaption" value="hari buka" />
+        <phrase id="fldcaption" value="Hari Buka" />
       </field>
       <field id="jam_buka">
-        <phrase id="fldcaption" value="jam buka" />
+        <phrase id="fldcaption" value="Jam Buka" />
       </field>
     </table>
     <table id="pasien">
