@@ -47,6 +47,12 @@ $Page->showMessage();
 <?php if ($Page->fasilitas_id->Visible) { // fasilitas_id ?>
         <th class="<?= $Page->fasilitas_id->headerCellClass() ?>"><span id="elh_fasilitas_rumah_sakit_fasilitas_id" class="fasilitas_rumah_sakit_fasilitas_id"><?= $Page->fasilitas_id->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->hari_buka->Visible) { // hari_buka ?>
+        <th class="<?= $Page->hari_buka->headerCellClass() ?>"><span id="elh_fasilitas_rumah_sakit_hari_buka" class="fasilitas_rumah_sakit_hari_buka"><?= $Page->hari_buka->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->jam_buka->Visible) { // jam_buka ?>
+        <th class="<?= $Page->jam_buka->headerCellClass() ?>"><span id="elh_fasilitas_rumah_sakit_jam_buka" class="fasilitas_rumah_sakit_jam_buka"><?= $Page->jam_buka->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -73,6 +79,22 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_fasilitas_rumah_sakit_fasilitas_id" class="fasilitas_rumah_sakit_fasilitas_id">
 <span<?= $Page->fasilitas_id->viewAttributes() ?>>
 <?= $Page->fasilitas_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->hari_buka->Visible) { // hari_buka ?>
+        <td <?= $Page->hari_buka->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_fasilitas_rumah_sakit_hari_buka" class="fasilitas_rumah_sakit_hari_buka">
+<span<?= $Page->hari_buka->viewAttributes() ?>>
+<?= $Page->hari_buka->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->jam_buka->Visible) { // jam_buka ?>
+        <td <?= $Page->jam_buka->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_fasilitas_rumah_sakit_jam_buka" class="fasilitas_rumah_sakit_jam_buka">
+<span<?= $Page->jam_buka->viewAttributes() ?>>
+<?= $Page->jam_buka->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

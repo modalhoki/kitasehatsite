@@ -17,6 +17,18 @@ loadjs.ready("head", function () {
     ffasilitas_rumah_sakitlist.formKeyCountName = '<?= $Page->FormKeyCountName ?>';
     loadjs.done("ffasilitas_rumah_sakitlist");
 });
+var ffasilitas_rumah_sakitlistsrch, currentSearchForm, currentAdvancedSearchForm;
+loadjs.ready("head", function () {
+    var $ = jQuery;
+    // Form object for search
+    ffasilitas_rumah_sakitlistsrch = currentSearchForm = new ew.Form("ffasilitas_rumah_sakitlistsrch");
+
+    // Dynamic selection lists
+
+    // Filters
+    ffasilitas_rumah_sakitlistsrch.filterList = <?= $Page->getFilterList() ?>;
+    loadjs.done("ffasilitas_rumah_sakitlistsrch");
+});
 </script>
 <script>
 loadjs.ready("head", function () {
@@ -31,6 +43,12 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if ($Page->ImportOptions->visible()) { ?>
 <?php $Page->ImportOptions->render("body") ?>
+<?php } ?>
+<?php if ($Page->SearchOptions->visible()) { ?>
+<?php $Page->SearchOptions->render("body") ?>
+<?php } ?>
+<?php if ($Page->FilterOptions->visible()) { ?>
+<?php $Page->FilterOptions->render("body") ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
@@ -47,6 +65,34 @@ if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "rumah_saki
 <?php
 $Page->renderOtherOptions();
 ?>
+<?php if ($Security->canSearch()) { ?>
+<?php if (!$Page->isExport() && !$Page->CurrentAction) { ?>
+<form name="ffasilitas_rumah_sakitlistsrch" id="ffasilitas_rumah_sakitlistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>">
+<div id="ffasilitas_rumah_sakitlistsrch-search-panel" class="<?= $Page->SearchPanelClass ?>">
+<input type="hidden" name="cmd" value="search">
+<input type="hidden" name="t" value="fasilitas_rumah_sakit">
+    <div class="ew-extended-search">
+<div id="xsr_<?= $Page->SearchRowCount + 1 ?>" class="ew-row d-sm-flex">
+    <div class="ew-quick-search input-group">
+        <input type="text" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>">
+        <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
+        <div class="input-group-append">
+            <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+            <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span></button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this);"><?= $Language->phrase("QuickSearchAuto") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "=") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, '=');"><?= $Language->phrase("QuickSearchExact") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "AND") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'AND');"><?= $Language->phrase("QuickSearchAll") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "OR") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'OR');"><?= $Language->phrase("QuickSearchAny") ?></a>
+            </div>
+        </div>
+    </div>
+</div>
+    </div><!-- /.ew-extended-search -->
+</div><!-- /.ew-search-panel -->
+</form>
+<?php } ?>
+<?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php
 $Page->showMessage();
@@ -80,6 +126,12 @@ $Page->ListOptions->render("header", "left");
 ?>
 <?php if ($Page->fasilitas_id->Visible) { // fasilitas_id ?>
         <th data-name="fasilitas_id" class="<?= $Page->fasilitas_id->headerCellClass() ?>"><div id="elh_fasilitas_rumah_sakit_fasilitas_id" class="fasilitas_rumah_sakit_fasilitas_id"><?= $Page->renderSort($Page->fasilitas_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->hari_buka->Visible) { // hari_buka ?>
+        <th data-name="hari_buka" class="<?= $Page->hari_buka->headerCellClass() ?>"><div id="elh_fasilitas_rumah_sakit_hari_buka" class="fasilitas_rumah_sakit_hari_buka"><?= $Page->renderSort($Page->hari_buka) ?></div></th>
+<?php } ?>
+<?php if ($Page->jam_buka->Visible) { // jam_buka ?>
+        <th data-name="jam_buka" class="<?= $Page->jam_buka->headerCellClass() ?>"><div id="elh_fasilitas_rumah_sakit_jam_buka" class="fasilitas_rumah_sakit_jam_buka"><?= $Page->renderSort($Page->jam_buka) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -153,6 +205,22 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_fasilitas_rumah_sakit_fasilitas_id">
 <span<?= $Page->fasilitas_id->viewAttributes() ?>>
 <?= $Page->fasilitas_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->hari_buka->Visible) { // hari_buka ?>
+        <td data-name="hari_buka" <?= $Page->hari_buka->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_fasilitas_rumah_sakit_hari_buka">
+<span<?= $Page->hari_buka->viewAttributes() ?>>
+<?= $Page->hari_buka->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->jam_buka->Visible) { // jam_buka ?>
+        <td data-name="jam_buka" <?= $Page->jam_buka->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_fasilitas_rumah_sakit_jam_buka">
+<span<?= $Page->jam_buka->viewAttributes() ?>>
+<?= $Page->jam_buka->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

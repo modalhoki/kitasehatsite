@@ -31,6 +31,24 @@ $Page->ListOptions->render("header", "left");
         </div></div></th>
     <?php } ?>
 <?php } ?>
+<?php if ($Page->hari_buka->Visible) { // hari_buka ?>
+    <?php if ($Page->SortUrl($Page->hari_buka) == "") { ?>
+        <th class="<?= $Page->hari_buka->headerCellClass() ?>"><?= $Page->hari_buka->caption() ?></th>
+    <?php } else { ?>
+        <th class="<?= $Page->hari_buka->headerCellClass() ?>"><div class="ew-pointer" data-sort="<?= HtmlEncode($Page->hari_buka->Name) ?>" data-sort-type="1" data-sort-order="<?= $Page->hari_buka->getNextSort() ?>">
+            <div class="ew-table-header-btn"><span class="ew-table-header-caption"><?= $Page->hari_buka->caption() ?></span><span class="ew-table-header-sort"><?php if ($Page->hari_buka->getSort() == "ASC") { ?><i class="fas fa-sort-up"></i><?php } elseif ($Page->hari_buka->getSort() == "DESC") { ?><i class="fas fa-sort-down"></i><?php } ?></span>
+        </div></div></th>
+    <?php } ?>
+<?php } ?>
+<?php if ($Page->jam_buka->Visible) { // jam_buka ?>
+    <?php if ($Page->SortUrl($Page->jam_buka) == "") { ?>
+        <th class="<?= $Page->jam_buka->headerCellClass() ?>"><?= $Page->jam_buka->caption() ?></th>
+    <?php } else { ?>
+        <th class="<?= $Page->jam_buka->headerCellClass() ?>"><div class="ew-pointer" data-sort="<?= HtmlEncode($Page->jam_buka->Name) ?>" data-sort-type="1" data-sort-order="<?= $Page->jam_buka->getNextSort() ?>">
+            <div class="ew-table-header-btn"><span class="ew-table-header-caption"><?= $Page->jam_buka->caption() ?></span><span class="ew-table-header-sort"><?php if ($Page->jam_buka->getSort() == "ASC") { ?><i class="fas fa-sort-up"></i><?php } elseif ($Page->jam_buka->getSort() == "DESC") { ?><i class="fas fa-sort-down"></i><?php } ?></span>
+        </div></div></th>
+    <?php } ?>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -66,6 +84,20 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
         <td<?= $Page->fasilitas_id->cellAttributes() ?>>
 <span<?= $Page->fasilitas_id->viewAttributes() ?>>
 <?= $Page->fasilitas_id->getViewValue() ?></span>
+</td>
+<?php } ?>
+<?php if ($Page->hari_buka->Visible) { // hari_buka ?>
+        <!-- hari_buka -->
+        <td<?= $Page->hari_buka->cellAttributes() ?>>
+<span<?= $Page->hari_buka->viewAttributes() ?>>
+<?= $Page->hari_buka->getViewValue() ?></span>
+</td>
+<?php } ?>
+<?php if ($Page->jam_buka->Visible) { // jam_buka ?>
+        <!-- jam_buka -->
+        <td<?= $Page->jam_buka->cellAttributes() ?>>
+<span<?= $Page->jam_buka->viewAttributes() ?>>
+<?= $Page->jam_buka->getViewValue() ?></span>
 </td>
 <?php } ?>
 <?php

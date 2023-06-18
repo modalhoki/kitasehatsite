@@ -571,6 +571,8 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
         $this->id->Visible = false;
         $this->rumah_sakit_id->Visible = false;
         $this->fasilitas_id->setVisibility();
+        $this->hari_buka->setVisibility();
+        $this->jam_buka->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -652,8 +654,33 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
                 $this->OtherOptions->hideAllOptions();
             }
 
+            // Get default search criteria
+            AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+
+            // Get basic search values
+            $this->loadBasicSearchValues();
+
+            // Process filter list
+            if ($this->processFilterList()) {
+                $this->terminate();
+                return;
+            }
+
+            // Restore search parms from Session if not searching / reset / export
+            if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
+                $this->restoreSearchParms();
+            }
+
+            // Call Recordset SearchValidated event
+            $this->recordsetSearchValidated();
+
             // Set up sorting order
             $this->setupSortOrder();
+
+            // Get basic search criteria
+            if (!$this->hasInvalidFields()) {
+                $srchBasic = $this->basicSearchWhere();
+            }
         }
 
         // Restore display records
@@ -667,6 +694,31 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
         // Load Sorting Order
         if ($this->Command != "json") {
             $this->loadSortOrder();
+        }
+
+        // Load search default if no existing search criteria
+        if (!$this->checkSearchParms()) {
+            // Load basic search from default
+            $this->BasicSearch->loadDefault();
+            if ($this->BasicSearch->Keyword != "") {
+                $srchBasic = $this->basicSearchWhere();
+            }
+        }
+
+        // Build search criteria
+        AddFilter($this->SearchWhere, $srchAdvanced);
+        AddFilter($this->SearchWhere, $srchBasic);
+
+        // Call Recordset_Searching event
+        $this->recordsetSearching($this->SearchWhere);
+
+        // Save search criteria
+        if ($this->Command == "search" && !$this->RestoreSearch) {
+            $this->setSearchWhere($this->SearchWhere); // Save to Session
+            $this->StartRecord = 1; // Reset start record counter
+            $this->setStartRecordNumber($this->StartRecord);
+        } elseif ($this->Command != "json") {
+            $this->SearchWhere = $this->getSearchWhere();
         }
 
         // Build filter
@@ -828,6 +880,263 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
         return $wrkFilter;
     }
 
+    // Get list of filters
+    public function getFilterList()
+    {
+        global $UserProfile;
+
+        // Initialize
+        $filterList = "";
+        $savedFilterList = "";
+        $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
+        $filterList = Concat($filterList, $this->rumah_sakit_id->AdvancedSearch->toJson(), ","); // Field rumah_sakit_id
+        $filterList = Concat($filterList, $this->fasilitas_id->AdvancedSearch->toJson(), ","); // Field fasilitas_id
+        $filterList = Concat($filterList, $this->hari_buka->AdvancedSearch->toJson(), ","); // Field hari_buka
+        $filterList = Concat($filterList, $this->jam_buka->AdvancedSearch->toJson(), ","); // Field jam_buka
+        if ($this->BasicSearch->Keyword != "") {
+            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
+            $filterList = Concat($filterList, $wrk, ",");
+        }
+
+        // Return filter list in JSON
+        if ($filterList != "") {
+            $filterList = "\"data\":{" . $filterList . "}";
+        }
+        if ($savedFilterList != "") {
+            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
+        }
+        return ($filterList != "") ? "{" . $filterList . "}" : "null";
+    }
+
+    // Process filter list
+    protected function processFilterList()
+    {
+        global $UserProfile;
+        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
+            $filters = Post("filters");
+            $UserProfile->setSearchFilters(CurrentUserName(), "ffasilitas_rumah_sakitlistsrch", $filters);
+            WriteJson([["success" => true]]); // Success
+            return true;
+        } elseif (Post("cmd") == "resetfilter") {
+            $this->restoreFilterList();
+        }
+        return false;
+    }
+
+    // Restore list of filters
+    protected function restoreFilterList()
+    {
+        // Return if not reset filter
+        if (Post("cmd") !== "resetfilter") {
+            return false;
+        }
+        $filter = json_decode(Post("filter"), true);
+        $this->Command = "search";
+
+        // Field id
+        $this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
+        $this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
+        $this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
+        $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
+        $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
+        $this->id->AdvancedSearch->save();
+
+        // Field rumah_sakit_id
+        $this->rumah_sakit_id->AdvancedSearch->SearchValue = @$filter["x_rumah_sakit_id"];
+        $this->rumah_sakit_id->AdvancedSearch->SearchOperator = @$filter["z_rumah_sakit_id"];
+        $this->rumah_sakit_id->AdvancedSearch->SearchCondition = @$filter["v_rumah_sakit_id"];
+        $this->rumah_sakit_id->AdvancedSearch->SearchValue2 = @$filter["y_rumah_sakit_id"];
+        $this->rumah_sakit_id->AdvancedSearch->SearchOperator2 = @$filter["w_rumah_sakit_id"];
+        $this->rumah_sakit_id->AdvancedSearch->save();
+
+        // Field fasilitas_id
+        $this->fasilitas_id->AdvancedSearch->SearchValue = @$filter["x_fasilitas_id"];
+        $this->fasilitas_id->AdvancedSearch->SearchOperator = @$filter["z_fasilitas_id"];
+        $this->fasilitas_id->AdvancedSearch->SearchCondition = @$filter["v_fasilitas_id"];
+        $this->fasilitas_id->AdvancedSearch->SearchValue2 = @$filter["y_fasilitas_id"];
+        $this->fasilitas_id->AdvancedSearch->SearchOperator2 = @$filter["w_fasilitas_id"];
+        $this->fasilitas_id->AdvancedSearch->save();
+
+        // Field hari_buka
+        $this->hari_buka->AdvancedSearch->SearchValue = @$filter["x_hari_buka"];
+        $this->hari_buka->AdvancedSearch->SearchOperator = @$filter["z_hari_buka"];
+        $this->hari_buka->AdvancedSearch->SearchCondition = @$filter["v_hari_buka"];
+        $this->hari_buka->AdvancedSearch->SearchValue2 = @$filter["y_hari_buka"];
+        $this->hari_buka->AdvancedSearch->SearchOperator2 = @$filter["w_hari_buka"];
+        $this->hari_buka->AdvancedSearch->save();
+
+        // Field jam_buka
+        $this->jam_buka->AdvancedSearch->SearchValue = @$filter["x_jam_buka"];
+        $this->jam_buka->AdvancedSearch->SearchOperator = @$filter["z_jam_buka"];
+        $this->jam_buka->AdvancedSearch->SearchCondition = @$filter["v_jam_buka"];
+        $this->jam_buka->AdvancedSearch->SearchValue2 = @$filter["y_jam_buka"];
+        $this->jam_buka->AdvancedSearch->SearchOperator2 = @$filter["w_jam_buka"];
+        $this->jam_buka->AdvancedSearch->save();
+        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
+        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
+    }
+
+    // Return basic search SQL
+    protected function basicSearchSql($arKeywords, $type)
+    {
+        $where = "";
+        $this->buildBasicSearchSql($where, $this->hari_buka, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->jam_buka, $arKeywords, $type);
+        return $where;
+    }
+
+    // Build basic search SQL
+    protected function buildBasicSearchSql(&$where, &$fld, $arKeywords, $type)
+    {
+        $defCond = ($type == "OR") ? "OR" : "AND";
+        $arSql = []; // Array for SQL parts
+        $arCond = []; // Array for search conditions
+        $cnt = count($arKeywords);
+        $j = 0; // Number of SQL parts
+        for ($i = 0; $i < $cnt; $i++) {
+            $keyword = $arKeywords[$i];
+            $keyword = trim($keyword);
+            if (Config("BASIC_SEARCH_IGNORE_PATTERN") != "") {
+                $keyword = preg_replace(Config("BASIC_SEARCH_IGNORE_PATTERN"), "\\", $keyword);
+                $ar = explode("\\", $keyword);
+            } else {
+                $ar = [$keyword];
+            }
+            foreach ($ar as $keyword) {
+                if ($keyword != "") {
+                    $wrk = "";
+                    if ($keyword == "OR" && $type == "") {
+                        if ($j > 0) {
+                            $arCond[$j - 1] = "OR";
+                        }
+                    } elseif ($keyword == Config("NULL_VALUE")) {
+                        $wrk = $fld->Expression . " IS NULL";
+                    } elseif ($keyword == Config("NOT_NULL_VALUE")) {
+                        $wrk = $fld->Expression . " IS NOT NULL";
+                    } elseif ($fld->IsVirtual && $fld->Visible) {
+                        $wrk = $fld->VirtualExpression . Like(QuotedValue("%" . $keyword . "%", DATATYPE_STRING, $this->Dbid), $this->Dbid);
+                    } elseif ($fld->DataType != DATATYPE_NUMBER || is_numeric($keyword)) {
+                        $wrk = $fld->BasicSearchExpression . Like(QuotedValue("%" . $keyword . "%", DATATYPE_STRING, $this->Dbid), $this->Dbid);
+                    }
+                    if ($wrk != "") {
+                        $arSql[$j] = $wrk;
+                        $arCond[$j] = $defCond;
+                        $j += 1;
+                    }
+                }
+            }
+        }
+        $cnt = count($arSql);
+        $quoted = false;
+        $sql = "";
+        if ($cnt > 0) {
+            for ($i = 0; $i < $cnt - 1; $i++) {
+                if ($arCond[$i] == "OR") {
+                    if (!$quoted) {
+                        $sql .= "(";
+                    }
+                    $quoted = true;
+                }
+                $sql .= $arSql[$i];
+                if ($quoted && $arCond[$i] != "OR") {
+                    $sql .= ")";
+                    $quoted = false;
+                }
+                $sql .= " " . $arCond[$i] . " ";
+            }
+            $sql .= $arSql[$cnt - 1];
+            if ($quoted) {
+                $sql .= ")";
+            }
+        }
+        if ($sql != "") {
+            if ($where != "") {
+                $where .= " OR ";
+            }
+            $where .= "(" . $sql . ")";
+        }
+    }
+
+    // Return basic search WHERE clause based on search keyword and type
+    protected function basicSearchWhere($default = false)
+    {
+        global $Security;
+        $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $searchKeyword = ($default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
+        $searchType = ($default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
+
+        // Get search SQL
+        if ($searchKeyword != "") {
+            $ar = $this->BasicSearch->keywordList($default);
+            // Search keyword in any fields
+            if (($searchType == "OR" || $searchType == "AND") && $this->BasicSearch->BasicSearchAnyFields) {
+                foreach ($ar as $keyword) {
+                    if ($keyword != "") {
+                        if ($searchStr != "") {
+                            $searchStr .= " " . $searchType . " ";
+                        }
+                        $searchStr .= "(" . $this->basicSearchSql([$keyword], $searchType) . ")";
+                    }
+                }
+            } else {
+                $searchStr = $this->basicSearchSql($ar, $searchType);
+            }
+            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
+                $this->Command = "search";
+            }
+        }
+        if (!$default && $this->Command == "search") {
+            $this->BasicSearch->setKeyword($searchKeyword);
+            $this->BasicSearch->setType($searchType);
+        }
+        return $searchStr;
+    }
+
+    // Check if search parm exists
+    protected function checkSearchParms()
+    {
+        // Check basic search
+        if ($this->BasicSearch->issetSession()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Clear all search parameters
+    protected function resetSearchParms()
+    {
+        // Clear search WHERE clause
+        $this->SearchWhere = "";
+        $this->setSearchWhere($this->SearchWhere);
+
+        // Clear basic search parameters
+        $this->resetBasicSearchParms();
+    }
+
+    // Load advanced search default values
+    protected function loadAdvancedSearchDefault()
+    {
+        return false;
+    }
+
+    // Clear all basic search parameters
+    protected function resetBasicSearchParms()
+    {
+        $this->BasicSearch->unsetSession();
+    }
+
+    // Restore all search parameters
+    protected function restoreSearchParms()
+    {
+        $this->RestoreSearch = true;
+
+        // Restore basic search values
+        $this->BasicSearch->load();
+    }
+
     // Set up sort parameters
     protected function setupSortOrder()
     {
@@ -836,6 +1145,8 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->fasilitas_id); // fasilitas_id
+            $this->updateSort($this->hari_buka); // hari_buka
+            $this->updateSort($this->jam_buka); // jam_buka
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -866,6 +1177,11 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
+            // Reset search criteria
+            if ($this->Command == "reset" || $this->Command == "resetall") {
+                $this->resetSearchParms();
+            }
+
             // Reset master/detail keys
             if ($this->Command == "resetall") {
                 $this->setCurrentMasterTable(""); // Clear master table
@@ -881,6 +1197,8 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
                 $this->id->setSort("");
                 $this->rumah_sakit_id->setSort("");
                 $this->fasilitas_id->setSort("");
+                $this->hari_buka->setSort("");
+                $this->jam_buka->setSort("");
             }
 
             // Reset start position
@@ -1028,10 +1346,10 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
         $item->Body = "<a class=\"ew-save-filter\" data-form=\"ffasilitas_rumah_sakitlistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
         $item->Body = "<a class=\"ew-delete-filter\" data-form=\"ffasilitas_rumah_sakitlistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1164,6 +1482,16 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
         global $Security, $Language;
     }
 
+    // Load basic search values
+    protected function loadBasicSearchValues()
+    {
+        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
+        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
+            $this->Command = "search";
+        }
+        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
+    }
+
     // Load recordset
     public function loadRecordset($offset = -1, $rowcnt = -1)
     {
@@ -1235,6 +1563,8 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
         $this->id->setDbValue($row['id']);
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
         $this->fasilitas_id->setDbValue($row['fasilitas_id']);
+        $this->hari_buka->setDbValue($row['hari_buka']);
+        $this->jam_buka->setDbValue($row['jam_buka']);
     }
 
     // Return a row with default values
@@ -1244,6 +1574,8 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
         $row['id'] = null;
         $row['rumah_sakit_id'] = null;
         $row['fasilitas_id'] = null;
+        $row['hari_buka'] = null;
+        $row['jam_buka'] = null;
         return $row;
     }
 
@@ -1286,6 +1618,10 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
         // rumah_sakit_id
 
         // fasilitas_id
+
+        // hari_buka
+
+        // jam_buka
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1334,10 +1670,28 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
             }
             $this->fasilitas_id->ViewCustomAttributes = "";
 
+            // hari_buka
+            $this->hari_buka->ViewValue = $this->hari_buka->CurrentValue;
+            $this->hari_buka->ViewCustomAttributes = "";
+
+            // jam_buka
+            $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
+            $this->jam_buka->ViewCustomAttributes = "";
+
             // fasilitas_id
             $this->fasilitas_id->LinkCustomAttributes = "";
             $this->fasilitas_id->HrefValue = "";
             $this->fasilitas_id->TooltipValue = "";
+
+            // hari_buka
+            $this->hari_buka->LinkCustomAttributes = "";
+            $this->hari_buka->HrefValue = "";
+            $this->hari_buka->TooltipValue = "";
+
+            // jam_buka
+            $this->jam_buka->LinkCustomAttributes = "";
+            $this->jam_buka->HrefValue = "";
+            $this->jam_buka->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1353,6 +1707,17 @@ class FasilitasRumahSakitList extends FasilitasRumahSakit
         $pageUrl = $this->pageUrl();
         $this->SearchOptions = new ListOptions("div");
         $this->SearchOptions->TagClassName = "ew-search-option";
+
+        // Search button
+        $item = &$this->SearchOptions->add("searchtoggle");
+        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" href=\"#\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ffasilitas_rumah_sakitlistsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Visible = true;
+
+        // Show all button
+        $item = &$this->SearchOptions->add("showall");
+        $item->Body = "<a class=\"btn btn-default ew-show-all\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
 
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;

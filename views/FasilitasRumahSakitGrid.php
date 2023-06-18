@@ -22,7 +22,9 @@ loadjs.ready("head", function () {
     if (!ew.vars.tables.fasilitas_rumah_sakit)
         ew.vars.tables.fasilitas_rumah_sakit = currentTable;
     ffasilitas_rumah_sakitgrid.addFields([
-        ["fasilitas_id", [fields.fasilitas_id.visible && fields.fasilitas_id.required ? ew.Validators.required(fields.fasilitas_id.caption) : null], fields.fasilitas_id.isInvalid]
+        ["fasilitas_id", [fields.fasilitas_id.visible && fields.fasilitas_id.required ? ew.Validators.required(fields.fasilitas_id.caption) : null], fields.fasilitas_id.isInvalid],
+        ["hari_buka", [fields.hari_buka.visible && fields.hari_buka.required ? ew.Validators.required(fields.hari_buka.caption) : null], fields.hari_buka.isInvalid],
+        ["jam_buka", [fields.jam_buka.visible && fields.jam_buka.required ? ew.Validators.required(fields.jam_buka.caption) : null], fields.jam_buka.isInvalid]
     ]);
 
     // Set invalid fields
@@ -78,6 +80,10 @@ loadjs.ready("head", function () {
         var fobj = this.getForm();
         if (ew.valueChanged(fobj, rowIndex, "fasilitas_id", false))
             return false;
+        if (ew.valueChanged(fobj, rowIndex, "hari_buka", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "jam_buka", false))
+            return false;
         return true;
     }
 
@@ -118,6 +124,12 @@ $Grid->ListOptions->render("header", "left");
 ?>
 <?php if ($Grid->fasilitas_id->Visible) { // fasilitas_id ?>
         <th data-name="fasilitas_id" class="<?= $Grid->fasilitas_id->headerCellClass() ?>"><div id="elh_fasilitas_rumah_sakit_fasilitas_id" class="fasilitas_rumah_sakit_fasilitas_id"><?= $Grid->renderSort($Grid->fasilitas_id) ?></div></th>
+<?php } ?>
+<?php if ($Grid->hari_buka->Visible) { // hari_buka ?>
+        <th data-name="hari_buka" class="<?= $Grid->hari_buka->headerCellClass() ?>"><div id="elh_fasilitas_rumah_sakit_hari_buka" class="fasilitas_rumah_sakit_hari_buka"><?= $Grid->renderSort($Grid->hari_buka) ?></div></th>
+<?php } ?>
+<?php if ($Grid->jam_buka->Visible) { // jam_buka ?>
+        <th data-name="jam_buka" class="<?= $Grid->jam_buka->headerCellClass() ?>"><div id="elh_fasilitas_rumah_sakit_jam_buka" class="fasilitas_rumah_sakit_jam_buka"><?= $Grid->renderSort($Grid->jam_buka) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -279,6 +291,60 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Grid->hari_buka->Visible) { // hari_buka ?>
+        <td data-name="hari_buka" <?= $Grid->hari_buka->cellAttributes() ?>>
+<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Grid->RowCount ?>_fasilitas_rumah_sakit_hari_buka" class="form-group">
+<input type="<?= $Grid->hari_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" name="x<?= $Grid->RowIndex ?>_hari_buka" id="x<?= $Grid->RowIndex ?>_hari_buka" size="30" maxlength="15" placeholder="<?= HtmlEncode($Grid->hari_buka->getPlaceHolder()) ?>" value="<?= $Grid->hari_buka->EditValue ?>"<?= $Grid->hari_buka->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->hari_buka->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" data-hidden="1" name="o<?= $Grid->RowIndex ?>_hari_buka" id="o<?= $Grid->RowIndex ?>_hari_buka" value="<?= HtmlEncode($Grid->hari_buka->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowCount ?>_fasilitas_rumah_sakit_hari_buka" class="form-group">
+<input type="<?= $Grid->hari_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" name="x<?= $Grid->RowIndex ?>_hari_buka" id="x<?= $Grid->RowIndex ?>_hari_buka" size="30" maxlength="15" placeholder="<?= HtmlEncode($Grid->hari_buka->getPlaceHolder()) ?>" value="<?= $Grid->hari_buka->EditValue ?>"<?= $Grid->hari_buka->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->hari_buka->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Grid->RowCount ?>_fasilitas_rumah_sakit_hari_buka">
+<span<?= $Grid->hari_buka->viewAttributes() ?>>
+<?= $Grid->hari_buka->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" data-hidden="1" name="ffasilitas_rumah_sakitgrid$x<?= $Grid->RowIndex ?>_hari_buka" id="ffasilitas_rumah_sakitgrid$x<?= $Grid->RowIndex ?>_hari_buka" value="<?= HtmlEncode($Grid->hari_buka->FormValue) ?>">
+<input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" data-hidden="1" name="ffasilitas_rumah_sakitgrid$o<?= $Grid->RowIndex ?>_hari_buka" id="ffasilitas_rumah_sakitgrid$o<?= $Grid->RowIndex ?>_hari_buka" value="<?= HtmlEncode($Grid->hari_buka->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->jam_buka->Visible) { // jam_buka ?>
+        <td data-name="jam_buka" <?= $Grid->jam_buka->cellAttributes() ?>>
+<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Grid->RowCount ?>_fasilitas_rumah_sakit_jam_buka" class="form-group">
+<input type="<?= $Grid->jam_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" name="x<?= $Grid->RowIndex ?>_jam_buka" id="x<?= $Grid->RowIndex ?>_jam_buka" size="30" maxlength="13" placeholder="<?= HtmlEncode($Grid->jam_buka->getPlaceHolder()) ?>" value="<?= $Grid->jam_buka->EditValue ?>"<?= $Grid->jam_buka->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->jam_buka->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" data-hidden="1" name="o<?= $Grid->RowIndex ?>_jam_buka" id="o<?= $Grid->RowIndex ?>_jam_buka" value="<?= HtmlEncode($Grid->jam_buka->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowCount ?>_fasilitas_rumah_sakit_jam_buka" class="form-group">
+<input type="<?= $Grid->jam_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" name="x<?= $Grid->RowIndex ?>_jam_buka" id="x<?= $Grid->RowIndex ?>_jam_buka" size="30" maxlength="13" placeholder="<?= HtmlEncode($Grid->jam_buka->getPlaceHolder()) ?>" value="<?= $Grid->jam_buka->EditValue ?>"<?= $Grid->jam_buka->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->jam_buka->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Grid->RowCount ?>_fasilitas_rumah_sakit_jam_buka">
+<span<?= $Grid->jam_buka->viewAttributes() ?>>
+<?= $Grid->jam_buka->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" data-hidden="1" name="ffasilitas_rumah_sakitgrid$x<?= $Grid->RowIndex ?>_jam_buka" id="ffasilitas_rumah_sakitgrid$x<?= $Grid->RowIndex ?>_jam_buka" value="<?= HtmlEncode($Grid->jam_buka->FormValue) ?>">
+<input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" data-hidden="1" name="ffasilitas_rumah_sakitgrid$o<?= $Grid->RowIndex ?>_jam_buka" id="ffasilitas_rumah_sakitgrid$o<?= $Grid->RowIndex ?>_jam_buka" value="<?= HtmlEncode($Grid->jam_buka->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
 <?php
 // Render list options (body, right)
 $Grid->ListOptions->render("body", "right", $Grid->RowCount);
@@ -348,6 +414,40 @@ $Grid->ListOptions->render("body", "left", $Grid->RowIndex);
 <input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_fasilitas_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_fasilitas_id" id="x<?= $Grid->RowIndex ?>_fasilitas_id" value="<?= HtmlEncode($Grid->fasilitas_id->FormValue) ?>">
 <?php } ?>
 <input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_fasilitas_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_fasilitas_id" id="o<?= $Grid->RowIndex ?>_fasilitas_id" value="<?= HtmlEncode($Grid->fasilitas_id->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Grid->hari_buka->Visible) { // hari_buka ?>
+        <td data-name="hari_buka">
+<?php if (!$Grid->isConfirm()) { ?>
+<span id="el$rowindex$_fasilitas_rumah_sakit_hari_buka" class="form-group fasilitas_rumah_sakit_hari_buka">
+<input type="<?= $Grid->hari_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" name="x<?= $Grid->RowIndex ?>_hari_buka" id="x<?= $Grid->RowIndex ?>_hari_buka" size="30" maxlength="15" placeholder="<?= HtmlEncode($Grid->hari_buka->getPlaceHolder()) ?>" value="<?= $Grid->hari_buka->EditValue ?>"<?= $Grid->hari_buka->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->hari_buka->getErrorMessage() ?></div>
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_fasilitas_rumah_sakit_hari_buka" class="form-group fasilitas_rumah_sakit_hari_buka">
+<span<?= $Grid->hari_buka->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->hari_buka->getDisplayValue($Grid->hari_buka->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" data-hidden="1" name="x<?= $Grid->RowIndex ?>_hari_buka" id="x<?= $Grid->RowIndex ?>_hari_buka" value="<?= HtmlEncode($Grid->hari_buka->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" data-hidden="1" name="o<?= $Grid->RowIndex ?>_hari_buka" id="o<?= $Grid->RowIndex ?>_hari_buka" value="<?= HtmlEncode($Grid->hari_buka->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Grid->jam_buka->Visible) { // jam_buka ?>
+        <td data-name="jam_buka">
+<?php if (!$Grid->isConfirm()) { ?>
+<span id="el$rowindex$_fasilitas_rumah_sakit_jam_buka" class="form-group fasilitas_rumah_sakit_jam_buka">
+<input type="<?= $Grid->jam_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" name="x<?= $Grid->RowIndex ?>_jam_buka" id="x<?= $Grid->RowIndex ?>_jam_buka" size="30" maxlength="13" placeholder="<?= HtmlEncode($Grid->jam_buka->getPlaceHolder()) ?>" value="<?= $Grid->jam_buka->EditValue ?>"<?= $Grid->jam_buka->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->jam_buka->getErrorMessage() ?></div>
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_fasilitas_rumah_sakit_jam_buka" class="form-group fasilitas_rumah_sakit_jam_buka">
+<span<?= $Grid->jam_buka->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->jam_buka->getDisplayValue($Grid->jam_buka->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" data-hidden="1" name="x<?= $Grid->RowIndex ?>_jam_buka" id="x<?= $Grid->RowIndex ?>_jam_buka" value="<?= HtmlEncode($Grid->jam_buka->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" data-hidden="1" name="o<?= $Grid->RowIndex ?>_jam_buka" id="o<?= $Grid->RowIndex ?>_jam_buka" value="<?= HtmlEncode($Grid->jam_buka->OldValue) ?>">
 </td>
     <?php } ?>
 <?php

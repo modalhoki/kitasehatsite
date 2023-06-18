@@ -508,6 +508,8 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
         $this->id->Visible = false;
         $this->rumah_sakit_id->Visible = false;
         $this->fasilitas_id->setVisibility();
+        $this->hari_buka->setVisibility();
+        $this->jam_buka->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -935,6 +937,12 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
         if ($CurrentForm->hasValue("x_fasilitas_id") && $CurrentForm->hasValue("o_fasilitas_id") && $this->fasilitas_id->CurrentValue != $this->fasilitas_id->OldValue) {
             return false;
         }
+        if ($CurrentForm->hasValue("x_hari_buka") && $CurrentForm->hasValue("o_hari_buka") && $this->hari_buka->CurrentValue != $this->hari_buka->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_jam_buka") && $CurrentForm->hasValue("o_jam_buka") && $this->jam_buka->CurrentValue != $this->jam_buka->OldValue) {
+            return false;
+        }
         return true;
     }
 
@@ -1017,6 +1025,8 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
     public function resetFormError()
     {
         $this->fasilitas_id->clearErrorMessage();
+        $this->hari_buka->clearErrorMessage();
+        $this->jam_buka->clearErrorMessage();
     }
 
     // Set up sort parameters
@@ -1243,6 +1253,10 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
         $this->rumah_sakit_id->OldValue = $this->rumah_sakit_id->CurrentValue;
         $this->fasilitas_id->CurrentValue = null;
         $this->fasilitas_id->OldValue = $this->fasilitas_id->CurrentValue;
+        $this->hari_buka->CurrentValue = null;
+        $this->hari_buka->OldValue = $this->hari_buka->CurrentValue;
+        $this->jam_buka->CurrentValue = null;
+        $this->jam_buka->OldValue = $this->jam_buka->CurrentValue;
     }
 
     // Load form values
@@ -1265,6 +1279,32 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
             $this->fasilitas_id->setOldValue($CurrentForm->getValue("o_fasilitas_id"));
         }
 
+        // Check field name 'hari_buka' first before field var 'x_hari_buka'
+        $val = $CurrentForm->hasValue("hari_buka") ? $CurrentForm->getValue("hari_buka") : $CurrentForm->getValue("x_hari_buka");
+        if (!$this->hari_buka->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->hari_buka->Visible = false; // Disable update for API request
+            } else {
+                $this->hari_buka->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_hari_buka")) {
+            $this->hari_buka->setOldValue($CurrentForm->getValue("o_hari_buka"));
+        }
+
+        // Check field name 'jam_buka' first before field var 'x_jam_buka'
+        $val = $CurrentForm->hasValue("jam_buka") ? $CurrentForm->getValue("jam_buka") : $CurrentForm->getValue("x_jam_buka");
+        if (!$this->jam_buka->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->jam_buka->Visible = false; // Disable update for API request
+            } else {
+                $this->jam_buka->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_jam_buka")) {
+            $this->jam_buka->setOldValue($CurrentForm->getValue("o_jam_buka"));
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
         if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
@@ -1280,6 +1320,8 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
             $this->id->CurrentValue = $this->id->FormValue;
         }
         $this->fasilitas_id->CurrentValue = $this->fasilitas_id->FormValue;
+        $this->hari_buka->CurrentValue = $this->hari_buka->FormValue;
+        $this->jam_buka->CurrentValue = $this->jam_buka->FormValue;
     }
 
     // Load recordset
@@ -1353,6 +1395,8 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
         $this->id->setDbValue($row['id']);
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
         $this->fasilitas_id->setDbValue($row['fasilitas_id']);
+        $this->hari_buka->setDbValue($row['hari_buka']);
+        $this->jam_buka->setDbValue($row['jam_buka']);
     }
 
     // Return a row with default values
@@ -1363,6 +1407,8 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
         $row['id'] = $this->id->CurrentValue;
         $row['rumah_sakit_id'] = $this->rumah_sakit_id->CurrentValue;
         $row['fasilitas_id'] = $this->fasilitas_id->CurrentValue;
+        $row['hari_buka'] = $this->hari_buka->CurrentValue;
+        $row['jam_buka'] = $this->jam_buka->CurrentValue;
         return $row;
     }
 
@@ -1403,6 +1449,10 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
         // rumah_sakit_id
 
         // fasilitas_id
+
+        // hari_buka
+
+        // jam_buka
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1451,10 +1501,28 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
             }
             $this->fasilitas_id->ViewCustomAttributes = "";
 
+            // hari_buka
+            $this->hari_buka->ViewValue = $this->hari_buka->CurrentValue;
+            $this->hari_buka->ViewCustomAttributes = "";
+
+            // jam_buka
+            $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
+            $this->jam_buka->ViewCustomAttributes = "";
+
             // fasilitas_id
             $this->fasilitas_id->LinkCustomAttributes = "";
             $this->fasilitas_id->HrefValue = "";
             $this->fasilitas_id->TooltipValue = "";
+
+            // hari_buka
+            $this->hari_buka->LinkCustomAttributes = "";
+            $this->hari_buka->HrefValue = "";
+            $this->hari_buka->TooltipValue = "";
+
+            // jam_buka
+            $this->jam_buka->LinkCustomAttributes = "";
+            $this->jam_buka->HrefValue = "";
+            $this->jam_buka->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // fasilitas_id
             $this->fasilitas_id->EditCustomAttributes = "";
@@ -1489,11 +1557,37 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
             }
             $this->fasilitas_id->PlaceHolder = RemoveHtml($this->fasilitas_id->caption());
 
+            // hari_buka
+            $this->hari_buka->EditAttrs["class"] = "form-control";
+            $this->hari_buka->EditCustomAttributes = "";
+            if (!$this->hari_buka->Raw) {
+                $this->hari_buka->CurrentValue = HtmlDecode($this->hari_buka->CurrentValue);
+            }
+            $this->hari_buka->EditValue = HtmlEncode($this->hari_buka->CurrentValue);
+            $this->hari_buka->PlaceHolder = RemoveHtml($this->hari_buka->caption());
+
+            // jam_buka
+            $this->jam_buka->EditAttrs["class"] = "form-control";
+            $this->jam_buka->EditCustomAttributes = "";
+            if (!$this->jam_buka->Raw) {
+                $this->jam_buka->CurrentValue = HtmlDecode($this->jam_buka->CurrentValue);
+            }
+            $this->jam_buka->EditValue = HtmlEncode($this->jam_buka->CurrentValue);
+            $this->jam_buka->PlaceHolder = RemoveHtml($this->jam_buka->caption());
+
             // Add refer script
 
             // fasilitas_id
             $this->fasilitas_id->LinkCustomAttributes = "";
             $this->fasilitas_id->HrefValue = "";
+
+            // hari_buka
+            $this->hari_buka->LinkCustomAttributes = "";
+            $this->hari_buka->HrefValue = "";
+
+            // jam_buka
+            $this->jam_buka->LinkCustomAttributes = "";
+            $this->jam_buka->HrefValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // fasilitas_id
             $this->fasilitas_id->EditCustomAttributes = "";
@@ -1528,11 +1622,37 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
             }
             $this->fasilitas_id->PlaceHolder = RemoveHtml($this->fasilitas_id->caption());
 
+            // hari_buka
+            $this->hari_buka->EditAttrs["class"] = "form-control";
+            $this->hari_buka->EditCustomAttributes = "";
+            if (!$this->hari_buka->Raw) {
+                $this->hari_buka->CurrentValue = HtmlDecode($this->hari_buka->CurrentValue);
+            }
+            $this->hari_buka->EditValue = HtmlEncode($this->hari_buka->CurrentValue);
+            $this->hari_buka->PlaceHolder = RemoveHtml($this->hari_buka->caption());
+
+            // jam_buka
+            $this->jam_buka->EditAttrs["class"] = "form-control";
+            $this->jam_buka->EditCustomAttributes = "";
+            if (!$this->jam_buka->Raw) {
+                $this->jam_buka->CurrentValue = HtmlDecode($this->jam_buka->CurrentValue);
+            }
+            $this->jam_buka->EditValue = HtmlEncode($this->jam_buka->CurrentValue);
+            $this->jam_buka->PlaceHolder = RemoveHtml($this->jam_buka->caption());
+
             // Edit refer script
 
             // fasilitas_id
             $this->fasilitas_id->LinkCustomAttributes = "";
             $this->fasilitas_id->HrefValue = "";
+
+            // hari_buka
+            $this->hari_buka->LinkCustomAttributes = "";
+            $this->hari_buka->HrefValue = "";
+
+            // jam_buka
+            $this->jam_buka->LinkCustomAttributes = "";
+            $this->jam_buka->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1556,6 +1676,16 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
         if ($this->fasilitas_id->Required) {
             if (!$this->fasilitas_id->IsDetailKey && EmptyValue($this->fasilitas_id->FormValue)) {
                 $this->fasilitas_id->addErrorMessage(str_replace("%s", $this->fasilitas_id->caption(), $this->fasilitas_id->RequiredErrorMessage));
+            }
+        }
+        if ($this->hari_buka->Required) {
+            if (!$this->hari_buka->IsDetailKey && EmptyValue($this->hari_buka->FormValue)) {
+                $this->hari_buka->addErrorMessage(str_replace("%s", $this->hari_buka->caption(), $this->hari_buka->RequiredErrorMessage));
+            }
+        }
+        if ($this->jam_buka->Required) {
+            if (!$this->jam_buka->IsDetailKey && EmptyValue($this->jam_buka->FormValue)) {
+                $this->jam_buka->addErrorMessage(str_replace("%s", $this->jam_buka->caption(), $this->jam_buka->RequiredErrorMessage));
             }
         }
 
@@ -1670,6 +1800,12 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
             // fasilitas_id
             $this->fasilitas_id->setDbValueDef($rsnew, $this->fasilitas_id->CurrentValue, 0, $this->fasilitas_id->ReadOnly);
 
+            // hari_buka
+            $this->hari_buka->setDbValueDef($rsnew, $this->hari_buka->CurrentValue, null, $this->hari_buka->ReadOnly);
+
+            // jam_buka
+            $this->jam_buka->setDbValueDef($rsnew, $this->jam_buka->CurrentValue, null, $this->jam_buka->ReadOnly);
+
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
             if ($updateRow) {
@@ -1733,6 +1869,12 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
 
         // fasilitas_id
         $this->fasilitas_id->setDbValueDef($rsnew, $this->fasilitas_id->CurrentValue, 0, false);
+
+        // hari_buka
+        $this->hari_buka->setDbValueDef($rsnew, $this->hari_buka->CurrentValue, null, false);
+
+        // jam_buka
+        $this->jam_buka->setDbValueDef($rsnew, $this->jam_buka->CurrentValue, null, false);
 
         // rumah_sakit_id
         if ($this->rumah_sakit_id->getSessionValue() != "") {

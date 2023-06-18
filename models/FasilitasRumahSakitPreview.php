@@ -393,6 +393,8 @@ class FasilitasRumahSakitPreview extends FasilitasRumahSakit
         $this->id->Visible = false;
         $this->rumah_sakit_id->Visible = false;
         $this->fasilitas_id->setVisibility();
+        $this->hari_buka->setVisibility();
+        $this->jam_buka->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -483,6 +485,8 @@ class FasilitasRumahSakitPreview extends FasilitasRumahSakit
             $this->id->setSort("");
             $this->rumah_sakit_id->setSort("");
             $this->fasilitas_id->setSort("");
+            $this->hari_buka->setSort("");
+            $this->jam_buka->setSort("");
 
             // Save sort to session
             $this->setSessionOrderBy("");
@@ -495,6 +499,8 @@ class FasilitasRumahSakitPreview extends FasilitasRumahSakit
         // Check for sort field
         if ($this->CurrentOrder !== "") {
             $this->updateSort($this->fasilitas_id); // fasilitas_id
+            $this->updateSort($this->hari_buka); // hari_buka
+            $this->updateSort($this->jam_buka); // jam_buka
         }
     }
 

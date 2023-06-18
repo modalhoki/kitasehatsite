@@ -377,6 +377,8 @@ class FasilitasRumahSakitDelete extends FasilitasRumahSakit
         $this->id->Visible = false;
         $this->rumah_sakit_id->Visible = false;
         $this->fasilitas_id->setVisibility();
+        $this->hari_buka->setVisibility();
+        $this->jam_buka->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -547,6 +549,8 @@ class FasilitasRumahSakitDelete extends FasilitasRumahSakit
         $this->id->setDbValue($row['id']);
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
         $this->fasilitas_id->setDbValue($row['fasilitas_id']);
+        $this->hari_buka->setDbValue($row['hari_buka']);
+        $this->jam_buka->setDbValue($row['jam_buka']);
     }
 
     // Return a row with default values
@@ -556,6 +560,8 @@ class FasilitasRumahSakitDelete extends FasilitasRumahSakit
         $row['id'] = null;
         $row['rumah_sakit_id'] = null;
         $row['fasilitas_id'] = null;
+        $row['hari_buka'] = null;
+        $row['jam_buka'] = null;
         return $row;
     }
 
@@ -576,6 +582,10 @@ class FasilitasRumahSakitDelete extends FasilitasRumahSakit
         // rumah_sakit_id
 
         // fasilitas_id
+
+        // hari_buka
+
+        // jam_buka
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -624,10 +634,28 @@ class FasilitasRumahSakitDelete extends FasilitasRumahSakit
             }
             $this->fasilitas_id->ViewCustomAttributes = "";
 
+            // hari_buka
+            $this->hari_buka->ViewValue = $this->hari_buka->CurrentValue;
+            $this->hari_buka->ViewCustomAttributes = "";
+
+            // jam_buka
+            $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
+            $this->jam_buka->ViewCustomAttributes = "";
+
             // fasilitas_id
             $this->fasilitas_id->LinkCustomAttributes = "";
             $this->fasilitas_id->HrefValue = "";
             $this->fasilitas_id->TooltipValue = "";
+
+            // hari_buka
+            $this->hari_buka->LinkCustomAttributes = "";
+            $this->hari_buka->HrefValue = "";
+            $this->hari_buka->TooltipValue = "";
+
+            // jam_buka
+            $this->jam_buka->LinkCustomAttributes = "";
+            $this->jam_buka->HrefValue = "";
+            $this->jam_buka->TooltipValue = "";
         }
 
         // Call Row Rendered event

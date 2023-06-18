@@ -31,6 +31,8 @@ class FasilitasRumahSakit extends DbTable
     public $id;
     public $rumah_sakit_id;
     public $fasilitas_id;
+    public $hari_buka;
+    public $jam_buka;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -98,6 +100,18 @@ class FasilitasRumahSakit extends DbTable
         $this->fasilitas_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->fasilitas_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->fasilitas_id->Param, "CustomMsg");
         $this->Fields['fasilitas_id'] = &$this->fasilitas_id;
+
+        // hari_buka
+        $this->hari_buka = new DbField('fasilitas_rumah_sakit', 'fasilitas_rumah_sakit', 'x_hari_buka', 'hari_buka', '`hari_buka`', '`hari_buka`', 200, 15, -1, false, '`hari_buka`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->hari_buka->Sortable = true; // Allow sort
+        $this->hari_buka->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->hari_buka->Param, "CustomMsg");
+        $this->Fields['hari_buka'] = &$this->hari_buka;
+
+        // jam_buka
+        $this->jam_buka = new DbField('fasilitas_rumah_sakit', 'fasilitas_rumah_sakit', 'x_jam_buka', 'jam_buka', '`jam_buka`', '`jam_buka`', 200, 13, -1, false, '`jam_buka`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->jam_buka->Sortable = true; // Allow sort
+        $this->jam_buka->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->jam_buka->Param, "CustomMsg");
+        $this->Fields['jam_buka'] = &$this->jam_buka;
     }
 
     // Field Visibility
@@ -566,6 +580,8 @@ class FasilitasRumahSakit extends DbTable
         $this->id->DbValue = $row['id'];
         $this->rumah_sakit_id->DbValue = $row['rumah_sakit_id'];
         $this->fasilitas_id->DbValue = $row['fasilitas_id'];
+        $this->hari_buka->DbValue = $row['hari_buka'];
+        $this->jam_buka->DbValue = $row['jam_buka'];
     }
 
     // Delete uploaded files
@@ -893,6 +909,8 @@ SORTHTML;
         $this->id->setDbValue($row['id']);
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
         $this->fasilitas_id->setDbValue($row['fasilitas_id']);
+        $this->hari_buka->setDbValue($row['hari_buka']);
+        $this->jam_buka->setDbValue($row['jam_buka']);
     }
 
     // Render list row values
@@ -910,6 +928,10 @@ SORTHTML;
         // rumah_sakit_id
 
         // fasilitas_id
+
+        // hari_buka
+
+        // jam_buka
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -958,6 +980,14 @@ SORTHTML;
         }
         $this->fasilitas_id->ViewCustomAttributes = "";
 
+        // hari_buka
+        $this->hari_buka->ViewValue = $this->hari_buka->CurrentValue;
+        $this->hari_buka->ViewCustomAttributes = "";
+
+        // jam_buka
+        $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
+        $this->jam_buka->ViewCustomAttributes = "";
+
         // id
         $this->id->LinkCustomAttributes = "";
         $this->id->HrefValue = "";
@@ -972,6 +1002,16 @@ SORTHTML;
         $this->fasilitas_id->LinkCustomAttributes = "";
         $this->fasilitas_id->HrefValue = "";
         $this->fasilitas_id->TooltipValue = "";
+
+        // hari_buka
+        $this->hari_buka->LinkCustomAttributes = "";
+        $this->hari_buka->HrefValue = "";
+        $this->hari_buka->TooltipValue = "";
+
+        // jam_buka
+        $this->jam_buka->LinkCustomAttributes = "";
+        $this->jam_buka->HrefValue = "";
+        $this->jam_buka->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1029,6 +1069,24 @@ SORTHTML;
         $this->fasilitas_id->EditCustomAttributes = "";
         $this->fasilitas_id->PlaceHolder = RemoveHtml($this->fasilitas_id->caption());
 
+        // hari_buka
+        $this->hari_buka->EditAttrs["class"] = "form-control";
+        $this->hari_buka->EditCustomAttributes = "";
+        if (!$this->hari_buka->Raw) {
+            $this->hari_buka->CurrentValue = HtmlDecode($this->hari_buka->CurrentValue);
+        }
+        $this->hari_buka->EditValue = $this->hari_buka->CurrentValue;
+        $this->hari_buka->PlaceHolder = RemoveHtml($this->hari_buka->caption());
+
+        // jam_buka
+        $this->jam_buka->EditAttrs["class"] = "form-control";
+        $this->jam_buka->EditCustomAttributes = "";
+        if (!$this->jam_buka->Raw) {
+            $this->jam_buka->CurrentValue = HtmlDecode($this->jam_buka->CurrentValue);
+        }
+        $this->jam_buka->EditValue = $this->jam_buka->CurrentValue;
+        $this->jam_buka->PlaceHolder = RemoveHtml($this->jam_buka->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1059,10 +1117,14 @@ SORTHTML;
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->fasilitas_id);
+                    $doc->exportCaption($this->hari_buka);
+                    $doc->exportCaption($this->jam_buka);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->rumah_sakit_id);
                     $doc->exportCaption($this->fasilitas_id);
+                    $doc->exportCaption($this->hari_buka);
+                    $doc->exportCaption($this->jam_buka);
                 }
                 $doc->endExportRow();
             }
@@ -1094,10 +1156,14 @@ SORTHTML;
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->fasilitas_id);
+                        $doc->exportField($this->hari_buka);
+                        $doc->exportField($this->jam_buka);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->rumah_sakit_id);
                         $doc->exportField($this->fasilitas_id);
+                        $doc->exportField($this->hari_buka);
+                        $doc->exportField($this->jam_buka);
                     }
                     $doc->endExportRow($rowCnt);
                 }
