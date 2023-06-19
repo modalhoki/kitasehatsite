@@ -1236,7 +1236,11 @@ class PraktikPoliGrid extends PraktikPoli
             $item = &$option->add("add");
             $addcaption = HtmlTitle($Language->phrase("AddLink"));
             $this->AddUrl = $this->getAddUrl();
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
+            if (IsMobile()) {
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
+            } else {
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"praktik_poli\" data-caption=\"" . $addcaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'AddBtn',url:'" . HtmlEncode(GetUrl($this->AddUrl)) . "'});\">" . $Language->phrase("AddLink") . "</a>";
+            }
             $item->Visible = $this->AddUrl != "" && $Security->canAdd();
         }
     }
