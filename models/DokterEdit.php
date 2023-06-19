@@ -966,7 +966,7 @@ class DokterEdit extends Dokter
             $this->nama_dokter->setDbValueDef($rsnew, $this->nama_dokter->CurrentValue, "", $this->nama_dokter->ReadOnly);
 
             // webusers_id
-            $this->webusers_id->setDbValueDef($rsnew, $this->webusers_id->CurrentValue, 0, $this->webusers_id->ReadOnly);
+            $this->webusers_id->setDbValueDef($rsnew, $this->webusers_id->CurrentValue, null, $this->webusers_id->ReadOnly);
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);

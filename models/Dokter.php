@@ -88,8 +88,6 @@ class Dokter extends DbTable
 
         // webusers_id
         $this->webusers_id = new DbField('dokter', 'dokter', 'x_webusers_id', 'webusers_id', '`webusers_id`', '`webusers_id`', 20, 20, -1, false, '`webusers_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->webusers_id->Nullable = false; // NOT NULL field
-        $this->webusers_id->Required = true; // Required field
         $this->webusers_id->Sortable = true; // Allow sort
         $this->webusers_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->webusers_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text

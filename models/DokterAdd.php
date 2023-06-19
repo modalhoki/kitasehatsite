@@ -933,7 +933,7 @@ class DokterAdd extends Dokter
         $this->nama_dokter->setDbValueDef($rsnew, $this->nama_dokter->CurrentValue, "", false);
 
         // webusers_id
-        $this->webusers_id->setDbValueDef($rsnew, $this->webusers_id->CurrentValue, 0, false);
+        $this->webusers_id->setDbValueDef($rsnew, $this->webusers_id->CurrentValue, null, false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
