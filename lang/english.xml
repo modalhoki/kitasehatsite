@@ -953,7 +953,7 @@
       <phrase id="menutext" value="Fasilitas/Layanan" />
     </menu>
     <menu id="6">
-      <phrase id="menutext" value="Fasilitas/Layanan @Rumah Sakit" />
+      <phrase id="menutext" value="Layanan @Rumah Sakit" />
     </menu>
     <menu id="22">
       <phrase id="menutext" value="Pasien" />
@@ -1093,7 +1093,7 @@
       </field>
     </table>
     <table id="fasilitas_rumah_sakit">
-      <phrase id="tblcaption" value="Fasilitas/Layanan @Rumah Sakit" />
+      <phrase id="tblcaption" value="Layanan @Rumah Sakit" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>

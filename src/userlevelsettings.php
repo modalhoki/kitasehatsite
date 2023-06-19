@@ -46,7 +46,7 @@ $USER_LEVEL_TABLES = [["antrean_bpjs","antrean_bpjs","Antrean BPJS",true,"{6882E
     ["daerah","daerah","Daerah",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","daerahlist"],
     ["dokter","dokter","Data Dokter",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","dokterlist"],
     ["fasilitas","fasilitas","Fasilitas/Layanan",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","fasilitaslist"],
-    ["fasilitas_rumah_sakit","fasilitas_rumah_sakit","Fasilitas/Layanan @Rumah Sakit",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","fasilitasrumahsakitlist"],
+    ["fasilitas_rumah_sakit","fasilitas_rumah_sakit","Layanan @Rumah Sakit",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","fasilitasrumahsakitlist"],
     ["pasien","pasien","Data Pasien",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","pasienlist"],
     ["rumah_sakit","rumah_sakit","Rumah Sakit",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","rumahsakitlist"],
     ["webusers","webusers","webusers",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","webuserslist"],

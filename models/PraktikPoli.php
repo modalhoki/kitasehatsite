@@ -1310,6 +1310,10 @@ SORTHTML;
     public function rowUpdated($rsold, &$rsnew)
     {
         //Log("Row Updated");
+        $query = "SELECT rumah_sakit_id FROM fasilitas_rumah_sakit WHERE id = ".$rsnew["fasilitas_rumah_sakit_id"];
+        $rumah_sakit_id = ExecuteScalar($query);
+        $url = "fasilitasrumahsakitlist?showmaster=rumah_sakit&fk_id=".$rumah_sakit_id;
+        $this->terminate($url);
     }
 
     // Row Update Conflict event
