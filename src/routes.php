@@ -55,6 +55,7 @@ return function (App $app) {
     // dokter
     $app->any('/dokterlist[/{id}]', DokterController::class . ':list')->add(PermissionMiddleware::class)->setName('dokterlist-dokter-list'); // list
     $app->any('/dokteradd[/{id}]', DokterController::class . ':add')->add(PermissionMiddleware::class)->setName('dokteradd-dokter-add'); // add
+    $app->any('/dokteraddopt', DokterController::class . ':addopt')->add(PermissionMiddleware::class)->setName('dokteraddopt-dokter-addopt'); // addopt
     $app->any('/dokterview[/{id}]', DokterController::class . ':view')->add(PermissionMiddleware::class)->setName('dokterview-dokter-view'); // view
     $app->any('/dokteredit[/{id}]', DokterController::class . ':edit')->add(PermissionMiddleware::class)->setName('dokteredit-dokter-edit'); // edit
     $app->any('/dokterdelete[/{id}]', DokterController::class . ':delete')->add(PermissionMiddleware::class)->setName('dokterdelete-dokter-delete'); // delete
@@ -64,6 +65,7 @@ return function (App $app) {
         function (RouteCollectorProxy $group) {
             $group->any('/' . Config("LIST_ACTION") . '[/{id}]', DokterController::class . ':list')->add(PermissionMiddleware::class)->setName('dokter/list-dokter-list-2'); // list
             $group->any('/' . Config("ADD_ACTION") . '[/{id}]', DokterController::class . ':add')->add(PermissionMiddleware::class)->setName('dokter/add-dokter-add-2'); // add
+            $group->any('/' . Config("ADDOPT_ACTION") . '', DokterController::class . ':addopt')->add(PermissionMiddleware::class)->setName('dokter/addopt-dokter-addopt-2'); // addopt
             $group->any('/' . Config("VIEW_ACTION") . '[/{id}]', DokterController::class . ':view')->add(PermissionMiddleware::class)->setName('dokter/view-dokter-view-2'); // view
             $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', DokterController::class . ':edit')->add(PermissionMiddleware::class)->setName('dokter/edit-dokter-edit-2'); // edit
             $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', DokterController::class . ':delete')->add(PermissionMiddleware::class)->setName('dokter/delete-dokter-delete-2'); // delete

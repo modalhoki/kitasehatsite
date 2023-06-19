@@ -138,6 +138,9 @@ $Page->showMessage();
     <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x_dokter_id"><?= EmptyValue(strval($Page->dokter_id->ViewValue)) ? $Language->phrase("PleaseSelect") : $Page->dokter_id->ViewValue ?></div>
     <div class="input-group-append">
         <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Page->dokter_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Page->dokter_id->ReadOnly || $Page->dokter_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x_dokter_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
+        <?php if (AllowAdd(CurrentProjectID() . "dokter") && !$Page->dokter_id->ReadOnly) { ?>
+        <button type="button" class="btn btn-default ew-add-opt-btn" id="aol_x_dokter_id" title="<?= HtmlTitle($Language->phrase("AddLink")) . "&nbsp;" . $Page->dokter_id->caption() ?>" data-title="<?= $Page->dokter_id->caption() ?>" onclick="ew.addOptionDialogShow({lnk:this,el:'x_dokter_id',url:'<?= GetUrl("dokteraddopt") ?>'});"><i class="fas fa-plus ew-icon"></i></button>
+        <?php } ?>
     </div>
 </div>
 <div class="invalid-feedback"><?= $Page->dokter_id->getErrorMessage() ?></div>
