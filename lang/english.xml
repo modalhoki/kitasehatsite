@@ -1293,11 +1293,11 @@
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
-      <field id="dokter_id">
-        <phrase id="fldcaption" value="Dokter" />
-      </field>
       <field id="fasilitas_rumah_sakit_id">
         <phrase id="fldcaption" value="Poli" />
+      </field>
+      <field id="dokter_id">
+        <phrase id="fldcaption" value="Dokter" />
       </field>
       <field id="hari_praktik">
         <phrase id="fldcaption" value="Hari Praktik" />

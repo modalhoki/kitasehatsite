@@ -31,15 +31,6 @@ $Page->ListOptions->render("header", "left");
         </div></div></th>
     <?php } ?>
 <?php } ?>
-<?php if ($Page->fasilitas_rumah_sakit_id->Visible) { // fasilitas_rumah_sakit_id ?>
-    <?php if ($Page->SortUrl($Page->fasilitas_rumah_sakit_id) == "") { ?>
-        <th class="<?= $Page->fasilitas_rumah_sakit_id->headerCellClass() ?>"><?= $Page->fasilitas_rumah_sakit_id->caption() ?></th>
-    <?php } else { ?>
-        <th class="<?= $Page->fasilitas_rumah_sakit_id->headerCellClass() ?>"><div class="ew-pointer" data-sort="<?= HtmlEncode($Page->fasilitas_rumah_sakit_id->Name) ?>" data-sort-type="1" data-sort-order="<?= $Page->fasilitas_rumah_sakit_id->getNextSort() ?>">
-            <div class="ew-table-header-btn"><span class="ew-table-header-caption"><?= $Page->fasilitas_rumah_sakit_id->caption() ?></span><span class="ew-table-header-sort"><?php if ($Page->fasilitas_rumah_sakit_id->getSort() == "ASC") { ?><i class="fas fa-sort-up"></i><?php } elseif ($Page->fasilitas_rumah_sakit_id->getSort() == "DESC") { ?><i class="fas fa-sort-down"></i><?php } ?></span>
-        </div></div></th>
-    <?php } ?>
-<?php } ?>
 <?php if ($Page->hari_praktik->Visible) { // hari_praktik ?>
     <?php if ($Page->SortUrl($Page->hari_praktik) == "") { ?>
         <th class="<?= $Page->hari_praktik->headerCellClass() ?>"><?= $Page->hari_praktik->caption() ?></th>
@@ -93,13 +84,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
         <td<?= $Page->dokter_id->cellAttributes() ?>>
 <span<?= $Page->dokter_id->viewAttributes() ?>>
 <?= $Page->dokter_id->getViewValue() ?></span>
-</td>
-<?php } ?>
-<?php if ($Page->fasilitas_rumah_sakit_id->Visible) { // fasilitas_rumah_sakit_id ?>
-        <!-- fasilitas_rumah_sakit_id -->
-        <td<?= $Page->fasilitas_rumah_sakit_id->cellAttributes() ?>>
-<span<?= $Page->fasilitas_rumah_sakit_id->viewAttributes() ?>>
-<?= $Page->fasilitas_rumah_sakit_id->getViewValue() ?></span>
 </td>
 <?php } ?>
 <?php if ($Page->hari_praktik->Visible) { // hari_praktik ?>

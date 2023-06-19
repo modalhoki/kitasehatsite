@@ -572,8 +572,8 @@ class PraktikPoliList extends PraktikPoli
         // Set up list options
         $this->setupListOptions();
         $this->id->Visible = false;
+        $this->fasilitas_rumah_sakit_id->Visible = false;
         $this->dokter_id->setVisibility();
-        $this->fasilitas_rumah_sakit_id->setVisibility();
         $this->hari_praktik->setVisibility();
         $this->jam_praktik->setVisibility();
         $this->hideFieldsForAddEdit();
@@ -606,8 +606,8 @@ class PraktikPoliList extends PraktikPoli
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->dokter_id);
         $this->setupLookupOptions($this->fasilitas_rumah_sakit_id);
+        $this->setupLookupOptions($this->dokter_id);
 
         // Search filters
         $srchAdvanced = ""; // Advanced search filter
@@ -1199,9 +1199,6 @@ class PraktikPoliList extends PraktikPoli
         if ($CurrentForm->hasValue("x_dokter_id") && $CurrentForm->hasValue("o_dokter_id") && $this->dokter_id->CurrentValue != $this->dokter_id->OldValue) {
             return false;
         }
-        if ($CurrentForm->hasValue("x_fasilitas_rumah_sakit_id") && $CurrentForm->hasValue("o_fasilitas_rumah_sakit_id") && $this->fasilitas_rumah_sakit_id->CurrentValue != $this->fasilitas_rumah_sakit_id->OldValue) {
-            return false;
-        }
         if ($CurrentForm->hasValue("x_hari_praktik") && $CurrentForm->hasValue("o_hari_praktik") && $this->hari_praktik->CurrentValue != $this->hari_praktik->OldValue) {
             return false;
         }
@@ -1290,7 +1287,6 @@ class PraktikPoliList extends PraktikPoli
     public function resetFormError()
     {
         $this->dokter_id->clearErrorMessage();
-        $this->fasilitas_rumah_sakit_id->clearErrorMessage();
         $this->hari_praktik->clearErrorMessage();
         $this->jam_praktik->clearErrorMessage();
     }
@@ -1304,8 +1300,8 @@ class PraktikPoliList extends PraktikPoli
         $filterList = "";
         $savedFilterList = "";
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->dokter_id->AdvancedSearch->toJson(), ","); // Field dokter_id
         $filterList = Concat($filterList, $this->fasilitas_rumah_sakit_id->AdvancedSearch->toJson(), ","); // Field fasilitas_rumah_sakit_id
+        $filterList = Concat($filterList, $this->dokter_id->AdvancedSearch->toJson(), ","); // Field dokter_id
         $filterList = Concat($filterList, $this->hari_praktik->AdvancedSearch->toJson(), ","); // Field hari_praktik
         $filterList = Concat($filterList, $this->jam_praktik->AdvancedSearch->toJson(), ","); // Field jam_praktik
         if ($this->BasicSearch->Keyword != "") {
@@ -1356,14 +1352,6 @@ class PraktikPoliList extends PraktikPoli
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field dokter_id
-        $this->dokter_id->AdvancedSearch->SearchValue = @$filter["x_dokter_id"];
-        $this->dokter_id->AdvancedSearch->SearchOperator = @$filter["z_dokter_id"];
-        $this->dokter_id->AdvancedSearch->SearchCondition = @$filter["v_dokter_id"];
-        $this->dokter_id->AdvancedSearch->SearchValue2 = @$filter["y_dokter_id"];
-        $this->dokter_id->AdvancedSearch->SearchOperator2 = @$filter["w_dokter_id"];
-        $this->dokter_id->AdvancedSearch->save();
-
         // Field fasilitas_rumah_sakit_id
         $this->fasilitas_rumah_sakit_id->AdvancedSearch->SearchValue = @$filter["x_fasilitas_rumah_sakit_id"];
         $this->fasilitas_rumah_sakit_id->AdvancedSearch->SearchOperator = @$filter["z_fasilitas_rumah_sakit_id"];
@@ -1371,6 +1359,14 @@ class PraktikPoliList extends PraktikPoli
         $this->fasilitas_rumah_sakit_id->AdvancedSearch->SearchValue2 = @$filter["y_fasilitas_rumah_sakit_id"];
         $this->fasilitas_rumah_sakit_id->AdvancedSearch->SearchOperator2 = @$filter["w_fasilitas_rumah_sakit_id"];
         $this->fasilitas_rumah_sakit_id->AdvancedSearch->save();
+
+        // Field dokter_id
+        $this->dokter_id->AdvancedSearch->SearchValue = @$filter["x_dokter_id"];
+        $this->dokter_id->AdvancedSearch->SearchOperator = @$filter["z_dokter_id"];
+        $this->dokter_id->AdvancedSearch->SearchCondition = @$filter["v_dokter_id"];
+        $this->dokter_id->AdvancedSearch->SearchValue2 = @$filter["y_dokter_id"];
+        $this->dokter_id->AdvancedSearch->SearchOperator2 = @$filter["w_dokter_id"];
+        $this->dokter_id->AdvancedSearch->save();
 
         // Field hari_praktik
         $this->hari_praktik->AdvancedSearch->SearchValue = @$filter["x_hari_praktik"];
@@ -1560,7 +1556,6 @@ class PraktikPoliList extends PraktikPoli
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->dokter_id); // dokter_id
-            $this->updateSort($this->fasilitas_rumah_sakit_id); // fasilitas_rumah_sakit_id
             $this->updateSort($this->hari_praktik); // hari_praktik
             $this->updateSort($this->jam_praktik); // jam_praktik
             $this->setStartRecordNumber(1); // Reset start position
@@ -1612,8 +1607,8 @@ class PraktikPoliList extends PraktikPoli
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->dokter_id->setSort("");
                 $this->fasilitas_rumah_sakit_id->setSort("");
+                $this->dokter_id->setSort("");
                 $this->hari_praktik->setSort("");
                 $this->jam_praktik->setSort("");
             }
@@ -2022,10 +2017,10 @@ class PraktikPoliList extends PraktikPoli
     {
         $this->id->CurrentValue = null;
         $this->id->OldValue = $this->id->CurrentValue;
-        $this->dokter_id->CurrentValue = null;
-        $this->dokter_id->OldValue = $this->dokter_id->CurrentValue;
         $this->fasilitas_rumah_sakit_id->CurrentValue = null;
         $this->fasilitas_rumah_sakit_id->OldValue = $this->fasilitas_rumah_sakit_id->CurrentValue;
+        $this->dokter_id->CurrentValue = null;
+        $this->dokter_id->OldValue = $this->dokter_id->CurrentValue;
         $this->hari_praktik->CurrentValue = null;
         $this->hari_praktik->OldValue = $this->hari_praktik->CurrentValue;
         $this->jam_praktik->CurrentValue = null;
@@ -2059,19 +2054,6 @@ class PraktikPoliList extends PraktikPoli
         }
         if ($CurrentForm->hasValue("o_dokter_id")) {
             $this->dokter_id->setOldValue($CurrentForm->getValue("o_dokter_id"));
-        }
-
-        // Check field name 'fasilitas_rumah_sakit_id' first before field var 'x_fasilitas_rumah_sakit_id'
-        $val = $CurrentForm->hasValue("fasilitas_rumah_sakit_id") ? $CurrentForm->getValue("fasilitas_rumah_sakit_id") : $CurrentForm->getValue("x_fasilitas_rumah_sakit_id");
-        if (!$this->fasilitas_rumah_sakit_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->fasilitas_rumah_sakit_id->Visible = false; // Disable update for API request
-            } else {
-                $this->fasilitas_rumah_sakit_id->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_fasilitas_rumah_sakit_id")) {
-            $this->fasilitas_rumah_sakit_id->setOldValue($CurrentForm->getValue("o_fasilitas_rumah_sakit_id"));
         }
 
         // Check field name 'hari_praktik' first before field var 'x_hari_praktik'
@@ -2115,7 +2097,6 @@ class PraktikPoliList extends PraktikPoli
             $this->id->CurrentValue = $this->id->FormValue;
         }
         $this->dokter_id->CurrentValue = $this->dokter_id->FormValue;
-        $this->fasilitas_rumah_sakit_id->CurrentValue = $this->fasilitas_rumah_sakit_id->FormValue;
         $this->hari_praktik->CurrentValue = $this->hari_praktik->FormValue;
         $this->jam_praktik->CurrentValue = $this->jam_praktik->FormValue;
     }
@@ -2192,8 +2173,8 @@ class PraktikPoliList extends PraktikPoli
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->dokter_id->setDbValue($row['dokter_id']);
         $this->fasilitas_rumah_sakit_id->setDbValue($row['fasilitas_rumah_sakit_id']);
+        $this->dokter_id->setDbValue($row['dokter_id']);
         $this->hari_praktik->setDbValue($row['hari_praktik']);
         $this->jam_praktik->setDbValue($row['jam_praktik']);
     }
@@ -2204,8 +2185,8 @@ class PraktikPoliList extends PraktikPoli
         $this->loadDefaultValues();
         $row = [];
         $row['id'] = $this->id->CurrentValue;
-        $row['dokter_id'] = $this->dokter_id->CurrentValue;
         $row['fasilitas_rumah_sakit_id'] = $this->fasilitas_rumah_sakit_id->CurrentValue;
+        $row['dokter_id'] = $this->dokter_id->CurrentValue;
         $row['hari_praktik'] = $this->hari_praktik->CurrentValue;
         $row['jam_praktik'] = $this->jam_praktik->CurrentValue;
         return $row;
@@ -2247,9 +2228,9 @@ class PraktikPoliList extends PraktikPoli
 
         // id
 
-        // dokter_id
-
         // fasilitas_rumah_sakit_id
+
+        // dokter_id
 
         // hari_praktik
 
@@ -2258,27 +2239,6 @@ class PraktikPoliList extends PraktikPoli
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
             $this->id->ViewCustomAttributes = "";
-
-            // dokter_id
-            $curVal = trim(strval($this->dokter_id->CurrentValue));
-            if ($curVal != "") {
-                $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-                if ($this->dokter_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                    } else {
-                        $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->dokter_id->ViewValue = null;
-            }
-            $this->dokter_id->ViewCustomAttributes = "";
 
             // fasilitas_rumah_sakit_id
             $curVal = trim(strval($this->fasilitas_rumah_sakit_id->CurrentValue));
@@ -2301,6 +2261,27 @@ class PraktikPoliList extends PraktikPoli
             }
             $this->fasilitas_rumah_sakit_id->ViewCustomAttributes = "";
 
+            // dokter_id
+            $curVal = trim(strval($this->dokter_id->CurrentValue));
+            if ($curVal != "") {
+                $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
+                if ($this->dokter_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
+                    } else {
+                        $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->dokter_id->ViewValue = null;
+            }
+            $this->dokter_id->ViewCustomAttributes = "";
+
             // hari_praktik
             $this->hari_praktik->ViewValue = $this->hari_praktik->CurrentValue;
             $this->hari_praktik->ViewCustomAttributes = "";
@@ -2313,11 +2294,6 @@ class PraktikPoliList extends PraktikPoli
             $this->dokter_id->LinkCustomAttributes = "";
             $this->dokter_id->HrefValue = "";
             $this->dokter_id->TooltipValue = "";
-
-            // fasilitas_rumah_sakit_id
-            $this->fasilitas_rumah_sakit_id->LinkCustomAttributes = "";
-            $this->fasilitas_rumah_sakit_id->HrefValue = "";
-            $this->fasilitas_rumah_sakit_id->TooltipValue = "";
 
             // hari_praktik
             $this->hari_praktik->LinkCustomAttributes = "";
@@ -2386,65 +2362,6 @@ class PraktikPoliList extends PraktikPoli
                 $this->dokter_id->PlaceHolder = RemoveHtml($this->dokter_id->caption());
             }
 
-            // fasilitas_rumah_sakit_id
-            $this->fasilitas_rumah_sakit_id->EditCustomAttributes = "";
-            if ($this->fasilitas_rumah_sakit_id->getSessionValue() != "") {
-                $this->fasilitas_rumah_sakit_id->CurrentValue = GetForeignKeyValue($this->fasilitas_rumah_sakit_id->getSessionValue());
-                $this->fasilitas_rumah_sakit_id->OldValue = $this->fasilitas_rumah_sakit_id->CurrentValue;
-                $curVal = trim(strval($this->fasilitas_rumah_sakit_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->lookupCacheOption($curVal);
-                    if ($this->fasilitas_rumah_sakit_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->displayValue($arwrk);
-                        } else {
-                            $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->fasilitas_rumah_sakit_id->ViewValue = null;
-                }
-                $this->fasilitas_rumah_sakit_id->ViewCustomAttributes = "";
-            } else {
-                $curVal = trim(strval($this->fasilitas_rumah_sakit_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->lookupCacheOption($curVal);
-                } else {
-                    $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->Lookup !== null && is_array($this->fasilitas_rumah_sakit_id->Lookup->Options) ? $curVal : null;
-                }
-                if ($this->fasilitas_rumah_sakit_id->ViewValue !== null) { // Load from cache
-                    $this->fasilitas_rumah_sakit_id->EditValue = array_values($this->fasilitas_rumah_sakit_id->Lookup->Options);
-                    if ($this->fasilitas_rumah_sakit_id->ViewValue == "") {
-                        $this->fasilitas_rumah_sakit_id->ViewValue = $Language->phrase("PleaseSelect");
-                    }
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = "`id`" . SearchString("=", $this->fasilitas_rumah_sakit_id->CurrentValue, DATATYPE_NUMBER, "");
-                    }
-                    $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->displayValue($arwrk);
-                    } else {
-                        $this->fasilitas_rumah_sakit_id->ViewValue = $Language->phrase("PleaseSelect");
-                    }
-                    $arwrk = $rswrk;
-                    foreach ($arwrk as &$row)
-                        $row = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($row);
-                    $this->fasilitas_rumah_sakit_id->EditValue = $arwrk;
-                }
-                $this->fasilitas_rumah_sakit_id->PlaceHolder = RemoveHtml($this->fasilitas_rumah_sakit_id->caption());
-            }
-
             // hari_praktik
             $this->hari_praktik->EditAttrs["class"] = "form-control";
             $this->hari_praktik->EditCustomAttributes = "";
@@ -2468,10 +2385,6 @@ class PraktikPoliList extends PraktikPoli
             // dokter_id
             $this->dokter_id->LinkCustomAttributes = "";
             $this->dokter_id->HrefValue = "";
-
-            // fasilitas_rumah_sakit_id
-            $this->fasilitas_rumah_sakit_id->LinkCustomAttributes = "";
-            $this->fasilitas_rumah_sakit_id->HrefValue = "";
 
             // hari_praktik
             $this->hari_praktik->LinkCustomAttributes = "";
@@ -2538,65 +2451,6 @@ class PraktikPoliList extends PraktikPoli
                 $this->dokter_id->PlaceHolder = RemoveHtml($this->dokter_id->caption());
             }
 
-            // fasilitas_rumah_sakit_id
-            $this->fasilitas_rumah_sakit_id->EditCustomAttributes = "";
-            if ($this->fasilitas_rumah_sakit_id->getSessionValue() != "") {
-                $this->fasilitas_rumah_sakit_id->CurrentValue = GetForeignKeyValue($this->fasilitas_rumah_sakit_id->getSessionValue());
-                $this->fasilitas_rumah_sakit_id->OldValue = $this->fasilitas_rumah_sakit_id->CurrentValue;
-                $curVal = trim(strval($this->fasilitas_rumah_sakit_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->lookupCacheOption($curVal);
-                    if ($this->fasilitas_rumah_sakit_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->displayValue($arwrk);
-                        } else {
-                            $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->fasilitas_rumah_sakit_id->ViewValue = null;
-                }
-                $this->fasilitas_rumah_sakit_id->ViewCustomAttributes = "";
-            } else {
-                $curVal = trim(strval($this->fasilitas_rumah_sakit_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->lookupCacheOption($curVal);
-                } else {
-                    $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->Lookup !== null && is_array($this->fasilitas_rumah_sakit_id->Lookup->Options) ? $curVal : null;
-                }
-                if ($this->fasilitas_rumah_sakit_id->ViewValue !== null) { // Load from cache
-                    $this->fasilitas_rumah_sakit_id->EditValue = array_values($this->fasilitas_rumah_sakit_id->Lookup->Options);
-                    if ($this->fasilitas_rumah_sakit_id->ViewValue == "") {
-                        $this->fasilitas_rumah_sakit_id->ViewValue = $Language->phrase("PleaseSelect");
-                    }
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = "`id`" . SearchString("=", $this->fasilitas_rumah_sakit_id->CurrentValue, DATATYPE_NUMBER, "");
-                    }
-                    $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->displayValue($arwrk);
-                    } else {
-                        $this->fasilitas_rumah_sakit_id->ViewValue = $Language->phrase("PleaseSelect");
-                    }
-                    $arwrk = $rswrk;
-                    foreach ($arwrk as &$row)
-                        $row = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($row);
-                    $this->fasilitas_rumah_sakit_id->EditValue = $arwrk;
-                }
-                $this->fasilitas_rumah_sakit_id->PlaceHolder = RemoveHtml($this->fasilitas_rumah_sakit_id->caption());
-            }
-
             // hari_praktik
             $this->hari_praktik->EditAttrs["class"] = "form-control";
             $this->hari_praktik->EditCustomAttributes = "";
@@ -2620,10 +2474,6 @@ class PraktikPoliList extends PraktikPoli
             // dokter_id
             $this->dokter_id->LinkCustomAttributes = "";
             $this->dokter_id->HrefValue = "";
-
-            // fasilitas_rumah_sakit_id
-            $this->fasilitas_rumah_sakit_id->LinkCustomAttributes = "";
-            $this->fasilitas_rumah_sakit_id->HrefValue = "";
 
             // hari_praktik
             $this->hari_praktik->LinkCustomAttributes = "";
@@ -2655,11 +2505,6 @@ class PraktikPoliList extends PraktikPoli
         if ($this->dokter_id->Required) {
             if (!$this->dokter_id->IsDetailKey && EmptyValue($this->dokter_id->FormValue)) {
                 $this->dokter_id->addErrorMessage(str_replace("%s", $this->dokter_id->caption(), $this->dokter_id->RequiredErrorMessage));
-            }
-        }
-        if ($this->fasilitas_rumah_sakit_id->Required) {
-            if (!$this->fasilitas_rumah_sakit_id->IsDetailKey && EmptyValue($this->fasilitas_rumah_sakit_id->FormValue)) {
-                $this->fasilitas_rumah_sakit_id->addErrorMessage(str_replace("%s", $this->fasilitas_rumah_sakit_id->caption(), $this->fasilitas_rumah_sakit_id->RequiredErrorMessage));
             }
         }
         if ($this->hari_praktik->Required) {
@@ -2787,12 +2632,6 @@ class PraktikPoliList extends PraktikPoli
             }
             $this->dokter_id->setDbValueDef($rsnew, $this->dokter_id->CurrentValue, 0, $this->dokter_id->ReadOnly);
 
-            // fasilitas_rumah_sakit_id
-            if ($this->fasilitas_rumah_sakit_id->getSessionValue() != "") {
-                $this->fasilitas_rumah_sakit_id->ReadOnly = true;
-            }
-            $this->fasilitas_rumah_sakit_id->setDbValueDef($rsnew, $this->fasilitas_rumah_sakit_id->CurrentValue, 0, $this->fasilitas_rumah_sakit_id->ReadOnly);
-
             // hari_praktik
             $this->hari_praktik->setDbValueDef($rsnew, $this->hari_praktik->CurrentValue, null, $this->hari_praktik->ReadOnly);
 
@@ -2865,7 +2704,6 @@ class PraktikPoliList extends PraktikPoli
         $row = ($rs instanceof Recordset) ? $rs->fields : $rs;
         $hash = "";
         $hash .= GetFieldHash($row['dokter_id']); // dokter_id
-        $hash .= GetFieldHash($row['fasilitas_rumah_sakit_id']); // fasilitas_rumah_sakit_id
         $hash .= GetFieldHash($row['hari_praktik']); // hari_praktik
         $hash .= GetFieldHash($row['jam_praktik']); // jam_praktik
         return md5($hash);
@@ -2886,14 +2724,16 @@ class PraktikPoliList extends PraktikPoli
         // dokter_id
         $this->dokter_id->setDbValueDef($rsnew, $this->dokter_id->CurrentValue, 0, false);
 
-        // fasilitas_rumah_sakit_id
-        $this->fasilitas_rumah_sakit_id->setDbValueDef($rsnew, $this->fasilitas_rumah_sakit_id->CurrentValue, 0, false);
-
         // hari_praktik
         $this->hari_praktik->setDbValueDef($rsnew, $this->hari_praktik->CurrentValue, null, false);
 
         // jam_praktik
         $this->jam_praktik->setDbValueDef($rsnew, $this->jam_praktik->CurrentValue, null, false);
+
+        // fasilitas_rumah_sakit_id
+        if ($this->fasilitas_rumah_sakit_id->getSessionValue() != "") {
+            $rsnew['fasilitas_rumah_sakit_id'] = $this->fasilitas_rumah_sakit_id->getSessionValue();
+        }
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
@@ -3104,9 +2944,9 @@ class PraktikPoliList extends PraktikPoli
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_dokter_id":
-                    break;
                 case "x_fasilitas_rumah_sakit_id":
+                    break;
+                case "x_dokter_id":
                     break;
                 default:
                     $lookupFilter = "";

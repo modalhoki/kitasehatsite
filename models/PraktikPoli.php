@@ -29,8 +29,8 @@ class PraktikPoli extends DbTable
 
     // Fields
     public $id;
-    public $dokter_id;
     public $fasilitas_rumah_sakit_id;
+    public $dokter_id;
     public $hari_praktik;
     public $jam_praktik;
 
@@ -78,19 +78,6 @@ class PraktikPoli extends DbTable
         $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
-        // dokter_id
-        $this->dokter_id = new DbField('praktik_poli', 'praktik_poli', 'x_dokter_id', 'dokter_id', '`dokter_id`', '`dokter_id`', 20, 20, -1, false, '`dokter_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->dokter_id->IsForeignKey = true; // Foreign key field
-        $this->dokter_id->Nullable = false; // NOT NULL field
-        $this->dokter_id->Required = true; // Required field
-        $this->dokter_id->Sortable = true; // Allow sort
-        $this->dokter_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->dokter_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->dokter_id->Lookup = new Lookup('dokter_id', 'dokter', false, 'id', ["nama_dokter","","",""], [], [], [], [], [], [], '', '');
-        $this->dokter_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->dokter_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->dokter_id->Param, "CustomMsg");
-        $this->Fields['dokter_id'] = &$this->dokter_id;
-
         // fasilitas_rumah_sakit_id
         $this->fasilitas_rumah_sakit_id = new DbField('praktik_poli', 'praktik_poli', 'x_fasilitas_rumah_sakit_id', 'fasilitas_rumah_sakit_id', '`fasilitas_rumah_sakit_id`', '`fasilitas_rumah_sakit_id`', 20, 20, -1, false, '`fasilitas_rumah_sakit_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
         $this->fasilitas_rumah_sakit_id->IsForeignKey = true; // Foreign key field
@@ -103,6 +90,19 @@ class PraktikPoli extends DbTable
         $this->fasilitas_rumah_sakit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->fasilitas_rumah_sakit_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->fasilitas_rumah_sakit_id->Param, "CustomMsg");
         $this->Fields['fasilitas_rumah_sakit_id'] = &$this->fasilitas_rumah_sakit_id;
+
+        // dokter_id
+        $this->dokter_id = new DbField('praktik_poli', 'praktik_poli', 'x_dokter_id', 'dokter_id', '`dokter_id`', '`dokter_id`', 20, 20, -1, false, '`dokter_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->dokter_id->IsForeignKey = true; // Foreign key field
+        $this->dokter_id->Nullable = false; // NOT NULL field
+        $this->dokter_id->Required = true; // Required field
+        $this->dokter_id->Sortable = true; // Allow sort
+        $this->dokter_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->dokter_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->dokter_id->Lookup = new Lookup('dokter_id', 'dokter', false, 'id', ["nama_dokter","","",""], [], [], [], [], [], [], '', '');
+        $this->dokter_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->dokter_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->dokter_id->Param, "CustomMsg");
+        $this->Fields['dokter_id'] = &$this->dokter_id;
 
         // hari_praktik
         $this->hari_praktik = new DbField('praktik_poli', 'praktik_poli', 'x_hari_praktik', 'hari_praktik', '`hari_praktik`', '`hari_praktik`', 200, 50, -1, false, '`hari_praktik`', false, false, false, 'FORMATTED TEXT', 'TEXT');
@@ -606,8 +606,8 @@ class PraktikPoli extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->dokter_id->DbValue = $row['dokter_id'];
         $this->fasilitas_rumah_sakit_id->DbValue = $row['fasilitas_rumah_sakit_id'];
+        $this->dokter_id->DbValue = $row['dokter_id'];
         $this->hari_praktik->DbValue = $row['hari_praktik'];
         $this->jam_praktik->DbValue = $row['jam_praktik'];
     }
@@ -939,8 +939,8 @@ SORTHTML;
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->dokter_id->setDbValue($row['dokter_id']);
         $this->fasilitas_rumah_sakit_id->setDbValue($row['fasilitas_rumah_sakit_id']);
+        $this->dokter_id->setDbValue($row['dokter_id']);
         $this->hari_praktik->setDbValue($row['hari_praktik']);
         $this->jam_praktik->setDbValue($row['jam_praktik']);
     }
@@ -957,9 +957,9 @@ SORTHTML;
 
         // id
 
-        // dokter_id
-
         // fasilitas_rumah_sakit_id
+
+        // dokter_id
 
         // hari_praktik
 
@@ -968,27 +968,6 @@ SORTHTML;
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
         $this->id->ViewCustomAttributes = "";
-
-        // dokter_id
-        $curVal = trim(strval($this->dokter_id->CurrentValue));
-        if ($curVal != "") {
-            $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-            if ($this->dokter_id->ViewValue === null) { // Lookup from database
-                $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                } else {
-                    $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
-                }
-            }
-        } else {
-            $this->dokter_id->ViewValue = null;
-        }
-        $this->dokter_id->ViewCustomAttributes = "";
 
         // fasilitas_rumah_sakit_id
         $curVal = trim(strval($this->fasilitas_rumah_sakit_id->CurrentValue));
@@ -1011,6 +990,27 @@ SORTHTML;
         }
         $this->fasilitas_rumah_sakit_id->ViewCustomAttributes = "";
 
+        // dokter_id
+        $curVal = trim(strval($this->dokter_id->CurrentValue));
+        if ($curVal != "") {
+            $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
+            if ($this->dokter_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
+                } else {
+                    $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->dokter_id->ViewValue = null;
+        }
+        $this->dokter_id->ViewCustomAttributes = "";
+
         // hari_praktik
         $this->hari_praktik->ViewValue = $this->hari_praktik->CurrentValue;
         $this->hari_praktik->ViewCustomAttributes = "";
@@ -1024,15 +1024,15 @@ SORTHTML;
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // dokter_id
-        $this->dokter_id->LinkCustomAttributes = "";
-        $this->dokter_id->HrefValue = "";
-        $this->dokter_id->TooltipValue = "";
-
         // fasilitas_rumah_sakit_id
         $this->fasilitas_rumah_sakit_id->LinkCustomAttributes = "";
         $this->fasilitas_rumah_sakit_id->HrefValue = "";
         $this->fasilitas_rumah_sakit_id->TooltipValue = "";
+
+        // dokter_id
+        $this->dokter_id->LinkCustomAttributes = "";
+        $this->dokter_id->HrefValue = "";
+        $this->dokter_id->TooltipValue = "";
 
         // hari_praktik
         $this->hari_praktik->LinkCustomAttributes = "";
@@ -1065,34 +1065,6 @@ SORTHTML;
         $this->id->EditValue = $this->id->CurrentValue;
         $this->id->ViewCustomAttributes = "";
 
-        // dokter_id
-        $this->dokter_id->EditAttrs["class"] = "form-control";
-        $this->dokter_id->EditCustomAttributes = "";
-        if ($this->dokter_id->getSessionValue() != "") {
-            $this->dokter_id->CurrentValue = GetForeignKeyValue($this->dokter_id->getSessionValue());
-            $curVal = trim(strval($this->dokter_id->CurrentValue));
-            if ($curVal != "") {
-                $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-                if ($this->dokter_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                    } else {
-                        $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->dokter_id->ViewValue = null;
-            }
-            $this->dokter_id->ViewCustomAttributes = "";
-        } else {
-            $this->dokter_id->PlaceHolder = RemoveHtml($this->dokter_id->caption());
-        }
-
         // fasilitas_rumah_sakit_id
         $this->fasilitas_rumah_sakit_id->EditAttrs["class"] = "form-control";
         $this->fasilitas_rumah_sakit_id->EditCustomAttributes = "";
@@ -1119,6 +1091,34 @@ SORTHTML;
             $this->fasilitas_rumah_sakit_id->ViewCustomAttributes = "";
         } else {
             $this->fasilitas_rumah_sakit_id->PlaceHolder = RemoveHtml($this->fasilitas_rumah_sakit_id->caption());
+        }
+
+        // dokter_id
+        $this->dokter_id->EditAttrs["class"] = "form-control";
+        $this->dokter_id->EditCustomAttributes = "";
+        if ($this->dokter_id->getSessionValue() != "") {
+            $this->dokter_id->CurrentValue = GetForeignKeyValue($this->dokter_id->getSessionValue());
+            $curVal = trim(strval($this->dokter_id->CurrentValue));
+            if ($curVal != "") {
+                $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
+                if ($this->dokter_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
+                    } else {
+                        $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->dokter_id->ViewValue = null;
+            }
+            $this->dokter_id->ViewCustomAttributes = "";
+        } else {
+            $this->dokter_id->PlaceHolder = RemoveHtml($this->dokter_id->caption());
         }
 
         // hari_praktik
@@ -1168,14 +1168,14 @@ SORTHTML;
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->dokter_id);
                     $doc->exportCaption($this->fasilitas_rumah_sakit_id);
+                    $doc->exportCaption($this->dokter_id);
                     $doc->exportCaption($this->hari_praktik);
                     $doc->exportCaption($this->jam_praktik);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->dokter_id);
                     $doc->exportCaption($this->fasilitas_rumah_sakit_id);
+                    $doc->exportCaption($this->dokter_id);
                     $doc->exportCaption($this->hari_praktik);
                     $doc->exportCaption($this->jam_praktik);
                 }
@@ -1208,14 +1208,14 @@ SORTHTML;
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->dokter_id);
                         $doc->exportField($this->fasilitas_rumah_sakit_id);
+                        $doc->exportField($this->dokter_id);
                         $doc->exportField($this->hari_praktik);
                         $doc->exportField($this->jam_praktik);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->dokter_id);
                         $doc->exportField($this->fasilitas_rumah_sakit_id);
+                        $doc->exportField($this->dokter_id);
                         $doc->exportField($this->hari_praktik);
                         $doc->exportField($this->jam_praktik);
                     }
@@ -1292,6 +1292,10 @@ SORTHTML;
     public function rowInserted($rsold, &$rsnew)
     {
         //Log("Row Inserted");
+        $query = "SELECT rumah_sakit_id FROM fasilitas_rumah_sakit WHERE id = ".$rsnew["fasilitas_rumah_sakit_id"];
+        $rumah_sakit_id = ExecuteScalar($query);
+        $url = "fasilitasrumahsakitlist?showmaster=rumah_sakit&fk_id=".$rumah_sakit_id;
+        $this->terminate($url);
     }
 
     // Row Updating event

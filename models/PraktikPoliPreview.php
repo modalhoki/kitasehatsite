@@ -391,8 +391,8 @@ class PraktikPoliPreview extends PraktikPoli
         // Set up list options
         $this->setupListOptions();
         $this->id->Visible = false;
+        $this->fasilitas_rumah_sakit_id->Visible = false;
         $this->dokter_id->setVisibility();
-        $this->fasilitas_rumah_sakit_id->setVisibility();
         $this->hari_praktik->setVisibility();
         $this->jam_praktik->setVisibility();
         $this->hideFieldsForAddEdit();
@@ -412,8 +412,8 @@ class PraktikPoliPreview extends PraktikPoli
         $this->setupOtherOptions();
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->dokter_id);
         $this->setupLookupOptions($this->fasilitas_rumah_sakit_id);
+        $this->setupLookupOptions($this->dokter_id);
 
         // Load filter
         $filter = Get("f", "");
@@ -483,8 +483,8 @@ class PraktikPoliPreview extends PraktikPoli
             $this->CurrentOrder = "";
             $this->CurrentOrderType = "";
             $this->id->setSort("");
-            $this->dokter_id->setSort("");
             $this->fasilitas_rumah_sakit_id->setSort("");
+            $this->dokter_id->setSort("");
             $this->hari_praktik->setSort("");
             $this->jam_praktik->setSort("");
 
@@ -499,7 +499,6 @@ class PraktikPoliPreview extends PraktikPoli
         // Check for sort field
         if ($this->CurrentOrder !== "") {
             $this->updateSort($this->dokter_id); // dokter_id
-            $this->updateSort($this->fasilitas_rumah_sakit_id); // fasilitas_rumah_sakit_id
             $this->updateSort($this->hari_praktik); // hari_praktik
             $this->updateSort($this->jam_praktik); // jam_praktik
         }
@@ -728,9 +727,9 @@ class PraktikPoliPreview extends PraktikPoli
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_dokter_id":
-                    break;
                 case "x_fasilitas_rumah_sakit_id":
+                    break;
+                case "x_dokter_id":
                     break;
                 default:
                     $lookupFilter = "";

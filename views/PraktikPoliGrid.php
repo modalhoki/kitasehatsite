@@ -23,7 +23,6 @@ loadjs.ready("head", function () {
         ew.vars.tables.praktik_poli = currentTable;
     fpraktik_poligrid.addFields([
         ["dokter_id", [fields.dokter_id.visible && fields.dokter_id.required ? ew.Validators.required(fields.dokter_id.caption) : null], fields.dokter_id.isInvalid],
-        ["fasilitas_rumah_sakit_id", [fields.fasilitas_rumah_sakit_id.visible && fields.fasilitas_rumah_sakit_id.required ? ew.Validators.required(fields.fasilitas_rumah_sakit_id.caption) : null], fields.fasilitas_rumah_sakit_id.isInvalid],
         ["hari_praktik", [fields.hari_praktik.visible && fields.hari_praktik.required ? ew.Validators.required(fields.hari_praktik.caption) : null], fields.hari_praktik.isInvalid],
         ["jam_praktik", [fields.jam_praktik.visible && fields.jam_praktik.required ? ew.Validators.required(fields.jam_praktik.caption) : null], fields.jam_praktik.isInvalid]
     ]);
@@ -81,8 +80,6 @@ loadjs.ready("head", function () {
         var fobj = this.getForm();
         if (ew.valueChanged(fobj, rowIndex, "dokter_id", false))
             return false;
-        if (ew.valueChanged(fobj, rowIndex, "fasilitas_rumah_sakit_id", false))
-            return false;
         if (ew.valueChanged(fobj, rowIndex, "hari_praktik", false))
             return false;
         if (ew.valueChanged(fobj, rowIndex, "jam_praktik", false))
@@ -101,7 +98,6 @@ loadjs.ready("head", function () {
 
     // Dynamic selection lists
     fpraktik_poligrid.lists.dokter_id = <?= $Grid->dokter_id->toClientList($Grid) ?>;
-    fpraktik_poligrid.lists.fasilitas_rumah_sakit_id = <?= $Grid->fasilitas_rumah_sakit_id->toClientList($Grid) ?>;
     loadjs.done("fpraktik_poligrid");
 });
 </script>
@@ -128,9 +124,6 @@ $Grid->ListOptions->render("header", "left");
 ?>
 <?php if ($Grid->dokter_id->Visible) { // dokter_id ?>
         <th data-name="dokter_id" class="<?= $Grid->dokter_id->headerCellClass() ?>"><div id="elh_praktik_poli_dokter_id" class="praktik_poli_dokter_id"><?= $Grid->renderSort($Grid->dokter_id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->fasilitas_rumah_sakit_id->Visible) { // fasilitas_rumah_sakit_id ?>
-        <th data-name="fasilitas_rumah_sakit_id" class="<?= $Grid->fasilitas_rumah_sakit_id->headerCellClass() ?>"><div id="elh_praktik_poli_fasilitas_rumah_sakit_id" class="praktik_poli_fasilitas_rumah_sakit_id"><?= $Grid->renderSort($Grid->fasilitas_rumah_sakit_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->hari_praktik->Visible) { // hari_praktik ?>
         <th data-name="hari_praktik" class="<?= $Grid->hari_praktik->headerCellClass() ?>"><div id="elh_praktik_poli_hari_praktik" class="praktik_poli_hari_praktik"><?= $Grid->renderSort($Grid->hari_praktik) ?></div></th>
@@ -314,69 +307,6 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 </td>
     <?php } ?>
-    <?php if ($Grid->fasilitas_rumah_sakit_id->Visible) { // fasilitas_rumah_sakit_id ?>
-        <td data-name="fasilitas_rumah_sakit_id" <?= $Grid->fasilitas_rumah_sakit_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
-<?php if ($Grid->fasilitas_rumah_sakit_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowCount ?>_praktik_poli_fasilitas_rumah_sakit_id" class="form-group">
-<span<?= $Grid->fasilitas_rumah_sakit_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->fasilitas_rumah_sakit_id->getDisplayValue($Grid->fasilitas_rumah_sakit_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" name="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" value="<?= HtmlEncode($Grid->fasilitas_rumah_sakit_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el<?= $Grid->RowCount ?>_praktik_poli_fasilitas_rumah_sakit_id" class="form-group">
-<div class="input-group ew-lookup-list">
-    <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id"><?= EmptyValue(strval($Grid->fasilitas_rumah_sakit_id->ViewValue)) ? $Language->phrase("PleaseSelect") : $Grid->fasilitas_rumah_sakit_id->ViewValue ?></div>
-    <div class="input-group-append">
-        <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Grid->fasilitas_rumah_sakit_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Grid->fasilitas_rumah_sakit_id->ReadOnly || $Grid->fasilitas_rumah_sakit_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
-        <?php if (AllowAdd(CurrentProjectID() . "fasilitas_rumah_sakit") && !$Grid->fasilitas_rumah_sakit_id->ReadOnly) { ?>
-        <button type="button" class="btn btn-default ew-add-opt-btn" id="aol_x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" title="<?= HtmlTitle($Language->phrase("AddLink")) . "&nbsp;" . $Grid->fasilitas_rumah_sakit_id->caption() ?>" data-title="<?= $Grid->fasilitas_rumah_sakit_id->caption() ?>" onclick="ew.addOptionDialogShow({lnk:this,el:'x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id',url:'<?= GetUrl("fasilitasrumahsakitaddopt") ?>'});"><i class="fas fa-plus ew-icon"></i></button>
-        <?php } ?>
-    </div>
-</div>
-<div class="invalid-feedback"><?= $Grid->fasilitas_rumah_sakit_id->getErrorMessage() ?></div>
-<?= $Grid->fasilitas_rumah_sakit_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_fasilitas_rumah_sakit_id") ?>
-<input type="hidden" is="selection-list" data-table="praktik_poli" data-field="x_fasilitas_rumah_sakit_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Grid->fasilitas_rumah_sakit_id->displayValueSeparatorAttribute() ?>" name="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" id="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" value="<?= $Grid->fasilitas_rumah_sakit_id->CurrentValue ?>"<?= $Grid->fasilitas_rumah_sakit_id->editAttributes() ?>>
-</span>
-<?php } ?>
-<input type="hidden" data-table="praktik_poli" data-field="x_fasilitas_rumah_sakit_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" id="o<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" value="<?= HtmlEncode($Grid->fasilitas_rumah_sakit_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<?php if ($Grid->fasilitas_rumah_sakit_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowCount ?>_praktik_poli_fasilitas_rumah_sakit_id" class="form-group">
-<span<?= $Grid->fasilitas_rumah_sakit_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->fasilitas_rumah_sakit_id->getDisplayValue($Grid->fasilitas_rumah_sakit_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" name="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" value="<?= HtmlEncode($Grid->fasilitas_rumah_sakit_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el<?= $Grid->RowCount ?>_praktik_poli_fasilitas_rumah_sakit_id" class="form-group">
-<div class="input-group ew-lookup-list">
-    <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id"><?= EmptyValue(strval($Grid->fasilitas_rumah_sakit_id->ViewValue)) ? $Language->phrase("PleaseSelect") : $Grid->fasilitas_rumah_sakit_id->ViewValue ?></div>
-    <div class="input-group-append">
-        <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Grid->fasilitas_rumah_sakit_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Grid->fasilitas_rumah_sakit_id->ReadOnly || $Grid->fasilitas_rumah_sakit_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
-        <?php if (AllowAdd(CurrentProjectID() . "fasilitas_rumah_sakit") && !$Grid->fasilitas_rumah_sakit_id->ReadOnly) { ?>
-        <button type="button" class="btn btn-default ew-add-opt-btn" id="aol_x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" title="<?= HtmlTitle($Language->phrase("AddLink")) . "&nbsp;" . $Grid->fasilitas_rumah_sakit_id->caption() ?>" data-title="<?= $Grid->fasilitas_rumah_sakit_id->caption() ?>" onclick="ew.addOptionDialogShow({lnk:this,el:'x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id',url:'<?= GetUrl("fasilitasrumahsakitaddopt") ?>'});"><i class="fas fa-plus ew-icon"></i></button>
-        <?php } ?>
-    </div>
-</div>
-<div class="invalid-feedback"><?= $Grid->fasilitas_rumah_sakit_id->getErrorMessage() ?></div>
-<?= $Grid->fasilitas_rumah_sakit_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_fasilitas_rumah_sakit_id") ?>
-<input type="hidden" is="selection-list" data-table="praktik_poli" data-field="x_fasilitas_rumah_sakit_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Grid->fasilitas_rumah_sakit_id->displayValueSeparatorAttribute() ?>" name="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" id="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" value="<?= $Grid->fasilitas_rumah_sakit_id->CurrentValue ?>"<?= $Grid->fasilitas_rumah_sakit_id->editAttributes() ?>>
-</span>
-<?php } ?>
-<?php } ?>
-<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
-<span id="el<?= $Grid->RowCount ?>_praktik_poli_fasilitas_rumah_sakit_id">
-<span<?= $Grid->fasilitas_rumah_sakit_id->viewAttributes() ?>>
-<?= $Grid->fasilitas_rumah_sakit_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="praktik_poli" data-field="x_fasilitas_rumah_sakit_id" data-hidden="1" name="fpraktik_poligrid$x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" id="fpraktik_poligrid$x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" value="<?= HtmlEncode($Grid->fasilitas_rumah_sakit_id->FormValue) ?>">
-<input type="hidden" data-table="praktik_poli" data-field="x_fasilitas_rumah_sakit_id" data-hidden="1" name="fpraktik_poligrid$o<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" id="fpraktik_poligrid$o<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" value="<?= HtmlEncode($Grid->fasilitas_rumah_sakit_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
     <?php if ($Grid->hari_praktik->Visible) { // hari_praktik ?>
         <td data-name="hari_praktik" <?= $Grid->hari_praktik->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
@@ -508,41 +438,6 @@ $Grid->ListOptions->render("body", "left", $Grid->RowIndex);
 <input type="hidden" data-table="praktik_poli" data-field="x_dokter_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_dokter_id" id="x<?= $Grid->RowIndex ?>_dokter_id" value="<?= HtmlEncode($Grid->dokter_id->FormValue) ?>">
 <?php } ?>
 <input type="hidden" data-table="praktik_poli" data-field="x_dokter_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_dokter_id" id="o<?= $Grid->RowIndex ?>_dokter_id" value="<?= HtmlEncode($Grid->dokter_id->OldValue) ?>">
-</td>
-    <?php } ?>
-    <?php if ($Grid->fasilitas_rumah_sakit_id->Visible) { // fasilitas_rumah_sakit_id ?>
-        <td data-name="fasilitas_rumah_sakit_id">
-<?php if (!$Grid->isConfirm()) { ?>
-<?php if ($Grid->fasilitas_rumah_sakit_id->getSessionValue() != "") { ?>
-<span id="el$rowindex$_praktik_poli_fasilitas_rumah_sakit_id" class="form-group praktik_poli_fasilitas_rumah_sakit_id">
-<span<?= $Grid->fasilitas_rumah_sakit_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->fasilitas_rumah_sakit_id->getDisplayValue($Grid->fasilitas_rumah_sakit_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" name="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" value="<?= HtmlEncode($Grid->fasilitas_rumah_sakit_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el$rowindex$_praktik_poli_fasilitas_rumah_sakit_id" class="form-group praktik_poli_fasilitas_rumah_sakit_id">
-<div class="input-group ew-lookup-list">
-    <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id"><?= EmptyValue(strval($Grid->fasilitas_rumah_sakit_id->ViewValue)) ? $Language->phrase("PleaseSelect") : $Grid->fasilitas_rumah_sakit_id->ViewValue ?></div>
-    <div class="input-group-append">
-        <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Grid->fasilitas_rumah_sakit_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Grid->fasilitas_rumah_sakit_id->ReadOnly || $Grid->fasilitas_rumah_sakit_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
-        <?php if (AllowAdd(CurrentProjectID() . "fasilitas_rumah_sakit") && !$Grid->fasilitas_rumah_sakit_id->ReadOnly) { ?>
-        <button type="button" class="btn btn-default ew-add-opt-btn" id="aol_x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" title="<?= HtmlTitle($Language->phrase("AddLink")) . "&nbsp;" . $Grid->fasilitas_rumah_sakit_id->caption() ?>" data-title="<?= $Grid->fasilitas_rumah_sakit_id->caption() ?>" onclick="ew.addOptionDialogShow({lnk:this,el:'x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id',url:'<?= GetUrl("fasilitasrumahsakitaddopt") ?>'});"><i class="fas fa-plus ew-icon"></i></button>
-        <?php } ?>
-    </div>
-</div>
-<div class="invalid-feedback"><?= $Grid->fasilitas_rumah_sakit_id->getErrorMessage() ?></div>
-<?= $Grid->fasilitas_rumah_sakit_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_fasilitas_rumah_sakit_id") ?>
-<input type="hidden" is="selection-list" data-table="praktik_poli" data-field="x_fasilitas_rumah_sakit_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Grid->fasilitas_rumah_sakit_id->displayValueSeparatorAttribute() ?>" name="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" id="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" value="<?= $Grid->fasilitas_rumah_sakit_id->CurrentValue ?>"<?= $Grid->fasilitas_rumah_sakit_id->editAttributes() ?>>
-</span>
-<?php } ?>
-<?php } else { ?>
-<span id="el$rowindex$_praktik_poli_fasilitas_rumah_sakit_id" class="form-group praktik_poli_fasilitas_rumah_sakit_id">
-<span<?= $Grid->fasilitas_rumah_sakit_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->fasilitas_rumah_sakit_id->getDisplayValue($Grid->fasilitas_rumah_sakit_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="praktik_poli" data-field="x_fasilitas_rumah_sakit_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" id="x<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" value="<?= HtmlEncode($Grid->fasilitas_rumah_sakit_id->FormValue) ?>">
-<?php } ?>
-<input type="hidden" data-table="praktik_poli" data-field="x_fasilitas_rumah_sakit_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" id="o<?= $Grid->RowIndex ?>_fasilitas_rumah_sakit_id" value="<?= HtmlEncode($Grid->fasilitas_rumah_sakit_id->OldValue) ?>">
 </td>
     <?php } ?>
     <?php if ($Grid->hari_praktik->Visible) { // hari_praktik ?>

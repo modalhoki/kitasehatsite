@@ -20,8 +20,8 @@ loadjs.ready("head", function () {
     if (!ew.vars.tables.praktik_poli)
         ew.vars.tables.praktik_poli = currentTable;
     fpraktik_poliadd.addFields([
-        ["dokter_id", [fields.dokter_id.visible && fields.dokter_id.required ? ew.Validators.required(fields.dokter_id.caption) : null], fields.dokter_id.isInvalid],
         ["fasilitas_rumah_sakit_id", [fields.fasilitas_rumah_sakit_id.visible && fields.fasilitas_rumah_sakit_id.required ? ew.Validators.required(fields.fasilitas_rumah_sakit_id.caption) : null], fields.fasilitas_rumah_sakit_id.isInvalid],
+        ["dokter_id", [fields.dokter_id.visible && fields.dokter_id.required ? ew.Validators.required(fields.dokter_id.caption) : null], fields.dokter_id.isInvalid],
         ["hari_praktik", [fields.hari_praktik.visible && fields.hari_praktik.required ? ew.Validators.required(fields.hari_praktik.caption) : null], fields.hari_praktik.isInvalid],
         ["jam_praktik", [fields.jam_praktik.visible && fields.jam_praktik.required ? ew.Validators.required(fields.jam_praktik.caption) : null], fields.jam_praktik.isInvalid]
     ]);
@@ -90,8 +90,8 @@ loadjs.ready("head", function () {
     fpraktik_poliadd.validateRequired = <?= Config("CLIENT_VALIDATE") ? "true" : "false" ?>;
 
     // Dynamic selection lists
-    fpraktik_poliadd.lists.dokter_id = <?= $Page->dokter_id->toClientList($Page) ?>;
     fpraktik_poliadd.lists.fasilitas_rumah_sakit_id = <?= $Page->fasilitas_rumah_sakit_id->toClientList($Page) ?>;
+    fpraktik_poliadd.lists.dokter_id = <?= $Page->dokter_id->toClientList($Page) ?>;
     loadjs.done("fpraktik_poliadd");
 });
 </script>
@@ -122,36 +122,6 @@ $Page->showMessage();
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->dokter_id->getSessionValue()) ?>">
 <?php } ?>
 <div class="ew-add-div"><!-- page* -->
-<?php if ($Page->dokter_id->Visible) { // dokter_id ?>
-    <div id="r_dokter_id" class="form-group row">
-        <label id="elh_praktik_poli_dokter_id" for="x_dokter_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->dokter_id->caption() ?><?= $Page->dokter_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->dokter_id->cellAttributes() ?>>
-<?php if ($Page->dokter_id->getSessionValue() != "") { ?>
-<span id="el_praktik_poli_dokter_id">
-<span<?= $Page->dokter_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->dokter_id->getDisplayValue($Page->dokter_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x_dokter_id" name="x_dokter_id" value="<?= HtmlEncode($Page->dokter_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
-<span id="el_praktik_poli_dokter_id">
-<div class="input-group ew-lookup-list" aria-describedby="x_dokter_id_help">
-    <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x_dokter_id"><?= EmptyValue(strval($Page->dokter_id->ViewValue)) ? $Language->phrase("PleaseSelect") : $Page->dokter_id->ViewValue ?></div>
-    <div class="input-group-append">
-        <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Page->dokter_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Page->dokter_id->ReadOnly || $Page->dokter_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x_dokter_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
-        <?php if (AllowAdd(CurrentProjectID() . "dokter") && !$Page->dokter_id->ReadOnly) { ?>
-        <button type="button" class="btn btn-default ew-add-opt-btn" id="aol_x_dokter_id" title="<?= HtmlTitle($Language->phrase("AddLink")) . "&nbsp;" . $Page->dokter_id->caption() ?>" data-title="<?= $Page->dokter_id->caption() ?>" onclick="ew.addOptionDialogShow({lnk:this,el:'x_dokter_id',url:'<?= GetUrl("dokteraddopt") ?>'});"><i class="fas fa-plus ew-icon"></i></button>
-        <?php } ?>
-    </div>
-</div>
-<div class="invalid-feedback"><?= $Page->dokter_id->getErrorMessage() ?></div>
-<?= $Page->dokter_id->getCustomMessage() ?>
-<?= $Page->dokter_id->Lookup->getParamTag($Page, "p_x_dokter_id") ?>
-<input type="hidden" is="selection-list" data-table="praktik_poli" data-field="x_dokter_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->dokter_id->displayValueSeparatorAttribute() ?>" name="x_dokter_id" id="x_dokter_id" value="<?= $Page->dokter_id->CurrentValue ?>"<?= $Page->dokter_id->editAttributes() ?>>
-</span>
-<?php } ?>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->fasilitas_rumah_sakit_id->Visible) { // fasilitas_rumah_sakit_id ?>
     <div id="r_fasilitas_rumah_sakit_id" class="form-group row">
         <label id="elh_praktik_poli_fasilitas_rumah_sakit_id" for="x_fasilitas_rumah_sakit_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->fasilitas_rumah_sakit_id->caption() ?><?= $Page->fasilitas_rumah_sakit_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -177,6 +147,36 @@ $Page->showMessage();
 <?= $Page->fasilitas_rumah_sakit_id->getCustomMessage() ?>
 <?= $Page->fasilitas_rumah_sakit_id->Lookup->getParamTag($Page, "p_x_fasilitas_rumah_sakit_id") ?>
 <input type="hidden" is="selection-list" data-table="praktik_poli" data-field="x_fasilitas_rumah_sakit_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->fasilitas_rumah_sakit_id->displayValueSeparatorAttribute() ?>" name="x_fasilitas_rumah_sakit_id" id="x_fasilitas_rumah_sakit_id" value="<?= $Page->fasilitas_rumah_sakit_id->CurrentValue ?>"<?= $Page->fasilitas_rumah_sakit_id->editAttributes() ?>>
+</span>
+<?php } ?>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->dokter_id->Visible) { // dokter_id ?>
+    <div id="r_dokter_id" class="form-group row">
+        <label id="elh_praktik_poli_dokter_id" for="x_dokter_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->dokter_id->caption() ?><?= $Page->dokter_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->dokter_id->cellAttributes() ?>>
+<?php if ($Page->dokter_id->getSessionValue() != "") { ?>
+<span id="el_praktik_poli_dokter_id">
+<span<?= $Page->dokter_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->dokter_id->getDisplayValue($Page->dokter_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x_dokter_id" name="x_dokter_id" value="<?= HtmlEncode($Page->dokter_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el_praktik_poli_dokter_id">
+<div class="input-group ew-lookup-list" aria-describedby="x_dokter_id_help">
+    <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x_dokter_id"><?= EmptyValue(strval($Page->dokter_id->ViewValue)) ? $Language->phrase("PleaseSelect") : $Page->dokter_id->ViewValue ?></div>
+    <div class="input-group-append">
+        <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Page->dokter_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Page->dokter_id->ReadOnly || $Page->dokter_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x_dokter_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
+        <?php if (AllowAdd(CurrentProjectID() . "dokter") && !$Page->dokter_id->ReadOnly) { ?>
+        <button type="button" class="btn btn-default ew-add-opt-btn" id="aol_x_dokter_id" title="<?= HtmlTitle($Language->phrase("AddLink")) . "&nbsp;" . $Page->dokter_id->caption() ?>" data-title="<?= $Page->dokter_id->caption() ?>" onclick="ew.addOptionDialogShow({lnk:this,el:'x_dokter_id',url:'<?= GetUrl("dokteraddopt") ?>'});"><i class="fas fa-plus ew-icon"></i></button>
+        <?php } ?>
+    </div>
+</div>
+<div class="invalid-feedback"><?= $Page->dokter_id->getErrorMessage() ?></div>
+<?= $Page->dokter_id->getCustomMessage() ?>
+<?= $Page->dokter_id->Lookup->getParamTag($Page, "p_x_dokter_id") ?>
+<input type="hidden" is="selection-list" data-table="praktik_poli" data-field="x_dokter_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->dokter_id->displayValueSeparatorAttribute() ?>" name="x_dokter_id" id="x_dokter_id" value="<?= $Page->dokter_id->CurrentValue ?>"<?= $Page->dokter_id->editAttributes() ?>>
 </span>
 <?php } ?>
 </div></div>

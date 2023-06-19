@@ -47,9 +47,6 @@ $Page->showMessage();
 <?php if ($Page->dokter_id->Visible) { // dokter_id ?>
         <th class="<?= $Page->dokter_id->headerCellClass() ?>"><span id="elh_praktik_poli_dokter_id" class="praktik_poli_dokter_id"><?= $Page->dokter_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->fasilitas_rumah_sakit_id->Visible) { // fasilitas_rumah_sakit_id ?>
-        <th class="<?= $Page->fasilitas_rumah_sakit_id->headerCellClass() ?>"><span id="elh_praktik_poli_fasilitas_rumah_sakit_id" class="praktik_poli_fasilitas_rumah_sakit_id"><?= $Page->fasilitas_rumah_sakit_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->hari_praktik->Visible) { // hari_praktik ?>
         <th class="<?= $Page->hari_praktik->headerCellClass() ?>"><span id="elh_praktik_poli_hari_praktik" class="praktik_poli_hari_praktik"><?= $Page->hari_praktik->caption() ?></span></th>
 <?php } ?>
@@ -82,14 +79,6 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_praktik_poli_dokter_id" class="praktik_poli_dokter_id">
 <span<?= $Page->dokter_id->viewAttributes() ?>>
 <?= $Page->dokter_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->fasilitas_rumah_sakit_id->Visible) { // fasilitas_rumah_sakit_id ?>
-        <td <?= $Page->fasilitas_rumah_sakit_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_praktik_poli_fasilitas_rumah_sakit_id" class="praktik_poli_fasilitas_rumah_sakit_id">
-<span<?= $Page->fasilitas_rumah_sakit_id->viewAttributes() ?>>
-<?= $Page->fasilitas_rumah_sakit_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
