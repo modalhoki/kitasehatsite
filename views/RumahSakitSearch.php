@@ -185,7 +185,7 @@ $Page->showMessage();
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->jam_buka->cellAttributes() ?>>
             <span id="el_rumah_sakit_jam_buka" class="ew-search-field ew-search-field-single">
-<input type="<?= $Page->jam_buka->getInputTextType() ?>" data-table="rumah_sakit" data-field="x_jam_buka" name="x_jam_buka" id="x_jam_buka" size="30" maxlength="13" placeholder="<?= HtmlEncode($Page->jam_buka->getPlaceHolder()) ?>" value="<?= $Page->jam_buka->EditValue ?>"<?= $Page->jam_buka->editAttributes() ?>>
+<input type="<?= $Page->jam_buka->getInputTextType() ?>" data-table="rumah_sakit" data-field="x_jam_buka" name="x_jam_buka" id="x_jam_buka" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->jam_buka->getPlaceHolder()) ?>" value="<?= $Page->jam_buka->EditValue ?>"<?= $Page->jam_buka->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->jam_buka->getErrorMessage(false) ?></div>
 </span>
         </div></div>

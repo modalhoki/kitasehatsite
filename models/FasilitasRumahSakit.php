@@ -103,13 +103,13 @@ class FasilitasRumahSakit extends DbTable
         $this->Fields['fasilitas_id'] = &$this->fasilitas_id;
 
         // hari_buka
-        $this->hari_buka = new DbField('fasilitas_rumah_sakit', 'fasilitas_rumah_sakit', 'x_hari_buka', 'hari_buka', '`hari_buka`', '`hari_buka`', 200, 15, -1, false, '`hari_buka`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->hari_buka = new DbField('fasilitas_rumah_sakit', 'fasilitas_rumah_sakit', 'x_hari_buka', 'hari_buka', '`hari_buka`', '`hari_buka`', 200, 50, -1, false, '`hari_buka`', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->hari_buka->Sortable = true; // Allow sort
         $this->hari_buka->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->hari_buka->Param, "CustomMsg");
         $this->Fields['hari_buka'] = &$this->hari_buka;
 
         // jam_buka
-        $this->jam_buka = new DbField('fasilitas_rumah_sakit', 'fasilitas_rumah_sakit', 'x_jam_buka', 'jam_buka', '`jam_buka`', '`jam_buka`', 200, 13, -1, false, '`jam_buka`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->jam_buka = new DbField('fasilitas_rumah_sakit', 'fasilitas_rumah_sakit', 'x_jam_buka', 'jam_buka', '`jam_buka`', '`jam_buka`', 200, 50, -1, false, '`jam_buka`', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->jam_buka->Sortable = true; // Allow sort
         $this->jam_buka->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->jam_buka->Param, "CustomMsg");
         $this->Fields['jam_buka'] = &$this->jam_buka;

@@ -378,6 +378,7 @@ class PraktikPoliDelete extends PraktikPoli
         $this->dokter_id->setVisibility();
         $this->fasilitas_rumah_sakit_id->setVisibility();
         $this->jam_praktik->setVisibility();
+        $this->hari_praktik->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -549,6 +550,7 @@ class PraktikPoliDelete extends PraktikPoli
         $this->dokter_id->setDbValue($row['dokter_id']);
         $this->fasilitas_rumah_sakit_id->setDbValue($row['fasilitas_rumah_sakit_id']);
         $this->jam_praktik->setDbValue($row['jam_praktik']);
+        $this->hari_praktik->setDbValue($row['hari_praktik']);
     }
 
     // Return a row with default values
@@ -559,6 +561,7 @@ class PraktikPoliDelete extends PraktikPoli
         $row['dokter_id'] = null;
         $row['fasilitas_rumah_sakit_id'] = null;
         $row['jam_praktik'] = null;
+        $row['hari_praktik'] = null;
         return $row;
     }
 
@@ -581,6 +584,8 @@ class PraktikPoliDelete extends PraktikPoli
         // fasilitas_rumah_sakit_id
 
         // jam_praktik
+
+        // hari_praktik
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -632,6 +637,10 @@ class PraktikPoliDelete extends PraktikPoli
             $this->jam_praktik->ViewValue = $this->jam_praktik->CurrentValue;
             $this->jam_praktik->ViewCustomAttributes = "";
 
+            // hari_praktik
+            $this->hari_praktik->ViewValue = $this->hari_praktik->CurrentValue;
+            $this->hari_praktik->ViewCustomAttributes = "";
+
             // dokter_id
             $this->dokter_id->LinkCustomAttributes = "";
             $this->dokter_id->HrefValue = "";
@@ -646,6 +655,11 @@ class PraktikPoliDelete extends PraktikPoli
             $this->jam_praktik->LinkCustomAttributes = "";
             $this->jam_praktik->HrefValue = "";
             $this->jam_praktik->TooltipValue = "";
+
+            // hari_praktik
+            $this->hari_praktik->LinkCustomAttributes = "";
+            $this->hari_praktik->HrefValue = "";
+            $this->hari_praktik->TooltipValue = "";
         }
 
         // Call Row Rendered event

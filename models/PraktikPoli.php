@@ -32,6 +32,7 @@ class PraktikPoli extends DbTable
     public $dokter_id;
     public $fasilitas_rumah_sakit_id;
     public $jam_praktik;
+    public $hari_praktik;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -104,12 +105,20 @@ class PraktikPoli extends DbTable
         $this->Fields['fasilitas_rumah_sakit_id'] = &$this->fasilitas_rumah_sakit_id;
 
         // jam_praktik
-        $this->jam_praktik = new DbField('praktik_poli', 'praktik_poli', 'x_jam_praktik', 'jam_praktik', '`jam_praktik`', '`jam_praktik`', 200, 13, -1, false, '`jam_praktik`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->jam_praktik = new DbField('praktik_poli', 'praktik_poli', 'x_jam_praktik', 'jam_praktik', '`jam_praktik`', '`jam_praktik`', 200, 50, -1, false, '`jam_praktik`', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->jam_praktik->Nullable = false; // NOT NULL field
         $this->jam_praktik->Required = true; // Required field
         $this->jam_praktik->Sortable = true; // Allow sort
         $this->jam_praktik->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->jam_praktik->Param, "CustomMsg");
         $this->Fields['jam_praktik'] = &$this->jam_praktik;
+
+        // hari_praktik
+        $this->hari_praktik = new DbField('praktik_poli', 'praktik_poli', 'x_hari_praktik', 'hari_praktik', '`hari_praktik`', '`hari_praktik`', 200, 50, -1, false, '`hari_praktik`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->hari_praktik->Nullable = false; // NOT NULL field
+        $this->hari_praktik->Required = true; // Required field
+        $this->hari_praktik->Sortable = true; // Allow sort
+        $this->hari_praktik->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->hari_praktik->Param, "CustomMsg");
+        $this->Fields['hari_praktik'] = &$this->hari_praktik;
     }
 
     // Field Visibility
@@ -604,6 +613,7 @@ class PraktikPoli extends DbTable
         $this->dokter_id->DbValue = $row['dokter_id'];
         $this->fasilitas_rumah_sakit_id->DbValue = $row['fasilitas_rumah_sakit_id'];
         $this->jam_praktik->DbValue = $row['jam_praktik'];
+        $this->hari_praktik->DbValue = $row['hari_praktik'];
     }
 
     // Delete uploaded files
@@ -936,6 +946,7 @@ SORTHTML;
         $this->dokter_id->setDbValue($row['dokter_id']);
         $this->fasilitas_rumah_sakit_id->setDbValue($row['fasilitas_rumah_sakit_id']);
         $this->jam_praktik->setDbValue($row['jam_praktik']);
+        $this->hari_praktik->setDbValue($row['hari_praktik']);
     }
 
     // Render list row values
@@ -955,6 +966,8 @@ SORTHTML;
         // fasilitas_rumah_sakit_id
 
         // jam_praktik
+
+        // hari_praktik
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1006,6 +1019,10 @@ SORTHTML;
         $this->jam_praktik->ViewValue = $this->jam_praktik->CurrentValue;
         $this->jam_praktik->ViewCustomAttributes = "";
 
+        // hari_praktik
+        $this->hari_praktik->ViewValue = $this->hari_praktik->CurrentValue;
+        $this->hari_praktik->ViewCustomAttributes = "";
+
         // id
         $this->id->LinkCustomAttributes = "";
         $this->id->HrefValue = "";
@@ -1025,6 +1042,11 @@ SORTHTML;
         $this->jam_praktik->LinkCustomAttributes = "";
         $this->jam_praktik->HrefValue = "";
         $this->jam_praktik->TooltipValue = "";
+
+        // hari_praktik
+        $this->hari_praktik->LinkCustomAttributes = "";
+        $this->hari_praktik->HrefValue = "";
+        $this->hari_praktik->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1112,6 +1134,15 @@ SORTHTML;
         $this->jam_praktik->EditValue = $this->jam_praktik->CurrentValue;
         $this->jam_praktik->PlaceHolder = RemoveHtml($this->jam_praktik->caption());
 
+        // hari_praktik
+        $this->hari_praktik->EditAttrs["class"] = "form-control";
+        $this->hari_praktik->EditCustomAttributes = "";
+        if (!$this->hari_praktik->Raw) {
+            $this->hari_praktik->CurrentValue = HtmlDecode($this->hari_praktik->CurrentValue);
+        }
+        $this->hari_praktik->EditValue = $this->hari_praktik->CurrentValue;
+        $this->hari_praktik->PlaceHolder = RemoveHtml($this->hari_praktik->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1144,11 +1175,13 @@ SORTHTML;
                     $doc->exportCaption($this->dokter_id);
                     $doc->exportCaption($this->fasilitas_rumah_sakit_id);
                     $doc->exportCaption($this->jam_praktik);
+                    $doc->exportCaption($this->hari_praktik);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->dokter_id);
                     $doc->exportCaption($this->fasilitas_rumah_sakit_id);
                     $doc->exportCaption($this->jam_praktik);
+                    $doc->exportCaption($this->hari_praktik);
                 }
                 $doc->endExportRow();
             }
@@ -1182,11 +1215,13 @@ SORTHTML;
                         $doc->exportField($this->dokter_id);
                         $doc->exportField($this->fasilitas_rumah_sakit_id);
                         $doc->exportField($this->jam_praktik);
+                        $doc->exportField($this->hari_praktik);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->dokter_id);
                         $doc->exportField($this->fasilitas_rumah_sakit_id);
                         $doc->exportField($this->jam_praktik);
+                        $doc->exportField($this->hari_praktik);
                     }
                     $doc->endExportRow($rowCnt);
                 }

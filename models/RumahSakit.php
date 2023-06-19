@@ -116,7 +116,7 @@ class RumahSakit extends DbTable
         $this->Fields['foto_rumah_sakit'] = &$this->foto_rumah_sakit;
 
         // jam_buka
-        $this->jam_buka = new DbField('rumah_sakit', 'rumah_sakit', 'x_jam_buka', 'jam_buka', '`jam_buka`', '`jam_buka`', 200, 13, -1, false, '`jam_buka`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->jam_buka = new DbField('rumah_sakit', 'rumah_sakit', 'x_jam_buka', 'jam_buka', '`jam_buka`', '`jam_buka`', 200, 50, -1, false, '`jam_buka`', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->jam_buka->Nullable = false; // NOT NULL field
         $this->jam_buka->Required = true; // Required field
         $this->jam_buka->Sortable = true; // Allow sort

@@ -1305,6 +1305,9 @@
       <field id="jam_praktik">
         <phrase id="fldcaption" value="Jam Praktik" />
       </field>
+      <field id="hari_praktik">
+        <phrase id="fldcaption" value="hari praktik" />
+      </field>
     </table>
     <table id="image_slider">
       <phrase id="tblcaption" value="image slider" />

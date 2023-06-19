@@ -295,14 +295,14 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
         <td data-name="hari_buka" <?= $Grid->hari_buka->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
 <span id="el<?= $Grid->RowCount ?>_fasilitas_rumah_sakit_hari_buka" class="form-group">
-<input type="<?= $Grid->hari_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" name="x<?= $Grid->RowIndex ?>_hari_buka" id="x<?= $Grid->RowIndex ?>_hari_buka" size="30" maxlength="15" placeholder="<?= HtmlEncode($Grid->hari_buka->getPlaceHolder()) ?>" value="<?= $Grid->hari_buka->EditValue ?>"<?= $Grid->hari_buka->editAttributes() ?>>
+<input type="<?= $Grid->hari_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" name="x<?= $Grid->RowIndex ?>_hari_buka" id="x<?= $Grid->RowIndex ?>_hari_buka" size="30" maxlength="50" placeholder="<?= HtmlEncode($Grid->hari_buka->getPlaceHolder()) ?>" value="<?= $Grid->hari_buka->EditValue ?>"<?= $Grid->hari_buka->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->hari_buka->getErrorMessage() ?></div>
 </span>
 <input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" data-hidden="1" name="o<?= $Grid->RowIndex ?>_hari_buka" id="o<?= $Grid->RowIndex ?>_hari_buka" value="<?= HtmlEncode($Grid->hari_buka->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowCount ?>_fasilitas_rumah_sakit_hari_buka" class="form-group">
-<input type="<?= $Grid->hari_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" name="x<?= $Grid->RowIndex ?>_hari_buka" id="x<?= $Grid->RowIndex ?>_hari_buka" size="30" maxlength="15" placeholder="<?= HtmlEncode($Grid->hari_buka->getPlaceHolder()) ?>" value="<?= $Grid->hari_buka->EditValue ?>"<?= $Grid->hari_buka->editAttributes() ?>>
+<input type="<?= $Grid->hari_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" name="x<?= $Grid->RowIndex ?>_hari_buka" id="x<?= $Grid->RowIndex ?>_hari_buka" size="30" maxlength="50" placeholder="<?= HtmlEncode($Grid->hari_buka->getPlaceHolder()) ?>" value="<?= $Grid->hari_buka->EditValue ?>"<?= $Grid->hari_buka->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->hari_buka->getErrorMessage() ?></div>
 </span>
 <?php } ?>
@@ -322,14 +322,14 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
         <td data-name="jam_buka" <?= $Grid->jam_buka->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
 <span id="el<?= $Grid->RowCount ?>_fasilitas_rumah_sakit_jam_buka" class="form-group">
-<input type="<?= $Grid->jam_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" name="x<?= $Grid->RowIndex ?>_jam_buka" id="x<?= $Grid->RowIndex ?>_jam_buka" size="30" maxlength="13" placeholder="<?= HtmlEncode($Grid->jam_buka->getPlaceHolder()) ?>" value="<?= $Grid->jam_buka->EditValue ?>"<?= $Grid->jam_buka->editAttributes() ?>>
+<input type="<?= $Grid->jam_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" name="x<?= $Grid->RowIndex ?>_jam_buka" id="x<?= $Grid->RowIndex ?>_jam_buka" size="30" maxlength="50" placeholder="<?= HtmlEncode($Grid->jam_buka->getPlaceHolder()) ?>" value="<?= $Grid->jam_buka->EditValue ?>"<?= $Grid->jam_buka->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->jam_buka->getErrorMessage() ?></div>
 </span>
 <input type="hidden" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" data-hidden="1" name="o<?= $Grid->RowIndex ?>_jam_buka" id="o<?= $Grid->RowIndex ?>_jam_buka" value="<?= HtmlEncode($Grid->jam_buka->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowCount ?>_fasilitas_rumah_sakit_jam_buka" class="form-group">
-<input type="<?= $Grid->jam_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" name="x<?= $Grid->RowIndex ?>_jam_buka" id="x<?= $Grid->RowIndex ?>_jam_buka" size="30" maxlength="13" placeholder="<?= HtmlEncode($Grid->jam_buka->getPlaceHolder()) ?>" value="<?= $Grid->jam_buka->EditValue ?>"<?= $Grid->jam_buka->editAttributes() ?>>
+<input type="<?= $Grid->jam_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" name="x<?= $Grid->RowIndex ?>_jam_buka" id="x<?= $Grid->RowIndex ?>_jam_buka" size="30" maxlength="50" placeholder="<?= HtmlEncode($Grid->jam_buka->getPlaceHolder()) ?>" value="<?= $Grid->jam_buka->EditValue ?>"<?= $Grid->jam_buka->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->jam_buka->getErrorMessage() ?></div>
 </span>
 <?php } ?>
@@ -420,7 +420,7 @@ $Grid->ListOptions->render("body", "left", $Grid->RowIndex);
         <td data-name="hari_buka">
 <?php if (!$Grid->isConfirm()) { ?>
 <span id="el$rowindex$_fasilitas_rumah_sakit_hari_buka" class="form-group fasilitas_rumah_sakit_hari_buka">
-<input type="<?= $Grid->hari_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" name="x<?= $Grid->RowIndex ?>_hari_buka" id="x<?= $Grid->RowIndex ?>_hari_buka" size="30" maxlength="15" placeholder="<?= HtmlEncode($Grid->hari_buka->getPlaceHolder()) ?>" value="<?= $Grid->hari_buka->EditValue ?>"<?= $Grid->hari_buka->editAttributes() ?>>
+<input type="<?= $Grid->hari_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" name="x<?= $Grid->RowIndex ?>_hari_buka" id="x<?= $Grid->RowIndex ?>_hari_buka" size="30" maxlength="50" placeholder="<?= HtmlEncode($Grid->hari_buka->getPlaceHolder()) ?>" value="<?= $Grid->hari_buka->EditValue ?>"<?= $Grid->hari_buka->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->hari_buka->getErrorMessage() ?></div>
 </span>
 <?php } else { ?>
@@ -437,7 +437,7 @@ $Grid->ListOptions->render("body", "left", $Grid->RowIndex);
         <td data-name="jam_buka">
 <?php if (!$Grid->isConfirm()) { ?>
 <span id="el$rowindex$_fasilitas_rumah_sakit_jam_buka" class="form-group fasilitas_rumah_sakit_jam_buka">
-<input type="<?= $Grid->jam_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" name="x<?= $Grid->RowIndex ?>_jam_buka" id="x<?= $Grid->RowIndex ?>_jam_buka" size="30" maxlength="13" placeholder="<?= HtmlEncode($Grid->jam_buka->getPlaceHolder()) ?>" value="<?= $Grid->jam_buka->EditValue ?>"<?= $Grid->jam_buka->editAttributes() ?>>
+<input type="<?= $Grid->jam_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" name="x<?= $Grid->RowIndex ?>_jam_buka" id="x<?= $Grid->RowIndex ?>_jam_buka" size="30" maxlength="50" placeholder="<?= HtmlEncode($Grid->jam_buka->getPlaceHolder()) ?>" value="<?= $Grid->jam_buka->EditValue ?>"<?= $Grid->jam_buka->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->jam_buka->getErrorMessage() ?></div>
 </span>
 <?php } else { ?>

@@ -24,7 +24,8 @@ loadjs.ready("head", function () {
     fpraktik_polilist.addFields([
         ["dokter_id", [fields.dokter_id.visible && fields.dokter_id.required ? ew.Validators.required(fields.dokter_id.caption) : null], fields.dokter_id.isInvalid],
         ["fasilitas_rumah_sakit_id", [fields.fasilitas_rumah_sakit_id.visible && fields.fasilitas_rumah_sakit_id.required ? ew.Validators.required(fields.fasilitas_rumah_sakit_id.caption) : null], fields.fasilitas_rumah_sakit_id.isInvalid],
-        ["jam_praktik", [fields.jam_praktik.visible && fields.jam_praktik.required ? ew.Validators.required(fields.jam_praktik.caption) : null], fields.jam_praktik.isInvalid]
+        ["jam_praktik", [fields.jam_praktik.visible && fields.jam_praktik.required ? ew.Validators.required(fields.jam_praktik.caption) : null], fields.jam_praktik.isInvalid],
+        ["hari_praktik", [fields.hari_praktik.visible && fields.hari_praktik.required ? ew.Validators.required(fields.hari_praktik.caption) : null], fields.hari_praktik.isInvalid]
     ]);
 
     // Set invalid fields
@@ -87,6 +88,8 @@ loadjs.ready("head", function () {
         if (ew.valueChanged(fobj, rowIndex, "fasilitas_rumah_sakit_id", false))
             return false;
         if (ew.valueChanged(fobj, rowIndex, "jam_praktik", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "hari_praktik", false))
             return false;
         return true;
     }
@@ -231,6 +234,9 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->jam_praktik->Visible) { // jam_praktik ?>
         <th data-name="jam_praktik" class="<?= $Page->jam_praktik->headerCellClass() ?>"><div id="elh_praktik_poli_jam_praktik" class="praktik_poli_jam_praktik"><?= $Page->renderSort($Page->jam_praktik) ?></div></th>
+<?php } ?>
+<?php if ($Page->hari_praktik->Visible) { // hari_praktik ?>
+        <th data-name="hari_praktik" class="<?= $Page->hari_praktik->headerCellClass() ?>"><div id="elh_praktik_poli_hari_praktik" class="praktik_poli_hari_praktik"><?= $Page->renderSort($Page->hari_praktik) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -464,14 +470,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
         <td data-name="jam_praktik" <?= $Page->jam_praktik->cellAttributes() ?>>
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
 <span id="el<?= $Page->RowCount ?>_praktik_poli_jam_praktik" class="form-group">
-<input type="<?= $Page->jam_praktik->getInputTextType() ?>" data-table="praktik_poli" data-field="x_jam_praktik" name="x<?= $Page->RowIndex ?>_jam_praktik" id="x<?= $Page->RowIndex ?>_jam_praktik" size="30" maxlength="13" placeholder="<?= HtmlEncode($Page->jam_praktik->getPlaceHolder()) ?>" value="<?= $Page->jam_praktik->EditValue ?>"<?= $Page->jam_praktik->editAttributes() ?>>
+<input type="<?= $Page->jam_praktik->getInputTextType() ?>" data-table="praktik_poli" data-field="x_jam_praktik" name="x<?= $Page->RowIndex ?>_jam_praktik" id="x<?= $Page->RowIndex ?>_jam_praktik" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->jam_praktik->getPlaceHolder()) ?>" value="<?= $Page->jam_praktik->EditValue ?>"<?= $Page->jam_praktik->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->jam_praktik->getErrorMessage() ?></div>
 </span>
 <input type="hidden" data-table="praktik_poli" data-field="x_jam_praktik" data-hidden="1" name="o<?= $Page->RowIndex ?>_jam_praktik" id="o<?= $Page->RowIndex ?>_jam_praktik" value="<?= HtmlEncode($Page->jam_praktik->OldValue) ?>">
 <?php } ?>
 <?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?= $Page->RowCount ?>_praktik_poli_jam_praktik" class="form-group">
-<input type="<?= $Page->jam_praktik->getInputTextType() ?>" data-table="praktik_poli" data-field="x_jam_praktik" name="x<?= $Page->RowIndex ?>_jam_praktik" id="x<?= $Page->RowIndex ?>_jam_praktik" size="30" maxlength="13" placeholder="<?= HtmlEncode($Page->jam_praktik->getPlaceHolder()) ?>" value="<?= $Page->jam_praktik->EditValue ?>"<?= $Page->jam_praktik->editAttributes() ?>>
+<input type="<?= $Page->jam_praktik->getInputTextType() ?>" data-table="praktik_poli" data-field="x_jam_praktik" name="x<?= $Page->RowIndex ?>_jam_praktik" id="x<?= $Page->RowIndex ?>_jam_praktik" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->jam_praktik->getPlaceHolder()) ?>" value="<?= $Page->jam_praktik->EditValue ?>"<?= $Page->jam_praktik->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->jam_praktik->getErrorMessage() ?></div>
 </span>
 <?php } ?>
@@ -479,6 +485,29 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_praktik_poli_jam_praktik">
 <span<?= $Page->jam_praktik->viewAttributes() ?>>
 <?= $Page->jam_praktik->getViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Page->hari_praktik->Visible) { // hari_praktik ?>
+        <td data-name="hari_praktik" <?= $Page->hari_praktik->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Page->RowCount ?>_praktik_poli_hari_praktik" class="form-group">
+<input type="<?= $Page->hari_praktik->getInputTextType() ?>" data-table="praktik_poli" data-field="x_hari_praktik" name="x<?= $Page->RowIndex ?>_hari_praktik" id="x<?= $Page->RowIndex ?>_hari_praktik" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->hari_praktik->getPlaceHolder()) ?>" value="<?= $Page->hari_praktik->EditValue ?>"<?= $Page->hari_praktik->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->hari_praktik->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="praktik_poli" data-field="x_hari_praktik" data-hidden="1" name="o<?= $Page->RowIndex ?>_hari_praktik" id="o<?= $Page->RowIndex ?>_hari_praktik" value="<?= HtmlEncode($Page->hari_praktik->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Page->RowCount ?>_praktik_poli_hari_praktik" class="form-group">
+<input type="<?= $Page->hari_praktik->getInputTextType() ?>" data-table="praktik_poli" data-field="x_hari_praktik" name="x<?= $Page->RowIndex ?>_hari_praktik" id="x<?= $Page->RowIndex ?>_hari_praktik" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->hari_praktik->getPlaceHolder()) ?>" value="<?= $Page->hari_praktik->EditValue ?>"<?= $Page->hari_praktik->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->hari_praktik->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Page->RowCount ?>_praktik_poli_hari_praktik">
+<span<?= $Page->hari_praktik->viewAttributes() ?>>
+<?= $Page->hari_praktik->getViewValue() ?></span>
 </span>
 <?php } ?>
 </td>
@@ -581,10 +610,19 @@ $Page->ListOptions->render("body", "left", $Page->RowIndex);
     <?php if ($Page->jam_praktik->Visible) { // jam_praktik ?>
         <td data-name="jam_praktik">
 <span id="el$rowindex$_praktik_poli_jam_praktik" class="form-group praktik_poli_jam_praktik">
-<input type="<?= $Page->jam_praktik->getInputTextType() ?>" data-table="praktik_poli" data-field="x_jam_praktik" name="x<?= $Page->RowIndex ?>_jam_praktik" id="x<?= $Page->RowIndex ?>_jam_praktik" size="30" maxlength="13" placeholder="<?= HtmlEncode($Page->jam_praktik->getPlaceHolder()) ?>" value="<?= $Page->jam_praktik->EditValue ?>"<?= $Page->jam_praktik->editAttributes() ?>>
+<input type="<?= $Page->jam_praktik->getInputTextType() ?>" data-table="praktik_poli" data-field="x_jam_praktik" name="x<?= $Page->RowIndex ?>_jam_praktik" id="x<?= $Page->RowIndex ?>_jam_praktik" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->jam_praktik->getPlaceHolder()) ?>" value="<?= $Page->jam_praktik->EditValue ?>"<?= $Page->jam_praktik->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->jam_praktik->getErrorMessage() ?></div>
 </span>
 <input type="hidden" data-table="praktik_poli" data-field="x_jam_praktik" data-hidden="1" name="o<?= $Page->RowIndex ?>_jam_praktik" id="o<?= $Page->RowIndex ?>_jam_praktik" value="<?= HtmlEncode($Page->jam_praktik->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->hari_praktik->Visible) { // hari_praktik ?>
+        <td data-name="hari_praktik">
+<span id="el$rowindex$_praktik_poli_hari_praktik" class="form-group praktik_poli_hari_praktik">
+<input type="<?= $Page->hari_praktik->getInputTextType() ?>" data-table="praktik_poli" data-field="x_hari_praktik" name="x<?= $Page->RowIndex ?>_hari_praktik" id="x<?= $Page->RowIndex ?>_hari_praktik" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->hari_praktik->getPlaceHolder()) ?>" value="<?= $Page->hari_praktik->EditValue ?>"<?= $Page->hari_praktik->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->hari_praktik->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="praktik_poli" data-field="x_hari_praktik" data-hidden="1" name="o<?= $Page->RowIndex ?>_hari_praktik" id="o<?= $Page->RowIndex ?>_hari_praktik" value="<?= HtmlEncode($Page->hari_praktik->OldValue) ?>">
 </td>
     <?php } ?>
 <?php

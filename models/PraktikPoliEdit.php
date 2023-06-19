@@ -471,6 +471,7 @@ class PraktikPoliEdit extends PraktikPoli
         $this->dokter_id->setVisibility();
         $this->fasilitas_rumah_sakit_id->setVisibility();
         $this->jam_praktik->setVisibility();
+        $this->hari_praktik->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -686,6 +687,16 @@ class PraktikPoliEdit extends PraktikPoli
             }
         }
 
+        // Check field name 'hari_praktik' first before field var 'x_hari_praktik'
+        $val = $CurrentForm->hasValue("hari_praktik") ? $CurrentForm->getValue("hari_praktik") : $CurrentForm->getValue("x_hari_praktik");
+        if (!$this->hari_praktik->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->hari_praktik->Visible = false; // Disable update for API request
+            } else {
+                $this->hari_praktik->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
         if (!$this->id->IsDetailKey) {
@@ -701,6 +712,7 @@ class PraktikPoliEdit extends PraktikPoli
         $this->dokter_id->CurrentValue = $this->dokter_id->FormValue;
         $this->fasilitas_rumah_sakit_id->CurrentValue = $this->fasilitas_rumah_sakit_id->FormValue;
         $this->jam_praktik->CurrentValue = $this->jam_praktik->FormValue;
+        $this->hari_praktik->CurrentValue = $this->hari_praktik->FormValue;
     }
 
     /**
@@ -754,6 +766,7 @@ class PraktikPoliEdit extends PraktikPoli
         $this->dokter_id->setDbValue($row['dokter_id']);
         $this->fasilitas_rumah_sakit_id->setDbValue($row['fasilitas_rumah_sakit_id']);
         $this->jam_praktik->setDbValue($row['jam_praktik']);
+        $this->hari_praktik->setDbValue($row['hari_praktik']);
     }
 
     // Return a row with default values
@@ -764,6 +777,7 @@ class PraktikPoliEdit extends PraktikPoli
         $row['dokter_id'] = null;
         $row['fasilitas_rumah_sakit_id'] = null;
         $row['jam_praktik'] = null;
+        $row['hari_praktik'] = null;
         return $row;
     }
 
@@ -802,6 +816,8 @@ class PraktikPoliEdit extends PraktikPoli
         // fasilitas_rumah_sakit_id
 
         // jam_praktik
+
+        // hari_praktik
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -853,6 +869,10 @@ class PraktikPoliEdit extends PraktikPoli
             $this->jam_praktik->ViewValue = $this->jam_praktik->CurrentValue;
             $this->jam_praktik->ViewCustomAttributes = "";
 
+            // hari_praktik
+            $this->hari_praktik->ViewValue = $this->hari_praktik->CurrentValue;
+            $this->hari_praktik->ViewCustomAttributes = "";
+
             // dokter_id
             $this->dokter_id->LinkCustomAttributes = "";
             $this->dokter_id->HrefValue = "";
@@ -867,6 +887,11 @@ class PraktikPoliEdit extends PraktikPoli
             $this->jam_praktik->LinkCustomAttributes = "";
             $this->jam_praktik->HrefValue = "";
             $this->jam_praktik->TooltipValue = "";
+
+            // hari_praktik
+            $this->hari_praktik->LinkCustomAttributes = "";
+            $this->hari_praktik->HrefValue = "";
+            $this->hari_praktik->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // dokter_id
             $this->dokter_id->EditCustomAttributes = "";
@@ -991,6 +1016,15 @@ class PraktikPoliEdit extends PraktikPoli
             $this->jam_praktik->EditValue = HtmlEncode($this->jam_praktik->CurrentValue);
             $this->jam_praktik->PlaceHolder = RemoveHtml($this->jam_praktik->caption());
 
+            // hari_praktik
+            $this->hari_praktik->EditAttrs["class"] = "form-control";
+            $this->hari_praktik->EditCustomAttributes = "";
+            if (!$this->hari_praktik->Raw) {
+                $this->hari_praktik->CurrentValue = HtmlDecode($this->hari_praktik->CurrentValue);
+            }
+            $this->hari_praktik->EditValue = HtmlEncode($this->hari_praktik->CurrentValue);
+            $this->hari_praktik->PlaceHolder = RemoveHtml($this->hari_praktik->caption());
+
             // Edit refer script
 
             // dokter_id
@@ -1004,6 +1038,10 @@ class PraktikPoliEdit extends PraktikPoli
             // jam_praktik
             $this->jam_praktik->LinkCustomAttributes = "";
             $this->jam_praktik->HrefValue = "";
+
+            // hari_praktik
+            $this->hari_praktik->LinkCustomAttributes = "";
+            $this->hari_praktik->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1037,6 +1075,11 @@ class PraktikPoliEdit extends PraktikPoli
         if ($this->jam_praktik->Required) {
             if (!$this->jam_praktik->IsDetailKey && EmptyValue($this->jam_praktik->FormValue)) {
                 $this->jam_praktik->addErrorMessage(str_replace("%s", $this->jam_praktik->caption(), $this->jam_praktik->RequiredErrorMessage));
+            }
+        }
+        if ($this->hari_praktik->Required) {
+            if (!$this->hari_praktik->IsDetailKey && EmptyValue($this->hari_praktik->FormValue)) {
+                $this->hari_praktik->addErrorMessage(str_replace("%s", $this->hari_praktik->caption(), $this->hari_praktik->RequiredErrorMessage));
             }
         }
 
@@ -1085,6 +1128,9 @@ class PraktikPoliEdit extends PraktikPoli
 
             // jam_praktik
             $this->jam_praktik->setDbValueDef($rsnew, $this->jam_praktik->CurrentValue, "", $this->jam_praktik->ReadOnly);
+
+            // hari_praktik
+            $this->hari_praktik->setDbValueDef($rsnew, $this->hari_praktik->CurrentValue, "", $this->hari_praktik->ReadOnly);
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);

@@ -174,7 +174,7 @@ $Page->showMessage();
         <label id="elh_rumah_sakit_jam_buka" for="x_jam_buka" class="<?= $Page->LeftColumnClass ?>"><?= $Page->jam_buka->caption() ?><?= $Page->jam_buka->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->jam_buka->cellAttributes() ?>>
 <span id="el_rumah_sakit_jam_buka">
-<input type="<?= $Page->jam_buka->getInputTextType() ?>" data-table="rumah_sakit" data-field="x_jam_buka" name="x_jam_buka" id="x_jam_buka" size="30" maxlength="13" placeholder="<?= HtmlEncode($Page->jam_buka->getPlaceHolder()) ?>" value="<?= $Page->jam_buka->EditValue ?>"<?= $Page->jam_buka->editAttributes() ?> aria-describedby="x_jam_buka_help">
+<input type="<?= $Page->jam_buka->getInputTextType() ?>" data-table="rumah_sakit" data-field="x_jam_buka" name="x_jam_buka" id="x_jam_buka" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->jam_buka->getPlaceHolder()) ?>" value="<?= $Page->jam_buka->EditValue ?>"<?= $Page->jam_buka->editAttributes() ?> aria-describedby="x_jam_buka_help">
 <?= $Page->jam_buka->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->jam_buka->getErrorMessage() ?></div>
 </span>

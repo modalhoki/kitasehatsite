@@ -49,6 +49,15 @@ $Page->ListOptions->render("header", "left");
         </div></div></th>
     <?php } ?>
 <?php } ?>
+<?php if ($Page->hari_praktik->Visible) { // hari_praktik ?>
+    <?php if ($Page->SortUrl($Page->hari_praktik) == "") { ?>
+        <th class="<?= $Page->hari_praktik->headerCellClass() ?>"><?= $Page->hari_praktik->caption() ?></th>
+    <?php } else { ?>
+        <th class="<?= $Page->hari_praktik->headerCellClass() ?>"><div class="ew-pointer" data-sort="<?= HtmlEncode($Page->hari_praktik->Name) ?>" data-sort-type="1" data-sort-order="<?= $Page->hari_praktik->getNextSort() ?>">
+            <div class="ew-table-header-btn"><span class="ew-table-header-caption"><?= $Page->hari_praktik->caption() ?></span><span class="ew-table-header-sort"><?php if ($Page->hari_praktik->getSort() == "ASC") { ?><i class="fas fa-sort-up"></i><?php } elseif ($Page->hari_praktik->getSort() == "DESC") { ?><i class="fas fa-sort-down"></i><?php } ?></span>
+        </div></div></th>
+    <?php } ?>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -98,6 +107,13 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
         <td<?= $Page->jam_praktik->cellAttributes() ?>>
 <span<?= $Page->jam_praktik->viewAttributes() ?>>
 <?= $Page->jam_praktik->getViewValue() ?></span>
+</td>
+<?php } ?>
+<?php if ($Page->hari_praktik->Visible) { // hari_praktik ?>
+        <!-- hari_praktik -->
+        <td<?= $Page->hari_praktik->cellAttributes() ?>>
+<span<?= $Page->hari_praktik->viewAttributes() ?>>
+<?= $Page->hari_praktik->getViewValue() ?></span>
 </td>
 <?php } ?>
 <?php

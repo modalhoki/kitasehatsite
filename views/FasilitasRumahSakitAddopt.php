@@ -150,7 +150,7 @@ loadjs.ready(["ffasilitas_rumah_sakitaddopt"], function() {
     <div class="form-group row">
         <label class="col-sm-2 col-form-label ew-label" for="x_hari_buka"><?= $Page->hari_buka->caption() ?><?= $Page->hari_buka->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="col-sm-10">
-<input type="<?= $Page->hari_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" name="x_hari_buka" id="x_hari_buka" size="30" maxlength="15" placeholder="<?= HtmlEncode($Page->hari_buka->getPlaceHolder()) ?>" value="<?= $Page->hari_buka->EditValue ?>"<?= $Page->hari_buka->editAttributes() ?>>
+<input type="<?= $Page->hari_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_hari_buka" name="x_hari_buka" id="x_hari_buka" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->hari_buka->getPlaceHolder()) ?>" value="<?= $Page->hari_buka->EditValue ?>"<?= $Page->hari_buka->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->hari_buka->getErrorMessage() ?></div>
 </div>
     </div>
@@ -159,7 +159,7 @@ loadjs.ready(["ffasilitas_rumah_sakitaddopt"], function() {
     <div class="form-group row">
         <label class="col-sm-2 col-form-label ew-label" for="x_jam_buka"><?= $Page->jam_buka->caption() ?><?= $Page->jam_buka->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="col-sm-10">
-<input type="<?= $Page->jam_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" name="x_jam_buka" id="x_jam_buka" size="30" maxlength="13" placeholder="<?= HtmlEncode($Page->jam_buka->getPlaceHolder()) ?>" value="<?= $Page->jam_buka->EditValue ?>"<?= $Page->jam_buka->editAttributes() ?>>
+<input type="<?= $Page->jam_buka->getInputTextType() ?>" data-table="fasilitas_rumah_sakit" data-field="x_jam_buka" name="x_jam_buka" id="x_jam_buka" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->jam_buka->getPlaceHolder()) ?>" value="<?= $Page->jam_buka->EditValue ?>"<?= $Page->jam_buka->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->jam_buka->getErrorMessage() ?></div>
 </div>
     </div>
