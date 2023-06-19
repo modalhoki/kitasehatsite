@@ -374,7 +374,7 @@ class KontakDaruratDelete extends KontakDarurat
     {
         global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm;
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->pasien_id->setVisibility();
         $this->nama->setVisibility();
         $this->no_hp->setVisibility();
@@ -613,11 +613,6 @@ class KontakDaruratDelete extends KontakDarurat
             // no_hp
             $this->no_hp->ViewValue = $this->no_hp->CurrentValue;
             $this->no_hp->ViewCustomAttributes = "";
-
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // pasien_id
             $this->pasien_id->LinkCustomAttributes = "";

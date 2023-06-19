@@ -166,6 +166,14 @@ $Page->showMessage();
     <?php if (strval($Page->rumah_sakit_id->getSessionValue()) != "") { ?>
     <input type="hidden" name="x_rumah_sakit_id" id="x_rumah_sakit_id" value="<?= HtmlEncode(strval($Page->rumah_sakit_id->getSessionValue())) ?>">
     <?php } ?>
+<?php
+    if (in_array("praktik_poli", explode(",", $Page->getCurrentDetailTable())) && $praktik_poli->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("praktik_poli", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PraktikPoliGrid.php" ?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <div class="form-group row"><!-- buttons .form-group -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->

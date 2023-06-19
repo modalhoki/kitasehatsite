@@ -374,7 +374,7 @@ class RumahSakitDelete extends RumahSakit
     {
         global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm;
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->nama->setVisibility();
         $this->alamat->setVisibility();
         $this->daerah_id->setVisibility();
@@ -628,11 +628,6 @@ class RumahSakitDelete extends RumahSakit
             // jam_buka
             $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
             $this->jam_buka->ViewCustomAttributes = "";
-
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // nama
             $this->nama->LinkCustomAttributes = "";

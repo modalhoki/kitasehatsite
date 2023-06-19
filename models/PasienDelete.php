@@ -374,7 +374,7 @@ class PasienDelete extends Pasien
     {
         global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm;
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->nik->setVisibility();
         $this->nama->setVisibility();
         $this->jenis_kelamin->setVisibility();
@@ -699,11 +699,6 @@ class PasienDelete extends Pasien
             // foto_profil
             $this->foto_profil->ViewValue = $this->foto_profil->CurrentValue;
             $this->foto_profil->ViewCustomAttributes = "";
-
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // nik
             $this->nik->LinkCustomAttributes = "";

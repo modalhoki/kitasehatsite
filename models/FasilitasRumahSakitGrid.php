@@ -1219,7 +1219,11 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
             $item = &$option->add("add");
             $addcaption = HtmlTitle($Language->phrase("AddLink"));
             $this->AddUrl = $this->getAddUrl();
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
+            if (IsMobile()) {
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
+            } else {
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"fasilitas_rumah_sakit\" data-caption=\"" . $addcaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'AddBtn',url:'" . HtmlEncode(GetUrl($this->AddUrl)) . "'});\">" . $Language->phrase("AddLink") . "</a>";
+            }
             $item->Visible = $this->AddUrl != "" && $Security->canAdd();
         }
     }
@@ -1249,12 +1253,82 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
     // Set up list options (extended codes)
     protected function setupListOptionsExt()
     {
+        // Hide detail items for dropdown if necessary
+        $this->ListOptions->hideDetailItemsForDropDown();
     }
 
     // Render list options (extended codes)
     protected function renderListOptionsExt()
     {
         global $Security, $Language;
+        $links = "";
+        $btngrps = "";
+        $sqlwrk = "`fasilitas_rumah_sakit_id`=" . AdjustSql($this->id->CurrentValue, $this->Dbid) . "";
+
+        // Column "detail_praktik_poli"
+        if ($this->DetailPages && $this->DetailPages["praktik_poli"] && $this->DetailPages["praktik_poli"]->Visible && $Security->allowList(CurrentProjectID() . 'praktik_poli')) {
+            $link = "";
+            $option = $this->ListOptions["detail_praktik_poli"];
+            $url = "praktikpolipreview?t=fasilitas_rumah_sakit&f=" . Encrypt($sqlwrk);
+            $btngrp = "<div data-table=\"praktik_poli\" data-url=\"" . $url . "\">";
+            if ($Security->allowList(CurrentProjectID() . 'fasilitas_rumah_sakit')) {
+                $label = $Language->TablePhrase("praktik_poli", "TblCaption");
+                $link = "<li class=\"nav-item\"><a href=\"#\" class=\"nav-link\" data-toggle=\"tab\" data-table=\"praktik_poli\" data-url=\"" . $url . "\">" . $label . "</a></li>";
+                $links .= $link;
+                $detaillnk = JsEncodeAttribute("praktikpolilist?" . Config("TABLE_SHOW_MASTER") . "=fasilitas_rumah_sakit&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "");
+                $btngrp .= "<a href=\"#\" class=\"mr-2\" title=\"" . $Language->TablePhrase("praktik_poli", "TblCaption") . "\" onclick=\"window.location='" . $detaillnk . "';return false;\">" . $Language->phrase("MasterDetailListLink") . "</a>";
+            }
+            $detailPageObj = Container("PraktikPoliGrid");
+            if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'fasilitas_rumah_sakit')) {
+                $caption = $Language->phrase("MasterDetailViewLink");
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=praktik_poli");
+                $btngrp .= "<a href=\"#\" class=\"mr-2\" title=\"" . HtmlTitle($caption) . "\" onclick=\"window.location='" . HtmlEncode($url) . "';return false;\">" . $caption . "</a>";
+            }
+            if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'fasilitas_rumah_sakit')) {
+                $caption = $Language->phrase("MasterDetailEditLink");
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=praktik_poli");
+                $btngrp .= "<a href=\"#\" class=\"mr-2\" title=\"" . HtmlTitle($caption) . "\" onclick=\"window.location='" . HtmlEncode($url) . "';return false;\">" . $caption . "</a>";
+            }
+            $btngrp .= "</div>";
+            if ($link != "") {
+                $btngrps .= $btngrp;
+                $option->Body .= "<div class=\"d-none ew-preview\">" . $link . $btngrp . "</div>";
+            }
+        }
+
+        // Hide detail items if necessary
+        $this->ListOptions->hideDetailItemsForDropDown();
+
+        // Column "preview"
+        $option = $this->ListOptions["preview"];
+        if (!$option) { // Add preview column
+            $option = &$this->ListOptions->add("preview");
+            $option->OnLeft = false;
+            if ($option->OnLeft) {
+                $option->moveTo($this->ListOptions->itemPos("checkbox") + 1);
+            } else {
+                $option->moveTo($this->ListOptions->itemPos("checkbox"));
+            }
+            $option->Visible = !($this->isExport() || $this->isGridAdd() || $this->isGridEdit());
+            $option->ShowInDropDown = false;
+            $option->ShowInButtonGroup = false;
+        }
+        if ($option) {
+            $option->Body = "<i class=\"ew-preview-row-btn ew-icon icon-expand\"></i>";
+            $option->Body .= "<div class=\"d-none ew-preview\">" . $links . $btngrps . "</div>";
+            if ($option->Visible) {
+                $option->Visible = $links != "";
+            }
+        }
+
+        // Column "details" (Multiple details)
+        $option = $this->ListOptions["details"];
+        if ($option) {
+            $option->Body .= "<div class=\"d-none ew-preview\">" . $links . $btngrps . "</div>";
+            if ($option->Visible) {
+                $option->Visible = $links != "";
+            }
+        }
     }
 
     // Get upload files
@@ -1825,6 +1899,25 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
             // jam_buka
             $this->jam_buka->setDbValueDef($rsnew, $this->jam_buka->CurrentValue, null, $this->jam_buka->ReadOnly);
 
+            // Check referential integrity for master table 'rumah_sakit'
+            $validMasterRecord = true;
+            $masterFilter = $this->sqlMasterFilter_rumah_sakit();
+            $keyValue = $rsnew['rumah_sakit_id'] ?? $rsold['rumah_sakit_id'];
+            if (strval($keyValue) != "") {
+                $masterFilter = str_replace("@id@", AdjustSql($keyValue), $masterFilter);
+            } else {
+                $validMasterRecord = false;
+            }
+            if ($validMasterRecord) {
+                $rsmaster = Container("rumah_sakit")->loadRs($masterFilter)->fetch();
+                $validMasterRecord = $rsmaster !== false;
+            }
+            if (!$validMasterRecord) {
+                $relatedRecordMsg = str_replace("%t", "rumah_sakit", $Language->phrase("RelatedRecordRequired"));
+                $this->setFailureMessage($relatedRecordMsg);
+                return false;
+            }
+
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
             if ($updateRow) {
@@ -1877,6 +1970,24 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
         // Set up foreign key field value from Session
         if ($this->getCurrentMasterTable() == "rumah_sakit") {
             $this->rumah_sakit_id->CurrentValue = $this->rumah_sakit_id->getSessionValue();
+        }
+
+        // Check referential integrity for master table 'fasilitas_rumah_sakit'
+        $validMasterRecord = true;
+        $masterFilter = $this->sqlMasterFilter_rumah_sakit();
+        if ($this->rumah_sakit_id->getSessionValue() != "") {
+        $masterFilter = str_replace("@id@", AdjustSql($this->rumah_sakit_id->getSessionValue(), "DB"), $masterFilter);
+        } else {
+            $validMasterRecord = false;
+        }
+        if ($validMasterRecord) {
+            $rsmaster = Container("rumah_sakit")->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "rumah_sakit", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
         }
         $conn = $this->getConnection();
 

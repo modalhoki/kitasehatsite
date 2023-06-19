@@ -475,7 +475,7 @@ class AntreanBpjsEdit extends AntreanBpjs
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->nomor_antrean->setVisibility();
         $this->waktu->setVisibility();
         $this->pasien_id->setVisibility();
@@ -669,12 +669,6 @@ class AntreanBpjsEdit extends AntreanBpjs
         // Load from form
         global $CurrentForm;
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
-        }
-
         // Check field name 'nomor_antrean' first before field var 'x_nomor_antrean'
         $val = $CurrentForm->hasValue("nomor_antrean") ? $CurrentForm->getValue("nomor_antrean") : $CurrentForm->getValue("x_nomor_antrean");
         if (!$this->nomor_antrean->IsDetailKey) {
@@ -734,6 +728,12 @@ class AntreanBpjsEdit extends AntreanBpjs
             } else {
                 $this->status->setFormValue($val);
             }
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -957,11 +957,6 @@ class AntreanBpjsEdit extends AntreanBpjs
             $this->keluhan_awal->ViewValue = $this->keluhan_awal->CurrentValue;
             $this->keluhan_awal->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // nomor_antrean
             $this->nomor_antrean->LinkCustomAttributes = "";
             $this->nomor_antrean->HrefValue = "";
@@ -992,12 +987,6 @@ class AntreanBpjsEdit extends AntreanBpjs
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->ViewCustomAttributes = "";
-
             // nomor_antrean
             $this->nomor_antrean->EditAttrs["class"] = "form-control";
             $this->nomor_antrean->EditCustomAttributes = "";
@@ -1089,10 +1078,6 @@ class AntreanBpjsEdit extends AntreanBpjs
 
             // Edit refer script
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-
             // nomor_antrean
             $this->nomor_antrean->LinkCustomAttributes = "";
             $this->nomor_antrean->HrefValue = "";
@@ -1140,11 +1125,6 @@ class AntreanBpjsEdit extends AntreanBpjs
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
-        }
-        if ($this->id->Required) {
-            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-            }
         }
         if ($this->nomor_antrean->Required) {
             if (!$this->nomor_antrean->IsDetailKey && EmptyValue($this->nomor_antrean->FormValue)) {

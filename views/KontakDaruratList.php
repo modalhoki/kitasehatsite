@@ -22,7 +22,6 @@ loadjs.ready("head", function () {
     if (!ew.vars.tables.kontak_darurat)
         ew.vars.tables.kontak_darurat = currentTable;
     fkontak_daruratlist.addFields([
-        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
         ["pasien_id", [fields.pasien_id.visible && fields.pasien_id.required ? ew.Validators.required(fields.pasien_id.caption) : null], fields.pasien_id.isInvalid],
         ["nama", [fields.nama.visible && fields.nama.required ? ew.Validators.required(fields.nama.caption) : null], fields.nama.isInvalid],
         ["no_hp", [fields.no_hp.visible && fields.no_hp.required ? ew.Validators.required(fields.no_hp.caption) : null], fields.no_hp.isInvalid]
@@ -212,9 +211,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_kontak_darurat_id" class="kontak_darurat_id"><?= $Page->renderSort($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->pasien_id->Visible) { // pasien_id ?>
         <th data-name="pasien_id" class="<?= $Page->pasien_id->headerCellClass() ?>"><div id="elh_kontak_darurat_pasien_id" class="kontak_darurat_pasien_id"><?= $Page->renderSort($Page->pasien_id) ?></div></th>
 <?php } ?>
@@ -340,29 +336,6 @@ while ($Page->RecordCount < $Page->StopRecord) {
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id" <?= $Page->id->cellAttributes() ?>>
-<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
-<span id="el<?= $Page->RowCount ?>_kontak_darurat_id" class="form-group"></span>
-<input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_id" id="o<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?= $Page->RowCount ?>_kontak_darurat_id" class="form-group">
-<span<?= $Page->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="x<?= $Page->RowIndex ?>_id" id="x<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-<?php } ?>
-<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
-<span id="el<?= $Page->RowCount ?>_kontak_darurat_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-<?php } ?>
-</td>
-    <?php } else { ?>
-            <input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="x<?= $Page->RowIndex ?>_id" id="x<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-    <?php } ?>
     <?php if ($Page->pasien_id->Visible) { // pasien_id ?>
         <td data-name="pasien_id" <?= $Page->pasien_id->cellAttributes() ?>>
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
@@ -506,12 +479,6 @@ loadjs.ready(["fkontak_daruratlist","load"], function () {
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowIndex);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id">
-<span id="el$rowindex$_kontak_darurat_id" class="form-group kontak_darurat_id"></span>
-<input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_id" id="o<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->OldValue) ?>">
-</td>
-    <?php } ?>
     <?php if ($Page->pasien_id->Visible) { // pasien_id ?>
         <td data-name="pasien_id">
 <?php if ($Page->pasien_id->getSessionValue() != "") { ?>

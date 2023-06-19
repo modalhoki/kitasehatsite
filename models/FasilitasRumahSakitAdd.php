@@ -528,6 +528,9 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
             $this->loadFormValues(); // Load form values
         }
 
+        // Set up detail parameters
+        $this->setupDetailParms();
+
         // Validate form if post back
         if ($postBack) {
             if (!$this->validateForm()) {
@@ -552,6 +555,9 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
                     $this->terminate("fasilitasrumahsakitlist"); // No matching record, return to list
                     return;
                 }
+
+                // Set up detail parameters
+                $this->setupDetailParms();
                 break;
             case "insert": // Add new record
                 $this->SendEmail = true; // Send email on add success
@@ -559,7 +565,11 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
                     if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
-                    $returnUrl = $this->getReturnUrl();
+                    if ($this->getCurrentDetailTable() != "") { // Master/detail add
+                        $returnUrl = $this->getDetailUrl();
+                    } else {
+                        $returnUrl = $this->getReturnUrl();
+                    }
                     if (GetPageName($returnUrl) == "fasilitasrumahsakitlist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                     } elseif (GetPageName($returnUrl) == "fasilitasrumahsakitview") {
@@ -578,6 +588,9 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Add failed, restore form values
+
+                    // Set up detail parameters
+                    $this->setupDetailParms();
                 }
         }
 
@@ -957,6 +970,13 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
             }
         }
 
+        // Validate detail grid
+        $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("PraktikPoliGrid");
+        if (in_array("praktik_poli", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->validateGridForm();
+        }
+
         // Return validate result
         $validateForm = !$this->hasInvalidFields();
 
@@ -973,7 +993,30 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
     protected function addRow($rsold = null)
     {
         global $Language, $Security;
+
+        // Check referential integrity for master table 'fasilitas_rumah_sakit'
+        $validMasterRecord = true;
+        $masterFilter = $this->sqlMasterFilter_rumah_sakit();
+        if ($this->rumah_sakit_id->getSessionValue() != "") {
+        $masterFilter = str_replace("@id@", AdjustSql($this->rumah_sakit_id->getSessionValue(), "DB"), $masterFilter);
+        } else {
+            $validMasterRecord = false;
+        }
+        if ($validMasterRecord) {
+            $rsmaster = Container("rumah_sakit")->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "rumah_sakit", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
         $conn = $this->getConnection();
+
+        // Begin transaction
+        if ($this->getCurrentDetailTable() != "") {
+            $conn->beginTransaction();
+        }
 
         // Load db values from rsold
         $this->loadDbValues($rsold);
@@ -1016,6 +1059,30 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
                 $this->setFailureMessage($Language->phrase("InsertCancelled"));
             }
             $addRow = false;
+        }
+
+        // Add detail records
+        if ($addRow) {
+            $detailTblVar = explode(",", $this->getCurrentDetailTable());
+            $detailPage = Container("PraktikPoliGrid");
+            if (in_array("praktik_poli", $detailTblVar) && $detailPage->DetailAdd) {
+                $detailPage->fasilitas_rumah_sakit_id->setSessionValue($this->id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "praktik_poli"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->fasilitas_rumah_sakit_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+        }
+
+        // Commit/Rollback transaction
+        if ($this->getCurrentDetailTable() != "") {
+            if ($addRow) {
+                $conn->commit(); // Commit transaction
+            } else {
+                $conn->rollback(); // Rollback transaction
+            }
         }
         if ($addRow) {
             // Call Row Inserted event
@@ -1101,6 +1168,40 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
         }
         $this->DbMasterFilter = $this->getMasterFilter(); // Get master filter
         $this->DbDetailFilter = $this->getDetailFilter(); // Get detail filter
+    }
+
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("praktik_poli", $detailTblVar)) {
+                $detailPageObj = Container("PraktikPoliGrid");
+                if ($detailPageObj->DetailAdd) {
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->fasilitas_rumah_sakit_id->IsDetailKey = true;
+                    $detailPageObj->fasilitas_rumah_sakit_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->fasilitas_rumah_sakit_id->setSessionValue($detailPageObj->fasilitas_rumah_sakit_id->CurrentValue);
+                    $detailPageObj->dokter_id->setSessionValue(""); // Clear session key
+                }
+            }
+        }
     }
 
     // Set up Breadcrumb

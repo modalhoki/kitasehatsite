@@ -538,6 +538,7 @@ class WebusersView extends Webusers
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->role);
         $this->setupLookupOptions($this->rumah_sakit_id);
         $this->setupLookupOptions($this->administrator_rumah_sakit);
 
@@ -804,8 +805,21 @@ class WebusersView extends Webusers
 
             // role
             if ($Security->canAdmin()) { // System admin
-                if (strval($this->role->CurrentValue) != "") {
-                    $this->role->ViewValue = $this->role->optionCaption($this->role->CurrentValue);
+                $curVal = trim(strval($this->role->CurrentValue));
+                if ($curVal != "") {
+                    $this->role->ViewValue = $this->role->lookupCacheOption($curVal);
+                    if ($this->role->ViewValue === null) { // Lookup from database
+                        $filterWrk = "`userlevelid`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->role->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->role->Lookup->renderViewRow($rswrk[0]);
+                            $this->role->ViewValue = $this->role->displayValue($arwrk);
+                        } else {
+                            $this->role->ViewValue = $this->role->CurrentValue;
+                        }
+                    }
                 } else {
                     $this->role->ViewValue = null;
                 }

@@ -467,7 +467,7 @@ class FasilitasEdit extends Fasilitas
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->nama_layanan->setVisibility();
         $this->hideFieldsForAddEdit();
 
@@ -649,12 +649,6 @@ class FasilitasEdit extends Fasilitas
         // Load from form
         global $CurrentForm;
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
-        }
-
         // Check field name 'nama_layanan' first before field var 'x_nama_layanan'
         $val = $CurrentForm->hasValue("nama_layanan") ? $CurrentForm->getValue("nama_layanan") : $CurrentForm->getValue("x_nama_layanan");
         if (!$this->nama_layanan->IsDetailKey) {
@@ -663,6 +657,12 @@ class FasilitasEdit extends Fasilitas
             } else {
                 $this->nama_layanan->setFormValue($val);
             }
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -774,22 +774,11 @@ class FasilitasEdit extends Fasilitas
             $this->nama_layanan->ViewValue = $this->nama_layanan->CurrentValue;
             $this->nama_layanan->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // nama_layanan
             $this->nama_layanan->LinkCustomAttributes = "";
             $this->nama_layanan->HrefValue = "";
             $this->nama_layanan->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->ViewCustomAttributes = "";
-
             // nama_layanan
             $this->nama_layanan->EditAttrs["class"] = "form-control";
             $this->nama_layanan->EditCustomAttributes = "";
@@ -800,10 +789,6 @@ class FasilitasEdit extends Fasilitas
             $this->nama_layanan->PlaceHolder = RemoveHtml($this->nama_layanan->caption());
 
             // Edit refer script
-
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
 
             // nama_layanan
             $this->nama_layanan->LinkCustomAttributes = "";
@@ -827,11 +812,6 @@ class FasilitasEdit extends Fasilitas
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
-        }
-        if ($this->id->Required) {
-            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-            }
         }
         if ($this->nama_layanan->Required) {
             if (!$this->nama_layanan->IsDetailKey && EmptyValue($this->nama_layanan->FormValue)) {

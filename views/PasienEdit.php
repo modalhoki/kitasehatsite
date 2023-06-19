@@ -20,7 +20,6 @@ loadjs.ready("head", function () {
     if (!ew.vars.tables.pasien)
         ew.vars.tables.pasien = currentTable;
     fpasienedit.addFields([
-        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
         ["nik", [fields.nik.visible && fields.nik.required ? ew.Validators.required(fields.nik.caption) : null], fields.nik.isInvalid],
         ["nama", [fields.nama.visible && fields.nama.required ? ew.Validators.required(fields.nama.caption) : null], fields.nama.isInvalid],
         ["jenis_kelamin", [fields.jenis_kelamin.visible && fields.jenis_kelamin.required ? ew.Validators.required(fields.jenis_kelamin.caption) : null], fields.jenis_kelamin.isInvalid],
@@ -125,18 +124,6 @@ $Page->showMessage();
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
 <div class="ew-edit-div"><!-- page* -->
-<?php if ($Page->id->Visible) { // id ?>
-    <div id="r_id" class="form-group row">
-        <label id="elh_pasien_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->id->caption() ?><?= $Page->id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->id->cellAttributes() ?>>
-<span id="el_pasien_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="pasien" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->nik->Visible) { // nik ?>
     <div id="r_nik" class="form-group row">
         <label id="elh_pasien_nik" for="x_nik" class="<?= $Page->LeftColumnClass ?>"><?= $Page->nik->caption() ?><?= $Page->nik->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -380,6 +367,7 @@ loadjs.ready(["fpasienedit", "datetimepicker"], function() {
     </div>
 <?php } ?>
 </div><!-- /page* -->
+    <input type="hidden" data-table="pasien" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
 <?php
     if (in_array("kontak_darurat", explode(",", $Page->getCurrentDetailTable())) && $kontak_darurat->DetailEdit) {
 ?>

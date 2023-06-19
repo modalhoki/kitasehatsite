@@ -9,17 +9,6 @@ $pasien = Container("pasien");
 <div class="ew-master-div">
 <table id="tbl_pasienmaster" class="table ew-view-table ew-master-table ew-vertical">
     <tbody>
-<?php if ($pasien->id->Visible) { // id ?>
-        <tr id="r_id">
-            <td class="<?= $pasien->TableLeftColumnClass ?>"><?= $pasien->id->caption() ?></td>
-            <td <?= $pasien->id->cellAttributes() ?>>
-<span id="el_pasien_id">
-<span<?= $pasien->id->viewAttributes() ?>>
-<?= $pasien->id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
 <?php if ($pasien->nik->Visible) { // nik ?>
         <tr id="r_nik">
             <td class="<?= $pasien->TableLeftColumnClass ?>"><?= $pasien->nik->caption() ?></td>

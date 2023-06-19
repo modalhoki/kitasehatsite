@@ -20,7 +20,6 @@ loadjs.ready("head", function () {
     if (!ew.vars.tables.kontak_darurat)
         ew.vars.tables.kontak_darurat = currentTable;
     fkontak_daruratedit.addFields([
-        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
         ["pasien_id", [fields.pasien_id.visible && fields.pasien_id.required ? ew.Validators.required(fields.pasien_id.caption) : null], fields.pasien_id.isInvalid],
         ["nama", [fields.nama.visible && fields.nama.required ? ew.Validators.required(fields.nama.caption) : null], fields.nama.isInvalid],
         ["no_hp", [fields.no_hp.visible && fields.no_hp.required ? ew.Validators.required(fields.no_hp.caption) : null], fields.no_hp.isInvalid]
@@ -117,18 +116,6 @@ $Page->showMessage();
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->pasien_id->getSessionValue()) ?>">
 <?php } ?>
 <div class="ew-edit-div"><!-- page* -->
-<?php if ($Page->id->Visible) { // id ?>
-    <div id="r_id" class="form-group row">
-        <label id="elh_kontak_darurat_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->id->caption() ?><?= $Page->id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->id->cellAttributes() ?>>
-<span id="el_kontak_darurat_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->pasien_id->Visible) { // pasien_id ?>
     <div id="r_pasien_id" class="form-group row">
         <label id="elh_kontak_darurat_pasien_id" for="x_pasien_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->pasien_id->caption() ?><?= $Page->pasien_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -181,6 +168,7 @@ $Page->showMessage();
     </div>
 <?php } ?>
 </div><!-- /page* -->
+    <input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
 <?php if (!$Page->IsModal) { ?>
 <div class="form-group row"><!-- buttons .form-group -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->

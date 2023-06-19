@@ -467,7 +467,7 @@ class PasienEdit extends Pasien
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->nik->setVisibility();
         $this->nama->setVisibility();
         $this->jenis_kelamin->setVisibility();
@@ -674,12 +674,6 @@ class PasienEdit extends Pasien
         // Load from form
         global $CurrentForm;
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
-        }
-
         // Check field name 'nik' first before field var 'x_nik'
         $val = $CurrentForm->hasValue("nik") ? $CurrentForm->getValue("nik") : $CurrentForm->getValue("x_nik");
         if (!$this->nik->IsDetailKey) {
@@ -789,6 +783,12 @@ class PasienEdit extends Pasien
             } else {
                 $this->_password->setFormValue($val);
             }
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -1024,11 +1024,6 @@ class PasienEdit extends Pasien
             $this->foto_profil->ViewValue = $this->foto_profil->CurrentValue;
             $this->foto_profil->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // nik
             $this->nik->LinkCustomAttributes = "";
             $this->nik->HrefValue = "";
@@ -1084,12 +1079,6 @@ class PasienEdit extends Pasien
             $this->_password->HrefValue = "";
             $this->_password->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->ViewCustomAttributes = "";
-
             // nik
             $this->nik->EditAttrs["class"] = "form-control";
             $this->nik->EditCustomAttributes = "";
@@ -1165,10 +1154,6 @@ class PasienEdit extends Pasien
 
             // Edit refer script
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-
             // nik
             $this->nik->LinkCustomAttributes = "";
             $this->nik->HrefValue = "";
@@ -1231,11 +1216,6 @@ class PasienEdit extends Pasien
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
-        }
-        if ($this->id->Required) {
-            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-            }
         }
         if ($this->nik->Required) {
             if (!$this->nik->IsDetailKey && EmptyValue($this->nik->FormValue)) {

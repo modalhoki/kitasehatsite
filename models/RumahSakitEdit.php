@@ -467,7 +467,7 @@ class RumahSakitEdit extends RumahSakit
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->nama->setVisibility();
         $this->alamat->setVisibility();
         $this->daerah_id->setVisibility();
@@ -667,12 +667,6 @@ class RumahSakitEdit extends RumahSakit
         // Load from form
         global $CurrentForm;
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
-        }
-
         // Check field name 'nama' first before field var 'x_nama'
         $val = $CurrentForm->hasValue("nama") ? $CurrentForm->getValue("nama") : $CurrentForm->getValue("x_nama");
         if (!$this->nama->IsDetailKey) {
@@ -721,6 +715,12 @@ class RumahSakitEdit extends RumahSakit
             } else {
                 $this->jam_buka->setFormValue($val);
             }
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -885,11 +885,6 @@ class RumahSakitEdit extends RumahSakit
             $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
             $this->jam_buka->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // nama
             $this->nama->LinkCustomAttributes = "";
             $this->nama->HrefValue = "";
@@ -923,12 +918,6 @@ class RumahSakitEdit extends RumahSakit
             $this->jam_buka->HrefValue = "";
             $this->jam_buka->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->ViewCustomAttributes = "";
-
             // nama
             $this->nama->EditAttrs["class"] = "form-control";
             $this->nama->EditCustomAttributes = "";
@@ -1000,10 +989,6 @@ class RumahSakitEdit extends RumahSakit
 
             // Edit refer script
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-
             // nama
             $this->nama->LinkCustomAttributes = "";
             $this->nama->HrefValue = "";
@@ -1050,11 +1035,6 @@ class RumahSakitEdit extends RumahSakit
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
-        }
-        if ($this->id->Required) {
-            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-            }
         }
         if ($this->nama->Required) {
             if (!$this->nama->IsDetailKey && EmptyValue($this->nama->FormValue)) {

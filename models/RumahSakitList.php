@@ -568,7 +568,7 @@ class RumahSakitList extends RumahSakit
 
         // Set up list options
         $this->setupListOptions();
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->nama->setVisibility();
         $this->alamat->setVisibility();
         $this->daerah_id->setVisibility();
@@ -1283,7 +1283,6 @@ class RumahSakitList extends RumahSakit
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->nama); // nama
             $this->updateSort($this->alamat); // alamat
             $this->updateSort($this->daerah_id); // daerah_id
@@ -2025,14 +2024,6 @@ class RumahSakitList extends RumahSakit
             $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
             $this->jam_buka->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-            if (!$this->isExport()) {
-                $this->id->ViewValue = $this->highlightValue($this->id);
-            }
-
             // nama
             $this->nama->LinkCustomAttributes = "";
             $this->nama->HrefValue = "";
@@ -2078,12 +2069,6 @@ class RumahSakitList extends RumahSakit
                 $this->jam_buka->ViewValue = $this->highlightValue($this->jam_buka);
             }
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = HtmlEncode($this->id->AdvancedSearch->SearchValue);
-            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
-
             // nama
             $this->nama->EditAttrs["class"] = "form-control";
             $this->nama->EditCustomAttributes = "";

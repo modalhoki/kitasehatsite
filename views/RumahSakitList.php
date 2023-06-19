@@ -27,7 +27,6 @@ loadjs.ready("head", function () {
     var currentTable = <?= JsonEncode(GetClientVar("tables", "rumah_sakit")) ?>,
         fields = currentTable.fields;
     frumah_sakitlistsrch.addFields([
-        ["id", [], fields.id.isInvalid],
         ["nama", [], fields.nama.isInvalid],
         ["alamat", [], fields.alamat.isInvalid],
         ["daerah_id", [], fields.daerah_id.isInvalid],
@@ -225,9 +224,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_rumah_sakit_id" class="rumah_sakit_id"><?= $Page->renderSort($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->nama->Visible) { // nama ?>
         <th data-name="nama" class="<?= $Page->nama->headerCellClass() ?>"><div id="elh_rumah_sakit_nama" class="rumah_sakit_nama"><?= $Page->renderSort($Page->nama) ?></div></th>
 <?php } ?>
@@ -310,14 +306,6 @@ while ($Page->RecordCount < $Page->StopRecord) {
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id" <?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_rumah_sakit_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->nama->Visible) { // nama ?>
         <td data-name="nama" <?= $Page->nama->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_rumah_sakit_nama">

@@ -467,7 +467,7 @@ class DaerahEdit extends Daerah
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->jenis->setVisibility();
         $this->nama_daerah->setVisibility();
         $this->hideFieldsForAddEdit();
@@ -650,12 +650,6 @@ class DaerahEdit extends Daerah
         // Load from form
         global $CurrentForm;
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
-        }
-
         // Check field name 'jenis' first before field var 'x_jenis'
         $val = $CurrentForm->hasValue("jenis") ? $CurrentForm->getValue("jenis") : $CurrentForm->getValue("x_jenis");
         if (!$this->jenis->IsDetailKey) {
@@ -674,6 +668,12 @@ class DaerahEdit extends Daerah
             } else {
                 $this->nama_daerah->setFormValue($val);
             }
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -798,11 +798,6 @@ class DaerahEdit extends Daerah
             $this->nama_daerah->ViewValue = $this->nama_daerah->CurrentValue;
             $this->nama_daerah->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // jenis
             $this->jenis->LinkCustomAttributes = "";
             $this->jenis->HrefValue = "";
@@ -813,12 +808,6 @@ class DaerahEdit extends Daerah
             $this->nama_daerah->HrefValue = "";
             $this->nama_daerah->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->ViewCustomAttributes = "";
-
             // jenis
             $this->jenis->EditCustomAttributes = "";
             $this->jenis->EditValue = $this->jenis->options(false);
@@ -834,10 +823,6 @@ class DaerahEdit extends Daerah
             $this->nama_daerah->PlaceHolder = RemoveHtml($this->nama_daerah->caption());
 
             // Edit refer script
-
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
 
             // jenis
             $this->jenis->LinkCustomAttributes = "";
@@ -865,11 +850,6 @@ class DaerahEdit extends Daerah
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
-        }
-        if ($this->id->Required) {
-            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-            }
         }
         if ($this->jenis->Required) {
             if ($this->jenis->FormValue == "") {

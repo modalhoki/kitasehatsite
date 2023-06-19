@@ -104,8 +104,7 @@ class Webusers extends DbTable
         $this->role->Sortable = true; // Allow sort
         $this->role->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->role->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->role->Lookup = new Lookup('role', 'webusers', false, '', ["","","",""], [], [], [], [], [], [], '', '');
-        $this->role->OptionCount = 3;
+        $this->role->Lookup = new Lookup('role', 'userlevels', false, 'userlevelid', ["userlevelname","","",""], [], [], [], [], [], [], '', '');
         $this->role->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->role->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->role->Param, "CustomMsg");
         $this->Fields['role'] = &$this->role;
@@ -926,8 +925,21 @@ SORTHTML;
 
         // role
         if ($Security->canAdmin()) { // System admin
-            if (strval($this->role->CurrentValue) != "") {
-                $this->role->ViewValue = $this->role->optionCaption($this->role->CurrentValue);
+            $curVal = trim(strval($this->role->CurrentValue));
+            if ($curVal != "") {
+                $this->role->ViewValue = $this->role->lookupCacheOption($curVal);
+                if ($this->role->ViewValue === null) { // Lookup from database
+                    $filterWrk = "`userlevelid`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->role->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->role->Lookup->renderViewRow($rswrk[0]);
+                        $this->role->ViewValue = $this->role->displayValue($arwrk);
+                    } else {
+                        $this->role->ViewValue = $this->role->CurrentValue;
+                    }
+                }
             } else {
                 $this->role->ViewValue = null;
             }
@@ -1050,7 +1062,6 @@ SORTHTML;
         if (!$Security->canAdmin()) { // System admin
             $this->role->EditValue = $Language->phrase("PasswordMask");
         } else {
-            $this->role->EditValue = $this->role->options(true);
             $this->role->PlaceHolder = RemoveHtml($this->role->caption());
         }
 

@@ -62,7 +62,7 @@ class FasilitasRumahSakit extends DbTable
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = true; // Allow detail add
         $this->DetailEdit = true; // Allow detail edit
-        $this->DetailView = true; // Allow detail view
+        $this->DetailView = false; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
@@ -73,6 +73,7 @@ class FasilitasRumahSakit extends DbTable
         $this->id = new DbField('fasilitas_rumah_sakit', 'fasilitas_rumah_sakit', 'x_id', 'id', '`id`', '`id`', 20, 20, -1, false, '`id`', false, false, false, 'FORMATTED TEXT', 'NO');
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
@@ -201,6 +202,32 @@ class FasilitasRumahSakit extends DbTable
     public function sqlDetailFilter_rumah_sakit()
     {
         return "`rumah_sakit_id`=@rumah_sakit_id@";
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE"));
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "praktik_poli") {
+            $detailUrl = Container("praktik_poli")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "fasilitasrumahsakitlist";
+        }
+        return $detailUrl;
     }
 
     // Table level SQL
@@ -727,7 +754,11 @@ class FasilitasRumahSakit extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("fasilitasrumahsakitedit", $this->getUrlParm($parm));
+        if ($parm != "") {
+            $url = $this->keyUrl("fasilitasrumahsakitedit", $this->getUrlParm($parm));
+        } else {
+            $url = $this->keyUrl("fasilitasrumahsakitedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -741,7 +772,11 @@ class FasilitasRumahSakit extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("fasilitasrumahsakitadd", $this->getUrlParm($parm));
+        if ($parm != "") {
+            $url = $this->keyUrl("fasilitasrumahsakitadd", $this->getUrlParm($parm));
+        } else {
+            $url = $this->keyUrl("fasilitasrumahsakitadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+        }
         return $this->addMasterUrl($url);
     }
 

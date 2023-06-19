@@ -60,7 +60,7 @@ class PraktikPoli extends DbTable
         $this->ExportWordPageOrientation = "portrait"; // Page orientation (PHPWord only)
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = false; // Allow detail add
-        $this->DetailEdit = false; // Allow detail edit
+        $this->DetailEdit = true; // Allow detail edit
         $this->DetailView = false; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
@@ -79,6 +79,7 @@ class PraktikPoli extends DbTable
 
         // dokter_id
         $this->dokter_id = new DbField('praktik_poli', 'praktik_poli', 'x_dokter_id', 'dokter_id', '`dokter_id`', '`dokter_id`', 20, 20, -1, false, '`dokter_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->dokter_id->IsForeignKey = true; // Foreign key field
         $this->dokter_id->Nullable = false; // NOT NULL field
         $this->dokter_id->Required = true; // Required field
         $this->dokter_id->Sortable = true; // Allow sort
@@ -91,6 +92,7 @@ class PraktikPoli extends DbTable
 
         // fasilitas_rumah_sakit_id
         $this->fasilitas_rumah_sakit_id = new DbField('praktik_poli', 'praktik_poli', 'x_fasilitas_rumah_sakit_id', 'fasilitas_rumah_sakit_id', '`fasilitas_rumah_sakit_id`', '`fasilitas_rumah_sakit_id`', 20, 20, -1, false, '`fasilitas_rumah_sakit_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->fasilitas_rumah_sakit_id->IsForeignKey = true; // Foreign key field
         $this->fasilitas_rumah_sakit_id->Nullable = false; // NOT NULL field
         $this->fasilitas_rumah_sakit_id->Required = true; // Required field
         $this->fasilitas_rumah_sakit_id->Sortable = true; // Allow sort
@@ -145,6 +147,83 @@ class PraktikPoli extends DbTable
         } else {
             $fld->setSort("");
         }
+    }
+
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Session master WHERE clause
+    public function getMasterFilter()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "fasilitas_rumah_sakit") {
+            if ($this->fasilitas_rumah_sakit_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetForeignKeySql("`id`", $this->fasilitas_rumah_sakit_id->getSessionValue(), DATATYPE_NUMBER, "DB");
+            } else {
+                return "";
+            }
+        }
+        if ($this->getCurrentMasterTable() == "dokter") {
+            if ($this->dokter_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetForeignKeySql("`id`", $this->dokter_id->getSessionValue(), DATATYPE_NUMBER, "DB");
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Session detail WHERE clause
+    public function getDetailFilter()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "fasilitas_rumah_sakit") {
+            if ($this->fasilitas_rumah_sakit_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetForeignKeySql("`fasilitas_rumah_sakit_id`", $this->fasilitas_rumah_sakit_id->getSessionValue(), DATATYPE_NUMBER, "DB");
+            } else {
+                return "";
+            }
+        }
+        if ($this->getCurrentMasterTable() == "dokter") {
+            if ($this->dokter_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetForeignKeySql("`dokter_id`", $this->dokter_id->getSessionValue(), DATATYPE_NUMBER, "DB");
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    // Master filter
+    public function sqlMasterFilter_fasilitas_rumah_sakit()
+    {
+        return "`id`=@id@";
+    }
+    // Detail filter
+    public function sqlDetailFilter_fasilitas_rumah_sakit()
+    {
+        return "`fasilitas_rumah_sakit_id`=@fasilitas_rumah_sakit_id@";
+    }
+
+    // Master filter
+    public function sqlMasterFilter_dokter()
+    {
+        return "`id`=@id@";
+    }
+    // Detail filter
+    public function sqlDetailFilter_dokter()
+    {
+        return "`dokter_id`=@dokter_id@";
     }
 
     // Table level SQL
@@ -704,6 +783,14 @@ class PraktikPoli extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "fasilitas_rumah_sakit" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->fasilitas_rumah_sakit_id->CurrentValue ?? $this->fasilitas_rumah_sakit_id->getSessionValue());
+        }
+        if ($this->getCurrentMasterTable() == "dokter" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->dokter_id->CurrentValue ?? $this->dokter_id->getSessionValue());
+        }
         return $url;
     }
 
@@ -963,12 +1050,58 @@ SORTHTML;
         // dokter_id
         $this->dokter_id->EditAttrs["class"] = "form-control";
         $this->dokter_id->EditCustomAttributes = "";
-        $this->dokter_id->PlaceHolder = RemoveHtml($this->dokter_id->caption());
+        if ($this->dokter_id->getSessionValue() != "") {
+            $this->dokter_id->CurrentValue = GetForeignKeyValue($this->dokter_id->getSessionValue());
+            $curVal = trim(strval($this->dokter_id->CurrentValue));
+            if ($curVal != "") {
+                $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
+                if ($this->dokter_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
+                    } else {
+                        $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->dokter_id->ViewValue = null;
+            }
+            $this->dokter_id->ViewCustomAttributes = "";
+        } else {
+            $this->dokter_id->PlaceHolder = RemoveHtml($this->dokter_id->caption());
+        }
 
         // fasilitas_rumah_sakit_id
         $this->fasilitas_rumah_sakit_id->EditAttrs["class"] = "form-control";
         $this->fasilitas_rumah_sakit_id->EditCustomAttributes = "";
-        $this->fasilitas_rumah_sakit_id->PlaceHolder = RemoveHtml($this->fasilitas_rumah_sakit_id->caption());
+        if ($this->fasilitas_rumah_sakit_id->getSessionValue() != "") {
+            $this->fasilitas_rumah_sakit_id->CurrentValue = GetForeignKeyValue($this->fasilitas_rumah_sakit_id->getSessionValue());
+            $curVal = trim(strval($this->fasilitas_rumah_sakit_id->CurrentValue));
+            if ($curVal != "") {
+                $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->lookupCacheOption($curVal);
+                if ($this->fasilitas_rumah_sakit_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->displayValue($arwrk);
+                    } else {
+                        $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->fasilitas_rumah_sakit_id->ViewValue = null;
+            }
+            $this->fasilitas_rumah_sakit_id->ViewCustomAttributes = "";
+        } else {
+            $this->fasilitas_rumah_sakit_id->PlaceHolder = RemoveHtml($this->fasilitas_rumah_sakit_id->caption());
+        }
 
         // jam_praktik
         $this->jam_praktik->EditAttrs["class"] = "form-control";

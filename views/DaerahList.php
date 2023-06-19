@@ -27,7 +27,6 @@ loadjs.ready("head", function () {
     var currentTable = <?= JsonEncode(GetClientVar("tables", "daerah")) ?>,
         fields = currentTable.fields;
     fdaerahlistsrch.addFields([
-        ["id", [], fields.id.isInvalid],
         ["jenis", [], fields.jenis.isInvalid],
         ["nama_daerah", [], fields.nama_daerah.isInvalid]
     ]);
@@ -176,9 +175,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_daerah_id" class="daerah_id"><?= $Page->renderSort($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->jenis->Visible) { // jenis ?>
         <th data-name="jenis" class="<?= $Page->jenis->headerCellClass() ?>"><div id="elh_daerah_jenis" class="daerah_jenis"><?= $Page->renderSort($Page->jenis) ?></div></th>
 <?php } ?>
@@ -252,14 +248,6 @@ while ($Page->RecordCount < $Page->StopRecord) {
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id" <?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_daerah_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->jenis->Visible) { // jenis ?>
         <td data-name="jenis" <?= $Page->jenis->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_daerah_jenis">

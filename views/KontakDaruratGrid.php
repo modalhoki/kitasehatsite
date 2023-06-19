@@ -22,7 +22,6 @@ loadjs.ready("head", function () {
     if (!ew.vars.tables.kontak_darurat)
         ew.vars.tables.kontak_darurat = currentTable;
     fkontak_daruratgrid.addFields([
-        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
         ["pasien_id", [fields.pasien_id.visible && fields.pasien_id.required ? ew.Validators.required(fields.pasien_id.caption) : null], fields.pasien_id.isInvalid],
         ["nama", [fields.nama.visible && fields.nama.required ? ew.Validators.required(fields.nama.caption) : null], fields.nama.isInvalid],
         ["no_hp", [fields.no_hp.visible && fields.no_hp.required ? ew.Validators.required(fields.no_hp.caption) : null], fields.no_hp.isInvalid]
@@ -123,9 +122,6 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_kontak_darurat_id" class="kontak_darurat_id"><?= $Grid->renderSort($Grid->id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->pasien_id->Visible) { // pasien_id ?>
         <th data-name="pasien_id" class="<?= $Grid->pasien_id->headerCellClass() ?>"><div id="elh_kontak_darurat_pasien_id" class="kontak_darurat_pasien_id"><?= $Grid->renderSort($Grid->pasien_id) ?></div></th>
 <?php } ?>
@@ -248,33 +244,6 @@ while ($Grid->RecordCount < $Grid->StopRecord) {
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id" <?= $Grid->id->cellAttributes() ?>>
-<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
-<span id="el<?= $Grid->RowCount ?>_kontak_darurat_id" class="form-group"></span>
-<input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowCount ?>_kontak_darurat_id" class="form-group">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->EditValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
-<span id="el<?= $Grid->RowCount ?>_kontak_darurat_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<?= $Grid->id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="fkontak_daruratgrid$x<?= $Grid->RowIndex ?>_id" id="fkontak_daruratgrid$x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
-<input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="fkontak_daruratgrid$o<?= $Grid->RowIndex ?>_id" id="fkontak_daruratgrid$o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } else { ?>
-            <input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-    <?php } ?>
     <?php if ($Grid->pasien_id->Visible) { // pasien_id ?>
         <td data-name="pasien_id" <?= $Grid->pasien_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
@@ -430,20 +399,6 @@ loadjs.ready(["fkontak_daruratgrid","load"], function () {
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowIndex);
 ?>
-    <?php if ($Grid->id->Visible) { // id ?>
-        <td data-name="id">
-<?php if (!$Grid->isConfirm()) { ?>
-<span id="el$rowindex$_kontak_darurat_id" class="form-group kontak_darurat_id"></span>
-<?php } else { ?>
-<span id="el$rowindex$_kontak_darurat_id" class="form-group kontak_darurat_id">
-<span<?= $Grid->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->id->getDisplayValue($Grid->id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->FormValue) ?>">
-<?php } ?>
-<input type="hidden" data-table="kontak_darurat" data-field="x_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-</td>
-    <?php } ?>
     <?php if ($Grid->pasien_id->Visible) { // pasien_id ?>
         <td data-name="pasien_id">
 <?php if (!$Grid->isConfirm()) { ?>

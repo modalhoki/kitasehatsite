@@ -467,7 +467,7 @@ class DokterEdit extends Dokter
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->nama_dokter->setVisibility();
         $this->webusers_id->setVisibility();
         $this->hideFieldsForAddEdit();
@@ -554,6 +554,9 @@ class DokterEdit extends Dokter
         // Process form if post back
         if ($postBack) {
             $this->loadFormValues(); // Get form values
+
+            // Set up detail parameters
+            $this->setupDetailParms();
         }
 
         // Validate form if post back
@@ -580,9 +583,16 @@ class DokterEdit extends Dokter
                     $this->terminate("dokterlist"); // No matching record, return to list
                     return;
                 }
+
+                // Set up detail parameters
+                $this->setupDetailParms();
                 break;
             case "update": // Update
-                $returnUrl = $this->getReturnUrl();
+                if ($this->getCurrentDetailTable() != "") { // Master/detail edit
+                    $returnUrl = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
+                } else {
+                    $returnUrl = $this->getReturnUrl();
+                }
                 if (GetPageName($returnUrl) == "dokterlist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
@@ -607,6 +617,9 @@ class DokterEdit extends Dokter
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Restore form values if update failed
+
+                    // Set up detail parameters
+                    $this->setupDetailParms();
                 }
         }
 
@@ -651,12 +664,6 @@ class DokterEdit extends Dokter
         // Load from form
         global $CurrentForm;
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
-        }
-
         // Check field name 'nama_dokter' first before field var 'x_nama_dokter'
         $val = $CurrentForm->hasValue("nama_dokter") ? $CurrentForm->getValue("nama_dokter") : $CurrentForm->getValue("x_nama_dokter");
         if (!$this->nama_dokter->IsDetailKey) {
@@ -675,6 +682,12 @@ class DokterEdit extends Dokter
             } else {
                 $this->webusers_id->setFormValue($val);
             }
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -812,11 +825,6 @@ class DokterEdit extends Dokter
             }
             $this->webusers_id->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // nama_dokter
             $this->nama_dokter->LinkCustomAttributes = "";
             $this->nama_dokter->HrefValue = "";
@@ -827,12 +835,6 @@ class DokterEdit extends Dokter
             $this->webusers_id->HrefValue = "";
             $this->webusers_id->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->ViewCustomAttributes = "";
-
             // nama_dokter
             $this->nama_dokter->EditAttrs["class"] = "form-control";
             $this->nama_dokter->EditCustomAttributes = "";
@@ -879,10 +881,6 @@ class DokterEdit extends Dokter
 
             // Edit refer script
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-
             // nama_dokter
             $this->nama_dokter->LinkCustomAttributes = "";
             $this->nama_dokter->HrefValue = "";
@@ -910,11 +908,6 @@ class DokterEdit extends Dokter
         if (!Config("SERVER_VALIDATE")) {
             return true;
         }
-        if ($this->id->Required) {
-            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-            }
-        }
         if ($this->nama_dokter->Required) {
             if (!$this->nama_dokter->IsDetailKey && EmptyValue($this->nama_dokter->FormValue)) {
                 $this->nama_dokter->addErrorMessage(str_replace("%s", $this->nama_dokter->caption(), $this->nama_dokter->RequiredErrorMessage));
@@ -924,6 +917,13 @@ class DokterEdit extends Dokter
             if (!$this->webusers_id->IsDetailKey && EmptyValue($this->webusers_id->FormValue)) {
                 $this->webusers_id->addErrorMessage(str_replace("%s", $this->webusers_id->caption(), $this->webusers_id->RequiredErrorMessage));
             }
+        }
+
+        // Validate detail grid
+        $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("PraktikPoliGrid");
+        if (in_array("praktik_poli", $detailTblVar) && $detailPage->DetailEdit) {
+            $detailPage->validateGridForm();
         }
 
         // Return validate result
@@ -953,6 +953,11 @@ class DokterEdit extends Dokter
             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
             $editRow = false; // Update Failed
         } else {
+            // Begin transaction
+            if ($this->getCurrentDetailTable() != "") {
+                $conn->beginTransaction();
+            }
+
             // Save old values
             $this->loadDbValues($rsold);
             $rsnew = [];
@@ -976,6 +981,26 @@ class DokterEdit extends Dokter
                     $editRow = true; // No field to update
                 }
                 if ($editRow) {
+                }
+
+                // Update detail records
+                $detailTblVar = explode(",", $this->getCurrentDetailTable());
+                if ($editRow) {
+                    $detailPage = Container("PraktikPoliGrid");
+                    if (in_array("praktik_poli", $detailTblVar) && $detailPage->DetailEdit) {
+                        $Security->loadCurrentUserLevel($this->ProjectID . "praktik_poli"); // Load user level of detail table
+                        $editRow = $detailPage->gridUpdate();
+                        $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                    }
+                }
+
+                // Commit/Rollback transaction
+                if ($this->getCurrentDetailTable() != "") {
+                    if ($editRow) {
+                        $conn->commit(); // Commit transaction
+                    } else {
+                        $conn->rollback(); // Rollback transaction
+                    }
                 }
             } else {
                 if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
@@ -1005,6 +1030,36 @@ class DokterEdit extends Dokter
             WriteJson(["success" => true, $this->TableVar => $row]);
         }
         return $editRow;
+    }
+
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("praktik_poli", $detailTblVar)) {
+                $detailPageObj = Container("PraktikPoliGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->CurrentMode = "edit";
+                    $detailPageObj->CurrentAction = "gridedit";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->dokter_id->IsDetailKey = true;
+                    $detailPageObj->dokter_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->dokter_id->setSessionValue($detailPageObj->dokter_id->CurrentValue);
+                    $detailPageObj->fasilitas_rumah_sakit_id->setSessionValue(""); // Clear session key
+                }
+            }
+        }
     }
 
     // Set up Breadcrumb

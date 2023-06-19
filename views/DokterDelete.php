@@ -44,9 +44,6 @@ $Page->showMessage();
 <table class="table ew-table">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_dokter_id" class="dokter_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->nama_dokter->Visible) { // nama_dokter ?>
         <th class="<?= $Page->nama_dokter->headerCellClass() ?>"><span id="elh_dokter_nama_dokter" class="dokter_nama_dokter"><?= $Page->nama_dokter->caption() ?></span></th>
 <?php } ?>
@@ -74,14 +71,6 @@ while (!$Page->Recordset->EOF) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td <?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_dokter_id" class="dokter_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->nama_dokter->Visible) { // nama_dokter ?>
         <td <?= $Page->nama_dokter->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_dokter_nama_dokter" class="dokter_nama_dokter">

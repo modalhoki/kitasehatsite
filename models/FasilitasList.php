@@ -568,7 +568,7 @@ class FasilitasList extends Fasilitas
 
         // Set up list options
         $this->setupListOptions();
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->nama_layanan->setVisibility();
         $this->hideFieldsForAddEdit();
 
@@ -1058,7 +1058,6 @@ class FasilitasList extends Fasilitas
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->nama_layanan); // nama_layanan
             $this->setStartRecordNumber(1); // Reset start position
         }
@@ -1120,12 +1119,6 @@ class FasilitasList extends Fasilitas
         $item->OnLeft = false;
         $item->Visible = false;
 
-        // "view"
-        $item = &$this->ListOptions->add("view");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canView();
-        $item->OnLeft = false;
-
         // "edit"
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
@@ -1136,12 +1129,6 @@ class FasilitasList extends Fasilitas
         $item = &$this->ListOptions->add("copy");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canAdd();
-        $item->OnLeft = false;
-
-        // "delete"
-        $item = &$this->ListOptions->add("delete");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
 
         // List actions
@@ -1187,20 +1174,15 @@ class FasilitasList extends Fasilitas
         $this->listOptionsRendering();
         $pageUrl = $this->pageUrl();
         if ($this->CurrentMode == "view") {
-            // "view"
-            $opt = $this->ListOptions["view"];
-            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
-                $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
-            } else {
-                $opt->Body = "";
-            }
-
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
             if ($Security->canEdit()) {
-                $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+                if (IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"fasilitas\" data-caption=\"" . $editcaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'SaveBtn',url:'" . HtmlEncode(GetUrl($this->EditUrl)) . "'});\">" . $Language->phrase("EditLink") . "</a>";
+                }
             } else {
                 $opt->Body = "";
             }
@@ -1214,14 +1196,6 @@ class FasilitasList extends Fasilitas
                 } else {
                     $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"fasilitas\" data-caption=\"" . $copycaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'AddBtn',url:'" . HtmlEncode(GetUrl($this->CopyUrl)) . "'});\">" . $Language->phrase("CopyLink") . "</a>";
                 }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "delete"
-            $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
-            $opt->Body = "<a class=\"ew-row-link ew-delete\"" . "" . " title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $Language->phrase("DeleteLink") . "</a>";
             } else {
                 $opt->Body = "";
             }
@@ -1588,14 +1562,6 @@ class FasilitasList extends Fasilitas
             $this->nama_layanan->ViewValue = $this->nama_layanan->CurrentValue;
             $this->nama_layanan->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-            if (!$this->isExport()) {
-                $this->id->ViewValue = $this->highlightValue($this->id);
-            }
-
             // nama_layanan
             $this->nama_layanan->LinkCustomAttributes = "";
             $this->nama_layanan->HrefValue = "";
@@ -1604,12 +1570,6 @@ class FasilitasList extends Fasilitas
                 $this->nama_layanan->ViewValue = $this->highlightValue($this->nama_layanan);
             }
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = HtmlEncode($this->id->AdvancedSearch->SearchValue);
-            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
-
             // nama_layanan
             $this->nama_layanan->EditAttrs["class"] = "form-control";
             $this->nama_layanan->EditCustomAttributes = "";

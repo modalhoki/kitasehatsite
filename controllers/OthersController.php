@@ -39,6 +39,12 @@ class OthersController extends ControllerBase
         return $this->runPage($request, $response, $args, "ChangePassword");
     }
 
+    // userpriv
+    public function userpriv(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "Userpriv");
+    }
+
     // logout
     public function logout(Request $request, Response $response, array $args): Response
     {

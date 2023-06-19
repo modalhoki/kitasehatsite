@@ -65,6 +65,8 @@ return [
     "image_slider" => \DI\create(ImageSlider::class),
     "audittrail" => \DI\create(Audittrail::class),
     "data_durasi" => \DI\create(DataDurasi::class),
+    "userlevelpermissions" => \DI\create(Userlevelpermissions::class),
+    "userlevels" => \DI\create(Userlevels::class),
 
     // User table
     "usertable" => \DI\get("webusers"),

@@ -374,7 +374,7 @@ class DokterDelete extends Dokter
     {
         global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm;
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->nama_dokter->setVisibility();
         $this->webusers_id->setVisibility();
         $this->hideFieldsForAddEdit();
@@ -601,11 +601,6 @@ class DokterDelete extends Dokter
                 $this->webusers_id->ViewValue = null;
             }
             $this->webusers_id->ViewCustomAttributes = "";
-
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
 
             // nama_dokter
             $this->nama_dokter->LinkCustomAttributes = "";

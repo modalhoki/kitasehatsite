@@ -112,11 +112,26 @@ $Page->showMessage();
 <input type="hidden" name="action" id="action" value="insert">
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "fasilitas_rumah_sakit") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="fasilitas_rumah_sakit">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->fasilitas_rumah_sakit_id->getSessionValue()) ?>">
+<?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "dokter") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="dokter">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->dokter_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-add-div"><!-- page* -->
 <?php if ($Page->dokter_id->Visible) { // dokter_id ?>
     <div id="r_dokter_id" class="form-group row">
         <label id="elh_praktik_poli_dokter_id" for="x_dokter_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->dokter_id->caption() ?><?= $Page->dokter_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->dokter_id->cellAttributes() ?>>
+<?php if ($Page->dokter_id->getSessionValue() != "") { ?>
+<span id="el_praktik_poli_dokter_id">
+<span<?= $Page->dokter_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->dokter_id->getDisplayValue($Page->dokter_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x_dokter_id" name="x_dokter_id" value="<?= HtmlEncode($Page->dokter_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_praktik_poli_dokter_id">
 <div class="input-group ew-lookup-list" aria-describedby="x_dokter_id_help">
     <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x_dokter_id"><?= EmptyValue(strval($Page->dokter_id->ViewValue)) ? $Language->phrase("PleaseSelect") : $Page->dokter_id->ViewValue ?></div>
@@ -129,6 +144,7 @@ $Page->showMessage();
 <?= $Page->dokter_id->Lookup->getParamTag($Page, "p_x_dokter_id") ?>
 <input type="hidden" is="selection-list" data-table="praktik_poli" data-field="x_dokter_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->dokter_id->displayValueSeparatorAttribute() ?>" name="x_dokter_id" id="x_dokter_id" value="<?= $Page->dokter_id->CurrentValue ?>"<?= $Page->dokter_id->editAttributes() ?>>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -136,11 +152,21 @@ $Page->showMessage();
     <div id="r_fasilitas_rumah_sakit_id" class="form-group row">
         <label id="elh_praktik_poli_fasilitas_rumah_sakit_id" for="x_fasilitas_rumah_sakit_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->fasilitas_rumah_sakit_id->caption() ?><?= $Page->fasilitas_rumah_sakit_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->fasilitas_rumah_sakit_id->cellAttributes() ?>>
+<?php if ($Page->fasilitas_rumah_sakit_id->getSessionValue() != "") { ?>
+<span id="el_praktik_poli_fasilitas_rumah_sakit_id">
+<span<?= $Page->fasilitas_rumah_sakit_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->fasilitas_rumah_sakit_id->getDisplayValue($Page->fasilitas_rumah_sakit_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x_fasilitas_rumah_sakit_id" name="x_fasilitas_rumah_sakit_id" value="<?= HtmlEncode($Page->fasilitas_rumah_sakit_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_praktik_poli_fasilitas_rumah_sakit_id">
 <div class="input-group ew-lookup-list" aria-describedby="x_fasilitas_rumah_sakit_id_help">
     <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x_fasilitas_rumah_sakit_id"><?= EmptyValue(strval($Page->fasilitas_rumah_sakit_id->ViewValue)) ? $Language->phrase("PleaseSelect") : $Page->fasilitas_rumah_sakit_id->ViewValue ?></div>
     <div class="input-group-append">
         <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Page->fasilitas_rumah_sakit_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Page->fasilitas_rumah_sakit_id->ReadOnly || $Page->fasilitas_rumah_sakit_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x_fasilitas_rumah_sakit_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
+        <?php if (AllowAdd(CurrentProjectID() . "fasilitas_rumah_sakit") && !$Page->fasilitas_rumah_sakit_id->ReadOnly) { ?>
+        <button type="button" class="btn btn-default ew-add-opt-btn" id="aol_x_fasilitas_rumah_sakit_id" title="<?= HtmlTitle($Language->phrase("AddLink")) . "&nbsp;" . $Page->fasilitas_rumah_sakit_id->caption() ?>" data-title="<?= $Page->fasilitas_rumah_sakit_id->caption() ?>" onclick="ew.addOptionDialogShow({lnk:this,el:'x_fasilitas_rumah_sakit_id',url:'<?= GetUrl("fasilitasrumahsakitaddopt") ?>'});"><i class="fas fa-plus ew-icon"></i></button>
+        <?php } ?>
     </div>
 </div>
 <div class="invalid-feedback"><?= $Page->fasilitas_rumah_sakit_id->getErrorMessage() ?></div>
@@ -148,6 +174,7 @@ $Page->showMessage();
 <?= $Page->fasilitas_rumah_sakit_id->Lookup->getParamTag($Page, "p_x_fasilitas_rumah_sakit_id") ?>
 <input type="hidden" is="selection-list" data-table="praktik_poli" data-field="x_fasilitas_rumah_sakit_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->fasilitas_rumah_sakit_id->displayValueSeparatorAttribute() ?>" name="x_fasilitas_rumah_sakit_id" id="x_fasilitas_rumah_sakit_id" value="<?= $Page->fasilitas_rumah_sakit_id->CurrentValue ?>"<?= $Page->fasilitas_rumah_sakit_id->editAttributes() ?>>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

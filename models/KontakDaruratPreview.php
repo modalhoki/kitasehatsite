@@ -390,7 +390,7 @@ class KontakDaruratPreview extends KontakDarurat
 
         // Set up list options
         $this->setupListOptions();
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->pasien_id->setVisibility();
         $this->nama->setVisibility();
         $this->no_hp->setVisibility();
@@ -495,7 +495,6 @@ class KontakDaruratPreview extends KontakDarurat
 
         // Check for sort field
         if ($this->CurrentOrder !== "") {
-            $this->updateSort($this->id); // id
             $this->updateSort($this->pasien_id); // pasien_id
             $this->updateSort($this->nama); // nama
             $this->updateSort($this->no_hp); // no_hp

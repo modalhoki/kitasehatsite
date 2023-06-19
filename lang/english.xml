@@ -967,14 +967,23 @@
     <menu id="8">
       <phrase id="menutext" value="Rumah Sakit" />
     </menu>
+    <menu id="59">
+      <phrase id="menutext" value="User" />
+    </menu>
     <menu id="9">
       <phrase id="menutext" value="webusers" />
+    </menu>
+    <menu id="40">
+      <phrase id="menutext" value="userlevelpermissions" />
+    </menu>
+    <menu id="41">
+      <phrase id="menutext" value="userlevels" />
     </menu>
     <menu id="38">
       <phrase id="menutext" value="audittrail" />
     </menu>
     <menu id="39">
-      <phrase id="menutext" value="data durasi" />
+      <phrase id="menutext" value="Durasi" />
     </menu>
     <table id="antrean_bpjs">
       <phrase id="tblcaption" value="Antrean BPJS" />
@@ -1059,7 +1068,7 @@
         <phrase id="fldtagcaption2" value="KOTA" />
       </field>
       <field id="nama_daerah">
-        <phrase id="fldcaption" value="Keluhan Awal" />
+        <phrase id="fldcaption" value="Nama" />
       </field>
     </table>
     <table id="dokter">
@@ -1352,6 +1361,27 @@
       </field>
       <field id="durasi">
         <phrase id="fldcaption" value="durasi" />
+      </field>
+    </table>
+    <table id="userlevelpermissions">
+      <phrase id="tblcaption" value="userlevelpermissions" />
+      <field id="userlevelid">
+        <phrase id="fldcaption" value="userlevelid" />
+      </field>
+      <field id="_tablename">
+        <phrase id="fldcaption" value="tablename" />
+      </field>
+      <field id="_permission">
+        <phrase id="fldcaption" value="permission" />
+      </field>
+    </table>
+    <table id="userlevels">
+      <phrase id="tblcaption" value="userlevels" />
+      <field id="userlevelid">
+        <phrase id="fldcaption" value="userlevelid" />
+      </field>
+      <field id="userlevelname">
+        <phrase id="fldcaption" value="userlevelname" />
       </field>
     </table>
   </project>

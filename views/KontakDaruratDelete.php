@@ -44,9 +44,6 @@ $Page->showMessage();
 <table class="table ew-table">
     <thead>
     <tr class="ew-table-header">
-<?php if ($Page->id->Visible) { // id ?>
-        <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_kontak_darurat_id" class="kontak_darurat_id"><?= $Page->id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->pasien_id->Visible) { // pasien_id ?>
         <th class="<?= $Page->pasien_id->headerCellClass() ?>"><span id="elh_kontak_darurat_pasien_id" class="kontak_darurat_pasien_id"><?= $Page->pasien_id->caption() ?></span></th>
 <?php } ?>
@@ -77,14 +74,6 @@ while (!$Page->Recordset->EOF) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
-<?php if ($Page->id->Visible) { // id ?>
-        <td <?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_kontak_darurat_id" class="kontak_darurat_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->pasien_id->Visible) { // pasien_id ?>
         <td <?= $Page->pasien_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_kontak_darurat_pasien_id" class="kontak_darurat_pasien_id">

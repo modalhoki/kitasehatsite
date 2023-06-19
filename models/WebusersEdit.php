@@ -467,7 +467,7 @@ class WebusersEdit extends Webusers
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->_username->setVisibility();
         $this->_password->setVisibility();
         $this->role->setVisibility();
@@ -487,6 +487,7 @@ class WebusersEdit extends Webusers
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->role);
         $this->setupLookupOptions($this->rumah_sakit_id);
         $this->setupLookupOptions($this->administrator_rumah_sakit);
 
@@ -655,12 +656,6 @@ class WebusersEdit extends Webusers
         // Load from form
         global $CurrentForm;
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
-        }
-
         // Check field name 'username' first before field var 'x__username'
         $val = $CurrentForm->hasValue("username") ? $CurrentForm->getValue("username") : $CurrentForm->getValue("x__username");
         if (!$this->_username->IsDetailKey) {
@@ -709,6 +704,12 @@ class WebusersEdit extends Webusers
             } else {
                 $this->administrator_rumah_sakit->setFormValue($val);
             }
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -855,8 +856,21 @@ class WebusersEdit extends Webusers
 
             // role
             if ($Security->canAdmin()) { // System admin
-                if (strval($this->role->CurrentValue) != "") {
-                    $this->role->ViewValue = $this->role->optionCaption($this->role->CurrentValue);
+                $curVal = trim(strval($this->role->CurrentValue));
+                if ($curVal != "") {
+                    $this->role->ViewValue = $this->role->lookupCacheOption($curVal);
+                    if ($this->role->ViewValue === null) { // Lookup from database
+                        $filterWrk = "`userlevelid`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->role->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->role->Lookup->renderViewRow($rswrk[0]);
+                            $this->role->ViewValue = $this->role->displayValue($arwrk);
+                        } else {
+                            $this->role->ViewValue = $this->role->CurrentValue;
+                        }
+                    }
                 } else {
                     $this->role->ViewValue = null;
                 }
@@ -907,11 +921,6 @@ class WebusersEdit extends Webusers
             }
             $this->administrator_rumah_sakit->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // username
             $this->_username->LinkCustomAttributes = "";
             $this->_username->HrefValue = "";
@@ -937,12 +946,6 @@ class WebusersEdit extends Webusers
             $this->administrator_rumah_sakit->HrefValue = "";
             $this->administrator_rumah_sakit->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->ViewCustomAttributes = "";
-
             // username
             $this->_username->EditAttrs["class"] = "form-control";
             $this->_username->EditCustomAttributes = "";
@@ -964,7 +967,26 @@ class WebusersEdit extends Webusers
             if (!$Security->canAdmin()) { // System admin
                 $this->role->EditValue = $Language->phrase("PasswordMask");
             } else {
-                $this->role->EditValue = $this->role->options(true);
+                $curVal = trim(strval($this->role->CurrentValue));
+                if ($curVal != "") {
+                    $this->role->ViewValue = $this->role->lookupCacheOption($curVal);
+                } else {
+                    $this->role->ViewValue = $this->role->Lookup !== null && is_array($this->role->Lookup->Options) ? $curVal : null;
+                }
+                if ($this->role->ViewValue !== null) { // Load from cache
+                    $this->role->EditValue = array_values($this->role->Lookup->Options);
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = "`userlevelid`" . SearchString("=", $this->role->CurrentValue, DATATYPE_NUMBER, "");
+                    }
+                    $sqlWrk = $this->role->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->role->EditValue = $arwrk;
+                }
                 $this->role->PlaceHolder = RemoveHtml($this->role->caption());
             }
 
@@ -1063,10 +1085,6 @@ class WebusersEdit extends Webusers
 
             // Edit refer script
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-
             // username
             $this->_username->LinkCustomAttributes = "";
             $this->_username->HrefValue = "";
@@ -1105,11 +1123,6 @@ class WebusersEdit extends Webusers
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
-        }
-        if ($this->id->Required) {
-            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-            }
         }
         if ($this->_username->Required) {
             if (!$this->_username->IsDetailKey && EmptyValue($this->_username->FormValue)) {

@@ -20,7 +20,6 @@ loadjs.ready("head", function () {
     if (!ew.vars.tables.rumah_sakit)
         ew.vars.tables.rumah_sakit = currentTable;
     frumah_sakitedit.addFields([
-        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
         ["nama", [fields.nama.visible && fields.nama.required ? ew.Validators.required(fields.nama.caption) : null], fields.nama.isInvalid],
         ["alamat", [fields.alamat.visible && fields.alamat.required ? ew.Validators.required(fields.alamat.caption) : null], fields.alamat.isInvalid],
         ["daerah_id", [fields.daerah_id.visible && fields.daerah_id.required ? ew.Validators.required(fields.daerah_id.caption) : null], fields.daerah_id.isInvalid],
@@ -115,18 +114,6 @@ $Page->showMessage();
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
 <div class="ew-edit-div"><!-- page* -->
-<?php if ($Page->id->Visible) { // id ?>
-    <div id="r_id" class="form-group row">
-        <label id="elh_rumah_sakit_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->id->caption() ?><?= $Page->id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->id->cellAttributes() ?>>
-<span id="el_rumah_sakit_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="rumah_sakit" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->nama->Visible) { // nama ?>
     <div id="r_nama" class="form-group row">
         <label id="elh_rumah_sakit_nama" for="x_nama" class="<?= $Page->LeftColumnClass ?>"><?= $Page->nama->caption() ?><?= $Page->nama->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -195,6 +182,7 @@ $Page->showMessage();
     </div>
 <?php } ?>
 </div><!-- /page* -->
+    <input type="hidden" data-table="rumah_sakit" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
 <?php
     if (in_array("fasilitas_rumah_sakit", explode(",", $Page->getCurrentDetailTable())) && $fasilitas_rumah_sakit->DetailEdit) {
 ?>

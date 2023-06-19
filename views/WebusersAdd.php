@@ -167,11 +167,11 @@ $Page->showMessage();
     </select>
     <?= $Page->role->getCustomMessage() ?>
     <div class="invalid-feedback"><?= $Page->role->getErrorMessage() ?></div>
+<?= $Page->role->Lookup->getParamTag($Page, "p_x_role") ?>
 <script>
 loadjs.ready("head", function() {
     var el = document.querySelector("select[data-select2-id='webusers_x_role']"),
         options = { name: "x_role", selectId: "webusers_x_role", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.data = ew.vars.tables.webusers.fields.role.lookupOptions;
     options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
     Object.assign(options, ew.vars.tables.webusers.fields.role.selectOptions);
     ew.createSelect(options);

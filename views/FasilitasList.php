@@ -27,7 +27,6 @@ loadjs.ready("head", function () {
     var currentTable = <?= JsonEncode(GetClientVar("tables", "fasilitas")) ?>,
         fields = currentTable.fields;
     ffasilitaslistsrch.addFields([
-        ["id", [], fields.id.isInvalid],
         ["nama_layanan", [], fields.nama_layanan.isInvalid]
     ]);
 
@@ -175,9 +174,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_fasilitas_id" class="fasilitas_id"><?= $Page->renderSort($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->nama_layanan->Visible) { // nama_layanan ?>
         <th data-name="nama_layanan" class="<?= $Page->nama_layanan->headerCellClass() ?>"><div id="elh_fasilitas_nama_layanan" class="fasilitas_nama_layanan"><?= $Page->renderSort($Page->nama_layanan) ?></div></th>
 <?php } ?>
@@ -248,14 +244,6 @@ while ($Page->RecordCount < $Page->StopRecord) {
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id" <?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_fasilitas_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->nama_layanan->Visible) { // nama_layanan ?>
         <td data-name="nama_layanan" <?= $Page->nama_layanan->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_fasilitas_nama_layanan">

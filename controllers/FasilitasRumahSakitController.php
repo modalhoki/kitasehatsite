@@ -20,6 +20,12 @@ class FasilitasRumahSakitController extends ControllerBase
         return $this->runPage($request, $response, $args, "FasilitasRumahSakitAdd");
     }
 
+    // addopt
+    public function addopt(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "FasilitasRumahSakitAddopt", false);
+    }
+
     // edit
     public function edit(Request $request, Response $response, array $args): Response
     {

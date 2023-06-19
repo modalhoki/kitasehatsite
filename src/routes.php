@@ -40,18 +40,14 @@ return function (App $app) {
     // daerah
     $app->any('/daerahlist[/{id}]', DaerahController::class . ':list')->add(PermissionMiddleware::class)->setName('daerahlist-daerah-list'); // list
     $app->any('/daerahadd[/{id}]', DaerahController::class . ':add')->add(PermissionMiddleware::class)->setName('daerahadd-daerah-add'); // add
-    $app->any('/daerahview[/{id}]', DaerahController::class . ':view')->add(PermissionMiddleware::class)->setName('daerahview-daerah-view'); // view
     $app->any('/daerahedit[/{id}]', DaerahController::class . ':edit')->add(PermissionMiddleware::class)->setName('daerahedit-daerah-edit'); // edit
-    $app->any('/daerahdelete[/{id}]', DaerahController::class . ':delete')->add(PermissionMiddleware::class)->setName('daerahdelete-daerah-delete'); // delete
     $app->any('/daerahsearch', DaerahController::class . ':search')->add(PermissionMiddleware::class)->setName('daerahsearch-daerah-search'); // search
     $app->group(
         '/daerah',
         function (RouteCollectorProxy $group) {
             $group->any('/' . Config("LIST_ACTION") . '[/{id}]', DaerahController::class . ':list')->add(PermissionMiddleware::class)->setName('daerah/list-daerah-list-2'); // list
             $group->any('/' . Config("ADD_ACTION") . '[/{id}]', DaerahController::class . ':add')->add(PermissionMiddleware::class)->setName('daerah/add-daerah-add-2'); // add
-            $group->any('/' . Config("VIEW_ACTION") . '[/{id}]', DaerahController::class . ':view')->add(PermissionMiddleware::class)->setName('daerah/view-daerah-view-2'); // view
             $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', DaerahController::class . ':edit')->add(PermissionMiddleware::class)->setName('daerah/edit-daerah-edit-2'); // edit
-            $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', DaerahController::class . ':delete')->add(PermissionMiddleware::class)->setName('daerah/delete-daerah-delete-2'); // delete
             $group->any('/' . Config("SEARCH_ACTION") . '', DaerahController::class . ':search')->add(PermissionMiddleware::class)->setName('daerah/search-daerah-search-2'); // search
         }
     );
@@ -79,9 +75,7 @@ return function (App $app) {
     $app->any('/fasilitaslist[/{id}]', FasilitasController::class . ':list')->add(PermissionMiddleware::class)->setName('fasilitaslist-fasilitas-list'); // list
     $app->any('/fasilitasadd[/{id}]', FasilitasController::class . ':add')->add(PermissionMiddleware::class)->setName('fasilitasadd-fasilitas-add'); // add
     $app->any('/fasilitasaddopt', FasilitasController::class . ':addopt')->add(PermissionMiddleware::class)->setName('fasilitasaddopt-fasilitas-addopt'); // addopt
-    $app->any('/fasilitasview[/{id}]', FasilitasController::class . ':view')->add(PermissionMiddleware::class)->setName('fasilitasview-fasilitas-view'); // view
     $app->any('/fasilitasedit[/{id}]', FasilitasController::class . ':edit')->add(PermissionMiddleware::class)->setName('fasilitasedit-fasilitas-edit'); // edit
-    $app->any('/fasilitasdelete[/{id}]', FasilitasController::class . ':delete')->add(PermissionMiddleware::class)->setName('fasilitasdelete-fasilitas-delete'); // delete
     $app->any('/fasilitassearch', FasilitasController::class . ':search')->add(PermissionMiddleware::class)->setName('fasilitassearch-fasilitas-search'); // search
     $app->group(
         '/fasilitas',
@@ -89,9 +83,7 @@ return function (App $app) {
             $group->any('/' . Config("LIST_ACTION") . '[/{id}]', FasilitasController::class . ':list')->add(PermissionMiddleware::class)->setName('fasilitas/list-fasilitas-list-2'); // list
             $group->any('/' . Config("ADD_ACTION") . '[/{id}]', FasilitasController::class . ':add')->add(PermissionMiddleware::class)->setName('fasilitas/add-fasilitas-add-2'); // add
             $group->any('/' . Config("ADDOPT_ACTION") . '', FasilitasController::class . ':addopt')->add(PermissionMiddleware::class)->setName('fasilitas/addopt-fasilitas-addopt-2'); // addopt
-            $group->any('/' . Config("VIEW_ACTION") . '[/{id}]', FasilitasController::class . ':view')->add(PermissionMiddleware::class)->setName('fasilitas/view-fasilitas-view-2'); // view
             $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', FasilitasController::class . ':edit')->add(PermissionMiddleware::class)->setName('fasilitas/edit-fasilitas-edit-2'); // edit
-            $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', FasilitasController::class . ':delete')->add(PermissionMiddleware::class)->setName('fasilitas/delete-fasilitas-delete-2'); // delete
             $group->any('/' . Config("SEARCH_ACTION") . '', FasilitasController::class . ':search')->add(PermissionMiddleware::class)->setName('fasilitas/search-fasilitas-search-2'); // search
         }
     );
@@ -99,6 +91,7 @@ return function (App $app) {
     // fasilitas_rumah_sakit
     $app->any('/fasilitasrumahsakitlist[/{id}]', FasilitasRumahSakitController::class . ':list')->add(PermissionMiddleware::class)->setName('fasilitasrumahsakitlist-fasilitas_rumah_sakit-list'); // list
     $app->any('/fasilitasrumahsakitadd[/{id}]', FasilitasRumahSakitController::class . ':add')->add(PermissionMiddleware::class)->setName('fasilitasrumahsakitadd-fasilitas_rumah_sakit-add'); // add
+    $app->any('/fasilitasrumahsakitaddopt', FasilitasRumahSakitController::class . ':addopt')->add(PermissionMiddleware::class)->setName('fasilitasrumahsakitaddopt-fasilitas_rumah_sakit-addopt'); // addopt
     $app->any('/fasilitasrumahsakitedit[/{id}]', FasilitasRumahSakitController::class . ':edit')->add(PermissionMiddleware::class)->setName('fasilitasrumahsakitedit-fasilitas_rumah_sakit-edit'); // edit
     $app->any('/fasilitasrumahsakitdelete[/{id}]', FasilitasRumahSakitController::class . ':delete')->add(PermissionMiddleware::class)->setName('fasilitasrumahsakitdelete-fasilitas_rumah_sakit-delete'); // delete
     $app->any('/fasilitasrumahsakitpreview', FasilitasRumahSakitController::class . ':preview')->add(PermissionMiddleware::class)->setName('fasilitasrumahsakitpreview-fasilitas_rumah_sakit-preview'); // preview
@@ -107,6 +100,7 @@ return function (App $app) {
         function (RouteCollectorProxy $group) {
             $group->any('/' . Config("LIST_ACTION") . '[/{id}]', FasilitasRumahSakitController::class . ':list')->add(PermissionMiddleware::class)->setName('fasilitas_rumah_sakit/list-fasilitas_rumah_sakit-list-2'); // list
             $group->any('/' . Config("ADD_ACTION") . '[/{id}]', FasilitasRumahSakitController::class . ':add')->add(PermissionMiddleware::class)->setName('fasilitas_rumah_sakit/add-fasilitas_rumah_sakit-add-2'); // add
+            $group->any('/' . Config("ADDOPT_ACTION") . '', FasilitasRumahSakitController::class . ':addopt')->add(PermissionMiddleware::class)->setName('fasilitas_rumah_sakit/addopt-fasilitas_rumah_sakit-addopt-2'); // addopt
             $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', FasilitasRumahSakitController::class . ':edit')->add(PermissionMiddleware::class)->setName('fasilitas_rumah_sakit/edit-fasilitas_rumah_sakit-edit-2'); // edit
             $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', FasilitasRumahSakitController::class . ':delete')->add(PermissionMiddleware::class)->setName('fasilitas_rumah_sakit/delete-fasilitas_rumah_sakit-delete-2'); // delete
             $group->any('/' . Config("PREVIEW_ACTION") . '', FasilitasRumahSakitController::class . ':preview')->add(PermissionMiddleware::class)->setName('fasilitas_rumah_sakit/preview-fasilitas_rumah_sakit-preview-2'); // preview
@@ -190,11 +184,17 @@ return function (App $app) {
     // praktik_poli
     $app->any('/praktikpolilist[/{id}]', PraktikPoliController::class . ':list')->add(PermissionMiddleware::class)->setName('praktikpolilist-praktik_poli-list'); // list
     $app->any('/praktikpoliadd[/{id}]', PraktikPoliController::class . ':add')->add(PermissionMiddleware::class)->setName('praktikpoliadd-praktik_poli-add'); // add
+    $app->any('/praktikpoliedit[/{id}]', PraktikPoliController::class . ':edit')->add(PermissionMiddleware::class)->setName('praktikpoliedit-praktik_poli-edit'); // edit
+    $app->any('/praktikpolidelete[/{id}]', PraktikPoliController::class . ':delete')->add(PermissionMiddleware::class)->setName('praktikpolidelete-praktik_poli-delete'); // delete
+    $app->any('/praktikpolipreview', PraktikPoliController::class . ':preview')->add(PermissionMiddleware::class)->setName('praktikpolipreview-praktik_poli-preview'); // preview
     $app->group(
         '/praktik_poli',
         function (RouteCollectorProxy $group) {
             $group->any('/' . Config("LIST_ACTION") . '[/{id}]', PraktikPoliController::class . ':list')->add(PermissionMiddleware::class)->setName('praktik_poli/list-praktik_poli-list-2'); // list
             $group->any('/' . Config("ADD_ACTION") . '[/{id}]', PraktikPoliController::class . ':add')->add(PermissionMiddleware::class)->setName('praktik_poli/add-praktik_poli-add-2'); // add
+            $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', PraktikPoliController::class . ':edit')->add(PermissionMiddleware::class)->setName('praktik_poli/edit-praktik_poli-edit-2'); // edit
+            $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', PraktikPoliController::class . ':delete')->add(PermissionMiddleware::class)->setName('praktik_poli/delete-praktik_poli-delete-2'); // delete
+            $group->any('/' . Config("PREVIEW_ACTION") . '', PraktikPoliController::class . ':preview')->add(PermissionMiddleware::class)->setName('praktik_poli/preview-praktik_poli-preview-2'); // preview
         }
     );
 
@@ -228,6 +228,40 @@ return function (App $app) {
         }
     );
 
+    // userlevelpermissions
+    $app->any('/userlevelpermissionslist[/{userlevelid}/{_tablename}]', UserlevelpermissionsController::class . ':list')->add(PermissionMiddleware::class)->setName('userlevelpermissionslist-userlevelpermissions-list'); // list
+    $app->any('/userlevelpermissionsadd[/{userlevelid}/{_tablename}]', UserlevelpermissionsController::class . ':add')->add(PermissionMiddleware::class)->setName('userlevelpermissionsadd-userlevelpermissions-add'); // add
+    $app->any('/userlevelpermissionsview[/{userlevelid}/{_tablename}]', UserlevelpermissionsController::class . ':view')->add(PermissionMiddleware::class)->setName('userlevelpermissionsview-userlevelpermissions-view'); // view
+    $app->any('/userlevelpermissionsedit[/{userlevelid}/{_tablename}]', UserlevelpermissionsController::class . ':edit')->add(PermissionMiddleware::class)->setName('userlevelpermissionsedit-userlevelpermissions-edit'); // edit
+    $app->any('/userlevelpermissionsdelete[/{userlevelid}/{_tablename}]', UserlevelpermissionsController::class . ':delete')->add(PermissionMiddleware::class)->setName('userlevelpermissionsdelete-userlevelpermissions-delete'); // delete
+    $app->group(
+        '/userlevelpermissions',
+        function (RouteCollectorProxy $group) {
+            $group->any('/' . Config("LIST_ACTION") . '[/{userlevelid}/{_tablename}]', UserlevelpermissionsController::class . ':list')->add(PermissionMiddleware::class)->setName('userlevelpermissions/list-userlevelpermissions-list-2'); // list
+            $group->any('/' . Config("ADD_ACTION") . '[/{userlevelid}/{_tablename}]', UserlevelpermissionsController::class . ':add')->add(PermissionMiddleware::class)->setName('userlevelpermissions/add-userlevelpermissions-add-2'); // add
+            $group->any('/' . Config("VIEW_ACTION") . '[/{userlevelid}/{_tablename}]', UserlevelpermissionsController::class . ':view')->add(PermissionMiddleware::class)->setName('userlevelpermissions/view-userlevelpermissions-view-2'); // view
+            $group->any('/' . Config("EDIT_ACTION") . '[/{userlevelid}/{_tablename}]', UserlevelpermissionsController::class . ':edit')->add(PermissionMiddleware::class)->setName('userlevelpermissions/edit-userlevelpermissions-edit-2'); // edit
+            $group->any('/' . Config("DELETE_ACTION") . '[/{userlevelid}/{_tablename}]', UserlevelpermissionsController::class . ':delete')->add(PermissionMiddleware::class)->setName('userlevelpermissions/delete-userlevelpermissions-delete-2'); // delete
+        }
+    );
+
+    // userlevels
+    $app->any('/userlevelslist[/{userlevelid}]', UserlevelsController::class . ':list')->add(PermissionMiddleware::class)->setName('userlevelslist-userlevels-list'); // list
+    $app->any('/userlevelsadd[/{userlevelid}]', UserlevelsController::class . ':add')->add(PermissionMiddleware::class)->setName('userlevelsadd-userlevels-add'); // add
+    $app->any('/userlevelsview[/{userlevelid}]', UserlevelsController::class . ':view')->add(PermissionMiddleware::class)->setName('userlevelsview-userlevels-view'); // view
+    $app->any('/userlevelsedit[/{userlevelid}]', UserlevelsController::class . ':edit')->add(PermissionMiddleware::class)->setName('userlevelsedit-userlevels-edit'); // edit
+    $app->any('/userlevelsdelete[/{userlevelid}]', UserlevelsController::class . ':delete')->add(PermissionMiddleware::class)->setName('userlevelsdelete-userlevels-delete'); // delete
+    $app->group(
+        '/userlevels',
+        function (RouteCollectorProxy $group) {
+            $group->any('/' . Config("LIST_ACTION") . '[/{userlevelid}]', UserlevelsController::class . ':list')->add(PermissionMiddleware::class)->setName('userlevels/list-userlevels-list-2'); // list
+            $group->any('/' . Config("ADD_ACTION") . '[/{userlevelid}]', UserlevelsController::class . ':add')->add(PermissionMiddleware::class)->setName('userlevels/add-userlevels-add-2'); // add
+            $group->any('/' . Config("VIEW_ACTION") . '[/{userlevelid}]', UserlevelsController::class . ':view')->add(PermissionMiddleware::class)->setName('userlevels/view-userlevels-view-2'); // view
+            $group->any('/' . Config("EDIT_ACTION") . '[/{userlevelid}]', UserlevelsController::class . ':edit')->add(PermissionMiddleware::class)->setName('userlevels/edit-userlevels-edit-2'); // edit
+            $group->any('/' . Config("DELETE_ACTION") . '[/{userlevelid}]', UserlevelsController::class . ':delete')->add(PermissionMiddleware::class)->setName('userlevels/delete-userlevels-delete-2'); // delete
+        }
+    );
+
     // error
     $app->any('/error', OthersController::class . ':error')->add(PermissionMiddleware::class)->setName('error');
 
@@ -239,6 +273,9 @@ return function (App $app) {
 
     // change_password
     $app->any('/changepassword', OthersController::class . ':changepassword')->add(PermissionMiddleware::class)->setName('changepassword');
+
+    // userpriv
+    $app->any('/userpriv', OthersController::class . ':userpriv')->add(PermissionMiddleware::class)->setName('userpriv');
 
     // logout
     $app->any('/logout', OthersController::class . ':logout')->add(PermissionMiddleware::class)->setName('logout');

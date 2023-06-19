@@ -27,7 +27,6 @@ loadjs.ready("head", function () {
     var currentTable = <?= JsonEncode(GetClientVar("tables", "dokter")) ?>,
         fields = currentTable.fields;
     fdokterlistsrch.addFields([
-        ["id", [], fields.id.isInvalid],
         ["nama_dokter", [], fields.nama_dokter.isInvalid],
         ["webusers_id", [], fields.webusers_id.isInvalid]
     ]);
@@ -72,6 +71,30 @@ loadjs.ready("head", function () {
     // Filters
     fdokterlistsrch.filterList = <?= $Page->getFilterList() ?>;
     loadjs.done("fdokterlistsrch");
+});
+</script>
+<style>
+.ew-table-preview-row { /* main table preview row color */
+    background-color: #FFFFFF; /* preview row color */
+}
+.ew-table-preview-row .ew-grid {
+    display: table;
+}
+</style>
+<div id="ew-preview" class="d-none"><!-- preview -->
+    <div class="ew-nav-tabs"><!-- .ew-nav-tabs -->
+        <ul class="nav nav-tabs"></ul>
+        <div class="tab-content"><!-- .tab-content -->
+            <div class="tab-pane fade active show"></div>
+        </div><!-- /.tab-content -->
+    </div><!-- /.ew-nav-tabs -->
+</div><!-- /preview -->
+<script>
+loadjs.ready("head", function() {
+    ew.PREVIEW_PLACEMENT = ew.CSS_FLIP ? "right" : "left";
+    ew.PREVIEW_SINGLE_ROW = false;
+    ew.PREVIEW_OVERLAY = false;
+    loadjs(ew.PATH_BASE + "js/ewpreview.js", "preview");
 });
 </script>
 <script>
@@ -176,9 +199,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_dokter_id" class="dokter_id"><?= $Page->renderSort($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->nama_dokter->Visible) { // nama_dokter ?>
         <th data-name="nama_dokter" class="<?= $Page->nama_dokter->headerCellClass() ?>"><div id="elh_dokter_nama_dokter" class="dokter_nama_dokter"><?= $Page->renderSort($Page->nama_dokter) ?></div></th>
 <?php } ?>
@@ -252,14 +272,6 @@ while ($Page->RecordCount < $Page->StopRecord) {
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id" <?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_dokter_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->nama_dokter->Visible) { // nama_dokter ?>
         <td data-name="nama_dokter" <?= $Page->nama_dokter->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_dokter_nama_dokter">

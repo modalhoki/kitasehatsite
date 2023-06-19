@@ -518,6 +518,10 @@ class PraktikPoliAdd extends PraktikPoli
         // Load old record / default values
         $loaded = $this->loadOldRecord();
 
+        // Set up master/detail parameters
+        // NOTE: must be after loadOldRecord to prevent master key values overwritten
+        $this->setupMasterParms();
+
         // Load form values
         if ($postBack) {
             $this->loadFormValues(); // Load form values
@@ -843,71 +847,117 @@ class PraktikPoliAdd extends PraktikPoli
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // dokter_id
             $this->dokter_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->dokter_id->CurrentValue));
-            if ($curVal != "") {
-                $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
+            if ($this->dokter_id->getSessionValue() != "") {
+                $this->dokter_id->CurrentValue = GetForeignKeyValue($this->dokter_id->getSessionValue());
+                $curVal = trim(strval($this->dokter_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
+                    if ($this->dokter_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
+                        } else {
+                            $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
+                        }
+                    }
+                } else {
+                    $this->dokter_id->ViewValue = null;
+                }
+                $this->dokter_id->ViewCustomAttributes = "";
             } else {
-                $this->dokter_id->ViewValue = $this->dokter_id->Lookup !== null && is_array($this->dokter_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->dokter_id->ViewValue !== null) { // Load from cache
-                $this->dokter_id->EditValue = array_values($this->dokter_id->Lookup->Options);
-                if ($this->dokter_id->ViewValue == "") {
-                    $this->dokter_id->ViewValue = $Language->phrase("PleaseSelect");
-                }
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
+                $curVal = trim(strval($this->dokter_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
                 } else {
-                    $filterWrk = "`id`" . SearchString("=", $this->dokter_id->CurrentValue, DATATYPE_NUMBER, "");
+                    $this->dokter_id->ViewValue = $this->dokter_id->Lookup !== null && is_array($this->dokter_id->Lookup->Options) ? $curVal : null;
                 }
-                $sqlWrk = $this->dokter_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                } else {
-                    $this->dokter_id->ViewValue = $Language->phrase("PleaseSelect");
+                if ($this->dokter_id->ViewValue !== null) { // Load from cache
+                    $this->dokter_id->EditValue = array_values($this->dokter_id->Lookup->Options);
+                    if ($this->dokter_id->ViewValue == "") {
+                        $this->dokter_id->ViewValue = $Language->phrase("PleaseSelect");
+                    }
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = "`id`" . SearchString("=", $this->dokter_id->CurrentValue, DATATYPE_NUMBER, "");
+                    }
+                    $sqlWrk = $this->dokter_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
+                    } else {
+                        $this->dokter_id->ViewValue = $Language->phrase("PleaseSelect");
+                    }
+                    $arwrk = $rswrk;
+                    $this->dokter_id->EditValue = $arwrk;
                 }
-                $arwrk = $rswrk;
-                $this->dokter_id->EditValue = $arwrk;
+                $this->dokter_id->PlaceHolder = RemoveHtml($this->dokter_id->caption());
             }
-            $this->dokter_id->PlaceHolder = RemoveHtml($this->dokter_id->caption());
 
             // fasilitas_rumah_sakit_id
             $this->fasilitas_rumah_sakit_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->fasilitas_rumah_sakit_id->CurrentValue));
-            if ($curVal != "") {
-                $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->lookupCacheOption($curVal);
+            if ($this->fasilitas_rumah_sakit_id->getSessionValue() != "") {
+                $this->fasilitas_rumah_sakit_id->CurrentValue = GetForeignKeyValue($this->fasilitas_rumah_sakit_id->getSessionValue());
+                $curVal = trim(strval($this->fasilitas_rumah_sakit_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->lookupCacheOption($curVal);
+                    if ($this->fasilitas_rumah_sakit_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->displayValue($arwrk);
+                        } else {
+                            $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->CurrentValue;
+                        }
+                    }
+                } else {
+                    $this->fasilitas_rumah_sakit_id->ViewValue = null;
+                }
+                $this->fasilitas_rumah_sakit_id->ViewCustomAttributes = "";
             } else {
-                $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->Lookup !== null && is_array($this->fasilitas_rumah_sakit_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->fasilitas_rumah_sakit_id->ViewValue !== null) { // Load from cache
-                $this->fasilitas_rumah_sakit_id->EditValue = array_values($this->fasilitas_rumah_sakit_id->Lookup->Options);
-                if ($this->fasilitas_rumah_sakit_id->ViewValue == "") {
-                    $this->fasilitas_rumah_sakit_id->ViewValue = $Language->phrase("PleaseSelect");
-                }
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
+                $curVal = trim(strval($this->fasilitas_rumah_sakit_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->lookupCacheOption($curVal);
                 } else {
-                    $filterWrk = "`id`" . SearchString("=", $this->fasilitas_rumah_sakit_id->CurrentValue, DATATYPE_NUMBER, "");
+                    $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->Lookup !== null && is_array($this->fasilitas_rumah_sakit_id->Lookup->Options) ? $curVal : null;
                 }
-                $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->displayValue($arwrk);
-                } else {
-                    $this->fasilitas_rumah_sakit_id->ViewValue = $Language->phrase("PleaseSelect");
+                if ($this->fasilitas_rumah_sakit_id->ViewValue !== null) { // Load from cache
+                    $this->fasilitas_rumah_sakit_id->EditValue = array_values($this->fasilitas_rumah_sakit_id->Lookup->Options);
+                    if ($this->fasilitas_rumah_sakit_id->ViewValue == "") {
+                        $this->fasilitas_rumah_sakit_id->ViewValue = $Language->phrase("PleaseSelect");
+                    }
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = "`id`" . SearchString("=", $this->fasilitas_rumah_sakit_id->CurrentValue, DATATYPE_NUMBER, "");
+                    }
+                    $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->displayValue($arwrk);
+                    } else {
+                        $this->fasilitas_rumah_sakit_id->ViewValue = $Language->phrase("PleaseSelect");
+                    }
+                    $arwrk = $rswrk;
+                    foreach ($arwrk as &$row)
+                        $row = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($row);
+                    $this->fasilitas_rumah_sakit_id->EditValue = $arwrk;
                 }
-                $arwrk = $rswrk;
-                foreach ($arwrk as &$row)
-                    $row = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($row);
-                $this->fasilitas_rumah_sakit_id->EditValue = $arwrk;
+                $this->fasilitas_rumah_sakit_id->PlaceHolder = RemoveHtml($this->fasilitas_rumah_sakit_id->caption());
             }
-            $this->fasilitas_rumah_sakit_id->PlaceHolder = RemoveHtml($this->fasilitas_rumah_sakit_id->caption());
 
             // jam_praktik
             $this->jam_praktik->EditAttrs["class"] = "form-control";
@@ -1037,6 +1087,108 @@ class PraktikPoliAdd extends PraktikPoli
             WriteJson(["success" => true, $this->TableVar => $row]);
         }
         return $addRow;
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "fasilitas_rumah_sakit") {
+                $validMaster = true;
+                $masterTbl = Container("fasilitas_rumah_sakit");
+                if (($parm = Get("fk_id", Get("fasilitas_rumah_sakit_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->fasilitas_rumah_sakit_id->setQueryStringValue($masterTbl->id->QueryStringValue);
+                    $this->fasilitas_rumah_sakit_id->setSessionValue($this->fasilitas_rumah_sakit_id->QueryStringValue);
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "dokter") {
+                $validMaster = true;
+                $masterTbl = Container("dokter");
+                if (($parm = Get("fk_id", Get("dokter_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->dokter_id->setQueryStringValue($masterTbl->id->QueryStringValue);
+                    $this->dokter_id->setSessionValue($this->dokter_id->QueryStringValue);
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "fasilitas_rumah_sakit") {
+                $validMaster = true;
+                $masterTbl = Container("fasilitas_rumah_sakit");
+                if (($parm = Post("fk_id", Post("fasilitas_rumah_sakit_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->fasilitas_rumah_sakit_id->setFormValue($masterTbl->id->FormValue);
+                    $this->fasilitas_rumah_sakit_id->setSessionValue($this->fasilitas_rumah_sakit_id->FormValue);
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "dokter") {
+                $validMaster = true;
+                $masterTbl = Container("dokter");
+                if (($parm = Post("fk_id", Post("dokter_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->dokter_id->setFormValue($masterTbl->id->FormValue);
+                    $this->dokter_id->setSessionValue($this->dokter_id->FormValue);
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "fasilitas_rumah_sakit") {
+                if ($this->fasilitas_rumah_sakit_id->CurrentValue == "") {
+                    $this->fasilitas_rumah_sakit_id->setSessionValue("");
+                }
+            }
+            if ($masterTblVar != "dokter") {
+                if ($this->dokter_id->CurrentValue == "") {
+                    $this->dokter_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilter(); // Get master filter
+        $this->DbDetailFilter = $this->getDetailFilter(); // Get detail filter
     }
 
     // Set up Breadcrumb

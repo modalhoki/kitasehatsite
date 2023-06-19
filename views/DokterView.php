@@ -79,6 +79,14 @@ $Page->showMessage();
     </tr>
 <?php } ?>
 </table>
+<?php
+    if (in_array("praktik_poli", explode(",", $Page->getCurrentDetailTable())) && $praktik_poli->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("praktik_poli", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PraktikPoliGrid.php" ?>
+<?php } ?>
 </form>
 <?php
 $Page->showPageFooter();

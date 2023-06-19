@@ -20,7 +20,6 @@ loadjs.ready("head", function () {
     if (!ew.vars.tables.dokter)
         ew.vars.tables.dokter = currentTable;
     fdokteredit.addFields([
-        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
         ["nama_dokter", [fields.nama_dokter.visible && fields.nama_dokter.required ? ew.Validators.required(fields.nama_dokter.caption) : null], fields.nama_dokter.isInvalid],
         ["webusers_id", [fields.webusers_id.visible && fields.webusers_id.required ? ew.Validators.required(fields.webusers_id.caption) : null], fields.webusers_id.isInvalid]
     ]);
@@ -112,18 +111,6 @@ $Page->showMessage();
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
 <div class="ew-edit-div"><!-- page* -->
-<?php if ($Page->id->Visible) { // id ?>
-    <div id="r_id" class="form-group row">
-        <label id="elh_dokter_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->id->caption() ?><?= $Page->id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->id->cellAttributes() ?>>
-<span id="el_dokter_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="dokter" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->nama_dokter->Visible) { // nama_dokter ?>
     <div id="r_nama_dokter" class="form-group row">
         <label id="elh_dokter_nama_dokter" for="x_nama_dokter" class="<?= $Page->LeftColumnClass ?>"><?= $Page->nama_dokter->caption() ?><?= $Page->nama_dokter->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -156,6 +143,15 @@ $Page->showMessage();
     </div>
 <?php } ?>
 </div><!-- /page* -->
+    <input type="hidden" data-table="dokter" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
+<?php
+    if (in_array("praktik_poli", explode(",", $Page->getCurrentDetailTable())) && $praktik_poli->DetailEdit) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("praktik_poli", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "PraktikPoliGrid.php" ?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <div class="form-group row"><!-- buttons .form-group -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->

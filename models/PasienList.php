@@ -568,7 +568,7 @@ class PasienList extends Pasien
 
         // Set up list options
         $this->setupListOptions();
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->nik->setVisibility();
         $this->nama->setVisibility();
         $this->jenis_kelamin->setVisibility();
@@ -1418,7 +1418,6 @@ class PasienList extends Pasien
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
             $this->updateSort($this->nik); // nik
             $this->updateSort($this->nama); // nama
             $this->updateSort($this->jenis_kelamin); // jenis_kelamin
@@ -2303,14 +2302,6 @@ class PasienList extends Pasien
             $this->foto_profil->ViewValue = $this->foto_profil->CurrentValue;
             $this->foto_profil->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-            if (!$this->isExport()) {
-                $this->id->ViewValue = $this->highlightValue($this->id);
-            }
-
             // nik
             $this->nik->LinkCustomAttributes = "";
             $this->nik->HrefValue = "";
@@ -2394,12 +2385,6 @@ class PasienList extends Pasien
                 $this->foto_profil->ViewValue = $this->highlightValue($this->foto_profil);
             }
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = HtmlEncode($this->id->AdvancedSearch->SearchValue);
-            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
-
             // nik
             $this->nik->EditAttrs["class"] = "form-control";
             $this->nik->EditCustomAttributes = "";

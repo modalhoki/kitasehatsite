@@ -467,7 +467,7 @@ class KontakDaruratEdit extends KontakDarurat
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->setVisibility();
+        $this->id->Visible = false;
         $this->pasien_id->setVisibility();
         $this->nama->setVisibility();
         $this->no_hp->setVisibility();
@@ -655,12 +655,6 @@ class KontakDaruratEdit extends KontakDarurat
         // Load from form
         global $CurrentForm;
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
-        }
-
         // Check field name 'pasien_id' first before field var 'x_pasien_id'
         $val = $CurrentForm->hasValue("pasien_id") ? $CurrentForm->getValue("pasien_id") : $CurrentForm->getValue("x_pasien_id");
         if (!$this->pasien_id->IsDetailKey) {
@@ -689,6 +683,12 @@ class KontakDaruratEdit extends KontakDarurat
             } else {
                 $this->no_hp->setFormValue($val);
             }
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey) {
+            $this->id->setFormValue($val);
         }
     }
 
@@ -835,11 +835,6 @@ class KontakDaruratEdit extends KontakDarurat
             $this->no_hp->ViewValue = $this->no_hp->CurrentValue;
             $this->no_hp->ViewCustomAttributes = "";
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
             // pasien_id
             $this->pasien_id->LinkCustomAttributes = "";
             $this->pasien_id->HrefValue = "";
@@ -855,12 +850,6 @@ class KontakDaruratEdit extends KontakDarurat
             $this->no_hp->HrefValue = "";
             $this->no_hp->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->ViewCustomAttributes = "";
-
             // pasien_id
             $this->pasien_id->EditCustomAttributes = "";
             if ($this->pasien_id->getSessionValue() != "") {
@@ -939,10 +928,6 @@ class KontakDaruratEdit extends KontakDarurat
 
             // Edit refer script
 
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-
             // pasien_id
             $this->pasien_id->LinkCustomAttributes = "";
             $this->pasien_id->HrefValue = "";
@@ -973,11 +958,6 @@ class KontakDaruratEdit extends KontakDarurat
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
-        }
-        if ($this->id->Required) {
-            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-            }
         }
         if ($this->pasien_id->Required) {
             if (!$this->pasien_id->IsDetailKey && EmptyValue($this->pasien_id->FormValue)) {

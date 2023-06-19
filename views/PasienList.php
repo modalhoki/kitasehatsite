@@ -27,7 +27,6 @@ loadjs.ready("head", function () {
     var currentTable = <?= JsonEncode(GetClientVar("tables", "pasien")) ?>,
         fields = currentTable.fields;
     fpasienlistsrch.addFields([
-        ["id", [], fields.id.isInvalid],
         ["nik", [], fields.nik.isInvalid],
         ["nama", [], fields.nama.isInvalid],
         ["jenis_kelamin", [], fields.jenis_kelamin.isInvalid],
@@ -274,9 +273,6 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id->Visible) { // id ?>
-        <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_pasien_id" class="pasien_id"><?= $Page->renderSort($Page->id) ?></div></th>
-<?php } ?>
 <?php if ($Page->nik->Visible) { // nik ?>
         <th data-name="nik" class="<?= $Page->nik->headerCellClass() ?>"><div id="elh_pasien_nik" class="pasien_nik"><?= $Page->renderSort($Page->nik) ?></div></th>
 <?php } ?>
@@ -380,14 +376,6 @@ while ($Page->RecordCount < $Page->StopRecord) {
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id->Visible) { // id ?>
-        <td data-name="id" <?= $Page->id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_pasien_id">
-<span<?= $Page->id->viewAttributes() ?>>
-<?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->nik->Visible) { // nik ?>
         <td data-name="nik" <?= $Page->nik->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_pasien_nik">

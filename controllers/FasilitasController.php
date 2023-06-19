@@ -26,22 +26,10 @@ class FasilitasController extends ControllerBase
         return $this->runPage($request, $response, $args, "FasilitasAddopt", false);
     }
 
-    // view
-    public function view(Request $request, Response $response, array $args): Response
-    {
-        return $this->runPage($request, $response, $args, "FasilitasView");
-    }
-
     // edit
     public function edit(Request $request, Response $response, array $args): Response
     {
         return $this->runPage($request, $response, $args, "FasilitasEdit");
-    }
-
-    // delete
-    public function delete(Request $request, Response $response, array $args): Response
-    {
-        return $this->runPage($request, $response, $args, "FasilitasDelete");
     }
 
     // search
