@@ -469,7 +469,6 @@ class RumahSakitAdd extends RumahSakit
         $this->alamat->setVisibility();
         $this->daerah_id->setVisibility();
         $this->foto_rumah_sakit->setVisibility();
-        $this->jam_buka->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -640,8 +639,6 @@ class RumahSakitAdd extends RumahSakit
         $this->daerah_id->OldValue = $this->daerah_id->CurrentValue;
         $this->foto_rumah_sakit->CurrentValue = null;
         $this->foto_rumah_sakit->OldValue = $this->foto_rumah_sakit->CurrentValue;
-        $this->jam_buka->CurrentValue = null;
-        $this->jam_buka->OldValue = $this->jam_buka->CurrentValue;
     }
 
     // Load form values
@@ -690,16 +687,6 @@ class RumahSakitAdd extends RumahSakit
             }
         }
 
-        // Check field name 'jam_buka' first before field var 'x_jam_buka'
-        $val = $CurrentForm->hasValue("jam_buka") ? $CurrentForm->getValue("jam_buka") : $CurrentForm->getValue("x_jam_buka");
-        if (!$this->jam_buka->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->jam_buka->Visible = false; // Disable update for API request
-            } else {
-                $this->jam_buka->setFormValue($val);
-            }
-        }
-
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -712,7 +699,6 @@ class RumahSakitAdd extends RumahSakit
         $this->alamat->CurrentValue = $this->alamat->FormValue;
         $this->daerah_id->CurrentValue = $this->daerah_id->FormValue;
         $this->foto_rumah_sakit->CurrentValue = $this->foto_rumah_sakit->FormValue;
-        $this->jam_buka->CurrentValue = $this->jam_buka->FormValue;
     }
 
     /**
@@ -767,7 +753,6 @@ class RumahSakitAdd extends RumahSakit
         $this->alamat->setDbValue($row['alamat']);
         $this->daerah_id->setDbValue($row['daerah_id']);
         $this->foto_rumah_sakit->setDbValue($row['foto_rumah_sakit']);
-        $this->jam_buka->setDbValue($row['jam_buka']);
     }
 
     // Return a row with default values
@@ -780,7 +765,6 @@ class RumahSakitAdd extends RumahSakit
         $row['alamat'] = $this->alamat->CurrentValue;
         $row['daerah_id'] = $this->daerah_id->CurrentValue;
         $row['foto_rumah_sakit'] = $this->foto_rumah_sakit->CurrentValue;
-        $row['jam_buka'] = $this->jam_buka->CurrentValue;
         return $row;
     }
 
@@ -821,8 +805,6 @@ class RumahSakitAdd extends RumahSakit
         // daerah_id
 
         // foto_rumah_sakit
-
-        // jam_buka
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -861,10 +843,6 @@ class RumahSakitAdd extends RumahSakit
             $this->foto_rumah_sakit->ViewValue = $this->foto_rumah_sakit->CurrentValue;
             $this->foto_rumah_sakit->ViewCustomAttributes = "";
 
-            // jam_buka
-            $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
-            $this->jam_buka->ViewCustomAttributes = "";
-
             // nama
             $this->nama->LinkCustomAttributes = "";
             $this->nama->HrefValue = "";
@@ -892,11 +870,6 @@ class RumahSakitAdd extends RumahSakit
                 $this->foto_rumah_sakit->HrefValue = "";
             }
             $this->foto_rumah_sakit->TooltipValue = "";
-
-            // jam_buka
-            $this->jam_buka->LinkCustomAttributes = "";
-            $this->jam_buka->HrefValue = "";
-            $this->jam_buka->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // nama
             $this->nama->EditAttrs["class"] = "form-control";
@@ -958,15 +931,6 @@ class RumahSakitAdd extends RumahSakit
             $this->foto_rumah_sakit->EditValue = HtmlEncode($this->foto_rumah_sakit->CurrentValue);
             $this->foto_rumah_sakit->PlaceHolder = RemoveHtml($this->foto_rumah_sakit->caption());
 
-            // jam_buka
-            $this->jam_buka->EditAttrs["class"] = "form-control";
-            $this->jam_buka->EditCustomAttributes = "";
-            if (!$this->jam_buka->Raw) {
-                $this->jam_buka->CurrentValue = HtmlDecode($this->jam_buka->CurrentValue);
-            }
-            $this->jam_buka->EditValue = HtmlEncode($this->jam_buka->CurrentValue);
-            $this->jam_buka->PlaceHolder = RemoveHtml($this->jam_buka->caption());
-
             // Add refer script
 
             // nama
@@ -992,10 +956,6 @@ class RumahSakitAdd extends RumahSakit
             } else {
                 $this->foto_rumah_sakit->HrefValue = "";
             }
-
-            // jam_buka
-            $this->jam_buka->LinkCustomAttributes = "";
-            $this->jam_buka->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1034,11 +994,6 @@ class RumahSakitAdd extends RumahSakit
         if ($this->foto_rumah_sakit->Required) {
             if (!$this->foto_rumah_sakit->IsDetailKey && EmptyValue($this->foto_rumah_sakit->FormValue)) {
                 $this->foto_rumah_sakit->addErrorMessage(str_replace("%s", $this->foto_rumah_sakit->caption(), $this->foto_rumah_sakit->RequiredErrorMessage));
-            }
-        }
-        if ($this->jam_buka->Required) {
-            if (!$this->jam_buka->IsDetailKey && EmptyValue($this->jam_buka->FormValue)) {
-                $this->jam_buka->addErrorMessage(str_replace("%s", $this->jam_buka->caption(), $this->jam_buka->RequiredErrorMessage));
             }
         }
 
@@ -1089,9 +1044,6 @@ class RumahSakitAdd extends RumahSakit
 
         // foto_rumah_sakit
         $this->foto_rumah_sakit->setDbValueDef($rsnew, $this->foto_rumah_sakit->CurrentValue, null, false);
-
-        // jam_buka
-        $this->jam_buka->setDbValueDef($rsnew, $this->jam_buka->CurrentValue, "", false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);

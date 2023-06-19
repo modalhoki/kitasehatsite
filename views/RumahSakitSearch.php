@@ -26,8 +26,7 @@ loadjs.ready("head", function () {
         ["nama", [], fields.nama.isInvalid],
         ["alamat", [], fields.alamat.isInvalid],
         ["daerah_id", [], fields.daerah_id.isInvalid],
-        ["foto_rumah_sakit", [], fields.foto_rumah_sakit.isInvalid],
-        ["jam_buka", [], fields.jam_buka.isInvalid]
+        ["foto_rumah_sakit", [], fields.foto_rumah_sakit.isInvalid]
     ]);
 
     // Set invalid fields
@@ -171,22 +170,6 @@ $Page->showMessage();
             <span id="el_rumah_sakit_foto_rumah_sakit" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->foto_rumah_sakit->getInputTextType() ?>" data-table="rumah_sakit" data-field="x_foto_rumah_sakit" name="x_foto_rumah_sakit" id="x_foto_rumah_sakit" size="30" maxlength="255" placeholder="<?= HtmlEncode($Page->foto_rumah_sakit->getPlaceHolder()) ?>" value="<?= $Page->foto_rumah_sakit->EditValue ?>"<?= $Page->foto_rumah_sakit->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->foto_rumah_sakit->getErrorMessage(false) ?></div>
-</span>
-        </div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->jam_buka->Visible) { // jam_buka ?>
-    <div id="r_jam_buka" class="form-group row">
-        <label for="x_jam_buka" class="<?= $Page->LeftColumnClass ?>"><span id="elh_rumah_sakit_jam_buka"><?= $Page->jam_buka->caption() ?></span>
-        <span class="ew-search-operator">
-<?= $Language->phrase("LIKE") ?>
-<input type="hidden" name="z_jam_buka" id="z_jam_buka" value="LIKE">
-</span>
-        </label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->jam_buka->cellAttributes() ?>>
-            <span id="el_rumah_sakit_jam_buka" class="ew-search-field ew-search-field-single">
-<input type="<?= $Page->jam_buka->getInputTextType() ?>" data-table="rumah_sakit" data-field="x_jam_buka" name="x_jam_buka" id="x_jam_buka" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->jam_buka->getPlaceHolder()) ?>" value="<?= $Page->jam_buka->EditValue ?>"<?= $Page->jam_buka->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Page->jam_buka->getErrorMessage(false) ?></div>
 </span>
         </div></div>
     </div>

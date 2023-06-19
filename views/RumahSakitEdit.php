@@ -23,8 +23,7 @@ loadjs.ready("head", function () {
         ["nama", [fields.nama.visible && fields.nama.required ? ew.Validators.required(fields.nama.caption) : null], fields.nama.isInvalid],
         ["alamat", [fields.alamat.visible && fields.alamat.required ? ew.Validators.required(fields.alamat.caption) : null], fields.alamat.isInvalid],
         ["daerah_id", [fields.daerah_id.visible && fields.daerah_id.required ? ew.Validators.required(fields.daerah_id.caption) : null], fields.daerah_id.isInvalid],
-        ["foto_rumah_sakit", [fields.foto_rumah_sakit.visible && fields.foto_rumah_sakit.required ? ew.Validators.required(fields.foto_rumah_sakit.caption) : null], fields.foto_rumah_sakit.isInvalid],
-        ["jam_buka", [fields.jam_buka.visible && fields.jam_buka.required ? ew.Validators.required(fields.jam_buka.caption) : null], fields.jam_buka.isInvalid]
+        ["foto_rumah_sakit", [fields.foto_rumah_sakit.visible && fields.foto_rumah_sakit.required ? ew.Validators.required(fields.foto_rumah_sakit.caption) : null], fields.foto_rumah_sakit.isInvalid]
     ]);
 
     // Set invalid fields
@@ -165,18 +164,6 @@ $Page->showMessage();
 <input type="<?= $Page->foto_rumah_sakit->getInputTextType() ?>" data-table="rumah_sakit" data-field="x_foto_rumah_sakit" name="x_foto_rumah_sakit" id="x_foto_rumah_sakit" size="30" maxlength="255" placeholder="<?= HtmlEncode($Page->foto_rumah_sakit->getPlaceHolder()) ?>" value="<?= $Page->foto_rumah_sakit->EditValue ?>"<?= $Page->foto_rumah_sakit->editAttributes() ?> aria-describedby="x_foto_rumah_sakit_help">
 <?= $Page->foto_rumah_sakit->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->foto_rumah_sakit->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->jam_buka->Visible) { // jam_buka ?>
-    <div id="r_jam_buka" class="form-group row">
-        <label id="elh_rumah_sakit_jam_buka" for="x_jam_buka" class="<?= $Page->LeftColumnClass ?>"><?= $Page->jam_buka->caption() ?><?= $Page->jam_buka->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->jam_buka->cellAttributes() ?>>
-<span id="el_rumah_sakit_jam_buka">
-<input type="<?= $Page->jam_buka->getInputTextType() ?>" data-table="rumah_sakit" data-field="x_jam_buka" name="x_jam_buka" id="x_jam_buka" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->jam_buka->getPlaceHolder()) ?>" value="<?= $Page->jam_buka->EditValue ?>"<?= $Page->jam_buka->editAttributes() ?> aria-describedby="x_jam_buka_help">
-<?= $Page->jam_buka->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->jam_buka->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

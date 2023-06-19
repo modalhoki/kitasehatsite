@@ -1245,9 +1245,6 @@
       <field id="foto_rumah_sakit">
         <phrase id="fldcaption" value="foto rumah sakit" />
       </field>
-      <field id="jam_buka">
-        <phrase id="fldcaption" value="jam buka" />
-      </field>
     </table>
     <table id="webusers">
       <phrase id="tblcaption" value="webusers" />

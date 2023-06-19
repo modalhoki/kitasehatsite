@@ -56,9 +56,6 @@ $Page->showMessage();
 <?php if ($Page->foto_rumah_sakit->Visible) { // foto_rumah_sakit ?>
         <th class="<?= $Page->foto_rumah_sakit->headerCellClass() ?>"><span id="elh_rumah_sakit_foto_rumah_sakit" class="rumah_sakit_foto_rumah_sakit"><?= $Page->foto_rumah_sakit->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->jam_buka->Visible) { // jam_buka ?>
-        <th class="<?= $Page->jam_buka->headerCellClass() ?>"><span id="elh_rumah_sakit_jam_buka" class="rumah_sakit_jam_buka"><?= $Page->jam_buka->caption() ?></span></th>
-<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -114,14 +111,6 @@ while (!$Page->Recordset->EOF) {
 <?= $Page->foto_rumah_sakit->getViewValue() ?>
 <?php } ?>
 </span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->jam_buka->Visible) { // jam_buka ?>
-        <td <?= $Page->jam_buka->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_rumah_sakit_jam_buka" class="rumah_sakit_jam_buka">
-<span<?= $Page->jam_buka->viewAttributes() ?>>
-<?= $Page->jam_buka->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
