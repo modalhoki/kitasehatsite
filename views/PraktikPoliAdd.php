@@ -22,8 +22,8 @@ loadjs.ready("head", function () {
     fpraktik_poliadd.addFields([
         ["dokter_id", [fields.dokter_id.visible && fields.dokter_id.required ? ew.Validators.required(fields.dokter_id.caption) : null], fields.dokter_id.isInvalid],
         ["fasilitas_rumah_sakit_id", [fields.fasilitas_rumah_sakit_id.visible && fields.fasilitas_rumah_sakit_id.required ? ew.Validators.required(fields.fasilitas_rumah_sakit_id.caption) : null], fields.fasilitas_rumah_sakit_id.isInvalid],
-        ["jam_praktik", [fields.jam_praktik.visible && fields.jam_praktik.required ? ew.Validators.required(fields.jam_praktik.caption) : null], fields.jam_praktik.isInvalid],
-        ["hari_praktik", [fields.hari_praktik.visible && fields.hari_praktik.required ? ew.Validators.required(fields.hari_praktik.caption) : null], fields.hari_praktik.isInvalid]
+        ["hari_praktik", [fields.hari_praktik.visible && fields.hari_praktik.required ? ew.Validators.required(fields.hari_praktik.caption) : null], fields.hari_praktik.isInvalid],
+        ["jam_praktik", [fields.jam_praktik.visible && fields.jam_praktik.required ? ew.Validators.required(fields.jam_praktik.caption) : null], fields.jam_praktik.isInvalid]
     ]);
 
     // Set invalid fields
@@ -182,18 +182,6 @@ $Page->showMessage();
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->jam_praktik->Visible) { // jam_praktik ?>
-    <div id="r_jam_praktik" class="form-group row">
-        <label id="elh_praktik_poli_jam_praktik" for="x_jam_praktik" class="<?= $Page->LeftColumnClass ?>"><?= $Page->jam_praktik->caption() ?><?= $Page->jam_praktik->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->jam_praktik->cellAttributes() ?>>
-<span id="el_praktik_poli_jam_praktik">
-<input type="<?= $Page->jam_praktik->getInputTextType() ?>" data-table="praktik_poli" data-field="x_jam_praktik" name="x_jam_praktik" id="x_jam_praktik" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->jam_praktik->getPlaceHolder()) ?>" value="<?= $Page->jam_praktik->EditValue ?>"<?= $Page->jam_praktik->editAttributes() ?> aria-describedby="x_jam_praktik_help">
-<?= $Page->jam_praktik->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->jam_praktik->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->hari_praktik->Visible) { // hari_praktik ?>
     <div id="r_hari_praktik" class="form-group row">
         <label id="elh_praktik_poli_hari_praktik" for="x_hari_praktik" class="<?= $Page->LeftColumnClass ?>"><?= $Page->hari_praktik->caption() ?><?= $Page->hari_praktik->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -202,6 +190,18 @@ $Page->showMessage();
 <input type="<?= $Page->hari_praktik->getInputTextType() ?>" data-table="praktik_poli" data-field="x_hari_praktik" name="x_hari_praktik" id="x_hari_praktik" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->hari_praktik->getPlaceHolder()) ?>" value="<?= $Page->hari_praktik->EditValue ?>"<?= $Page->hari_praktik->editAttributes() ?> aria-describedby="x_hari_praktik_help">
 <?= $Page->hari_praktik->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->hari_praktik->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->jam_praktik->Visible) { // jam_praktik ?>
+    <div id="r_jam_praktik" class="form-group row">
+        <label id="elh_praktik_poli_jam_praktik" for="x_jam_praktik" class="<?= $Page->LeftColumnClass ?>"><?= $Page->jam_praktik->caption() ?><?= $Page->jam_praktik->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->jam_praktik->cellAttributes() ?>>
+<span id="el_praktik_poli_jam_praktik">
+<input type="<?= $Page->jam_praktik->getInputTextType() ?>" data-table="praktik_poli" data-field="x_jam_praktik" name="x_jam_praktik" id="x_jam_praktik" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->jam_praktik->getPlaceHolder()) ?>" value="<?= $Page->jam_praktik->EditValue ?>"<?= $Page->jam_praktik->editAttributes() ?> aria-describedby="x_jam_praktik_help">
+<?= $Page->jam_praktik->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->jam_praktik->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

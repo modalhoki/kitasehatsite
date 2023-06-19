@@ -50,11 +50,11 @@ $Page->showMessage();
 <?php if ($Page->fasilitas_rumah_sakit_id->Visible) { // fasilitas_rumah_sakit_id ?>
         <th class="<?= $Page->fasilitas_rumah_sakit_id->headerCellClass() ?>"><span id="elh_praktik_poli_fasilitas_rumah_sakit_id" class="praktik_poli_fasilitas_rumah_sakit_id"><?= $Page->fasilitas_rumah_sakit_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->jam_praktik->Visible) { // jam_praktik ?>
-        <th class="<?= $Page->jam_praktik->headerCellClass() ?>"><span id="elh_praktik_poli_jam_praktik" class="praktik_poli_jam_praktik"><?= $Page->jam_praktik->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->hari_praktik->Visible) { // hari_praktik ?>
         <th class="<?= $Page->hari_praktik->headerCellClass() ?>"><span id="elh_praktik_poli_hari_praktik" class="praktik_poli_hari_praktik"><?= $Page->hari_praktik->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->jam_praktik->Visible) { // jam_praktik ?>
+        <th class="<?= $Page->jam_praktik->headerCellClass() ?>"><span id="elh_praktik_poli_jam_praktik" class="praktik_poli_jam_praktik"><?= $Page->jam_praktik->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -93,19 +93,19 @@ while (!$Page->Recordset->EOF) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->jam_praktik->Visible) { // jam_praktik ?>
-        <td <?= $Page->jam_praktik->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_praktik_poli_jam_praktik" class="praktik_poli_jam_praktik">
-<span<?= $Page->jam_praktik->viewAttributes() ?>>
-<?= $Page->jam_praktik->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->hari_praktik->Visible) { // hari_praktik ?>
         <td <?= $Page->hari_praktik->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_praktik_poli_hari_praktik" class="praktik_poli_hari_praktik">
 <span<?= $Page->hari_praktik->viewAttributes() ?>>
 <?= $Page->hari_praktik->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->jam_praktik->Visible) { // jam_praktik ?>
+        <td <?= $Page->jam_praktik->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_praktik_poli_jam_praktik" class="praktik_poli_jam_praktik">
+<span<?= $Page->jam_praktik->viewAttributes() ?>>
+<?= $Page->jam_praktik->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

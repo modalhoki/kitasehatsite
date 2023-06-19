@@ -393,8 +393,8 @@ class PraktikPoliPreview extends PraktikPoli
         $this->id->Visible = false;
         $this->dokter_id->setVisibility();
         $this->fasilitas_rumah_sakit_id->setVisibility();
-        $this->jam_praktik->setVisibility();
         $this->hari_praktik->setVisibility();
+        $this->jam_praktik->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -485,8 +485,8 @@ class PraktikPoliPreview extends PraktikPoli
             $this->id->setSort("");
             $this->dokter_id->setSort("");
             $this->fasilitas_rumah_sakit_id->setSort("");
-            $this->jam_praktik->setSort("");
             $this->hari_praktik->setSort("");
+            $this->jam_praktik->setSort("");
 
             // Save sort to session
             $this->setSessionOrderBy("");
@@ -500,8 +500,8 @@ class PraktikPoliPreview extends PraktikPoli
         if ($this->CurrentOrder !== "") {
             $this->updateSort($this->dokter_id); // dokter_id
             $this->updateSort($this->fasilitas_rumah_sakit_id); // fasilitas_rumah_sakit_id
-            $this->updateSort($this->jam_praktik); // jam_praktik
             $this->updateSort($this->hari_praktik); // hari_praktik
+            $this->updateSort($this->jam_praktik); // jam_praktik
         }
     }
 
