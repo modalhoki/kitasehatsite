@@ -290,23 +290,6 @@ return function (App $app) {
         }
     );
 
-    // webusers_rs
-    $app->any('/webusersrslist[/{id}]', WebusersRsController::class . ':list')->add(PermissionMiddleware::class)->setName('webusersrslist-webusers_rs-list'); // list
-    $app->any('/webusersrsadd[/{id}]', WebusersRsController::class . ':add')->add(PermissionMiddleware::class)->setName('webusersrsadd-webusers_rs-add'); // add
-    $app->any('/webusersrsedit[/{id}]', WebusersRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('webusersrsedit-webusers_rs-edit'); // edit
-    $app->any('/webusersrsdelete[/{id}]', WebusersRsController::class . ':delete')->add(PermissionMiddleware::class)->setName('webusersrsdelete-webusers_rs-delete'); // delete
-    $app->any('/webusersrssearch', WebusersRsController::class . ':search')->add(PermissionMiddleware::class)->setName('webusersrssearch-webusers_rs-search'); // search
-    $app->group(
-        '/webusers_rs',
-        function (RouteCollectorProxy $group) {
-            $group->any('/' . Config("LIST_ACTION") . '[/{id}]', WebusersRsController::class . ':list')->add(PermissionMiddleware::class)->setName('webusers_rs/list-webusers_rs-list-2'); // list
-            $group->any('/' . Config("ADD_ACTION") . '[/{id}]', WebusersRsController::class . ':add')->add(PermissionMiddleware::class)->setName('webusers_rs/add-webusers_rs-add-2'); // add
-            $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', WebusersRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('webusers_rs/edit-webusers_rs-edit-2'); // edit
-            $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', WebusersRsController::class . ':delete')->add(PermissionMiddleware::class)->setName('webusers_rs/delete-webusers_rs-delete-2'); // delete
-            $group->any('/' . Config("SEARCH_ACTION") . '', WebusersRsController::class . ':search')->add(PermissionMiddleware::class)->setName('webusers_rs/search-webusers_rs-search-2'); // search
-        }
-    );
-
     // error
     $app->any('/error', OthersController::class . ':error')->add(PermissionMiddleware::class)->setName('error');
 

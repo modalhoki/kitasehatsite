@@ -69,7 +69,6 @@ return [
     "userlevels" => \DI\create(Userlevels::class),
     "antrean_bpjs_rs" => \DI\create(AntreanBpjsRs::class),
     "antrean_umum_rs" => \DI\create(AntreanUmumRs::class),
-    "webusers_rs" => \DI\create(WebusersRs::class),
 
     // User table
     "usertable" => \DI\get("webusers"),

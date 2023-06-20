@@ -740,7 +740,7 @@ class AntreanUmumRsSearch extends AntreanUmumRs
                 if ($this->fasilitas_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
                     $lookupFilter = function() {
-                        return (CurrentUserLevel() == -1) ? "" : "`id` IN (SELECT fasilitas_rumah_sakit.fasilitas_id FROM fasilitas_rumah_sakit WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").)";
+                        return (CurrentUserLevel() == -1) ? "" : "`id` IN (SELECT fasilitas_rumah_sakit.fasilitas_id FROM fasilitas_rumah_sakit WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").")";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
                     $sqlWrk = $this->fasilitas_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
@@ -904,7 +904,7 @@ class AntreanUmumRsSearch extends AntreanUmumRs
                     $filterWrk = "`id`" . SearchString("=", $this->fasilitas_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
                 $lookupFilter = function() {
-                    return (CurrentUserLevel() == -1) ? "" : "`id` IN (SELECT fasilitas_rumah_sakit.fasilitas_id FROM fasilitas_rumah_sakit WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").)";
+                    return (CurrentUserLevel() == -1) ? "" : "`id` IN (SELECT fasilitas_rumah_sakit.fasilitas_id FROM fasilitas_rumah_sakit WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").")";
                 };
                 $lookupFilter = $lookupFilter->bindTo($this);
                 $sqlWrk = $this->fasilitas_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
@@ -1048,7 +1048,7 @@ class AntreanUmumRsSearch extends AntreanUmumRs
                     break;
                 case "x_fasilitas_id":
                     $lookupFilter = function () {
-                        return (CurrentUserLevel() == -1) ? "" : "`id` IN (SELECT fasilitas_rumah_sakit.fasilitas_id FROM fasilitas_rumah_sakit WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").)";
+                        return (CurrentUserLevel() == -1) ? "" : "`id` IN (SELECT fasilitas_rumah_sakit.fasilitas_id FROM fasilitas_rumah_sakit WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").")";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
                     break;
