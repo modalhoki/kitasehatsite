@@ -1,4 +1,3 @@
-Php_value memory_limit 256M;
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
