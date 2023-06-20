@@ -80,13 +80,11 @@ class FasilitasRumahSakit extends DbTable
         $this->Fields['id'] = &$this->id;
 
         // rumah_sakit_id
-        $this->rumah_sakit_id = new DbField('fasilitas_rumah_sakit', 'fasilitas_rumah_sakit', 'x_rumah_sakit_id', 'rumah_sakit_id', '`rumah_sakit_id`', '`rumah_sakit_id`', 20, 20, -1, false, '`rumah_sakit_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->rumah_sakit_id = new DbField('fasilitas_rumah_sakit', 'fasilitas_rumah_sakit', 'x_rumah_sakit_id', 'rumah_sakit_id', '`rumah_sakit_id`', '`rumah_sakit_id`', 20, 20, -1, false, '`rumah_sakit_id`', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->rumah_sakit_id->IsForeignKey = true; // Foreign key field
         $this->rumah_sakit_id->Nullable = false; // NOT NULL field
         $this->rumah_sakit_id->Required = true; // Required field
         $this->rumah_sakit_id->Sortable = true; // Allow sort
-        $this->rumah_sakit_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->rumah_sakit_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->rumah_sakit_id->Lookup = new Lookup('rumah_sakit_id', 'rumah_sakit', false, 'id', ["nama","daerah_id","",""], [], [], [], [], [], [], '', '');
         $this->rumah_sakit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->rumah_sakit_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->rumah_sakit_id->Param, "CustomMsg");
@@ -975,6 +973,7 @@ SORTHTML;
         $this->id->ViewCustomAttributes = "";
 
         // rumah_sakit_id
+        $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
         $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
         if ($curVal != "") {
             $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
@@ -1075,6 +1074,7 @@ SORTHTML;
         $this->rumah_sakit_id->EditCustomAttributes = "";
         if ($this->rumah_sakit_id->getSessionValue() != "") {
             $this->rumah_sakit_id->CurrentValue = GetForeignKeyValue($this->rumah_sakit_id->getSessionValue());
+            $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
             $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
             if ($curVal != "") {
                 $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
@@ -1095,6 +1095,7 @@ SORTHTML;
             }
             $this->rumah_sakit_id->ViewCustomAttributes = "";
         } else {
+            $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->CurrentValue;
             $this->rumah_sakit_id->PlaceHolder = RemoveHtml($this->rumah_sakit_id->caption());
         }
 

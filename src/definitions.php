@@ -67,8 +67,11 @@ return [
     "data_durasi" => \DI\create(DataDurasi::class),
     "userlevelpermissions" => \DI\create(Userlevelpermissions::class),
     "userlevels" => \DI\create(Userlevels::class),
+<<<<<<< HEAD
     "antrean_bpjs_rs" => \DI\create(AntreanBpjsRs::class),
     "antrean_umum_rs" => \DI\create(AntreanUmumRs::class),
+=======
+>>>>>>> parent of 72b00b1 (rumah sakit views refinements)
 
     // User table
     "usertable" => \DI\get("webusers"),

@@ -600,7 +600,7 @@ class AntreanBpjsEdit extends AntreanBpjs
                 }
                 break;
             case "update": // Update
-                $returnUrl = "antreanbpjslist";
+                $returnUrl = $this->getReturnUrl();
                 if (GetPageName($returnUrl) == "antreanbpjslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }

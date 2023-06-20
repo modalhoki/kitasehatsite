@@ -194,7 +194,7 @@ class Dokter extends DbTable
     public function getSqlWhere() // Where
     {
         $where = ($this->SqlWhere != "") ? $this->SqlWhere : "";
-        $this->DefaultFilter = (CurrentUserLevel() == -1) ? "" : "`webusers_id` IN (SELECT webusers.id FROM webusers WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").")";
+        $this->DefaultFilter = "";
         AddFilter($where, $this->DefaultFilter);
         return $where;
     }

@@ -829,11 +829,7 @@ class PraktikPoliEdit extends PraktikPoli
                 $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->lookupCacheOption($curVal);
                 if ($this->fasilitas_rumah_sakit_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $lookupFilter = function() {
-                        return (CurrentUserLevel() == -1) ? "" : "`rumah_sakit_id` = ".CurrentUserInfo("rumah_sakit_id");
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                    $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -906,11 +902,7 @@ class PraktikPoliEdit extends PraktikPoli
                     $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->lookupCacheOption($curVal);
                     if ($this->fasilitas_rumah_sakit_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $lookupFilter = function() {
-                            return (CurrentUserLevel() == -1) ? "" : "`rumah_sakit_id` = ".CurrentUserInfo("rumah_sakit_id");
-                        };
-                        $lookupFilter = $lookupFilter->bindTo($this);
-                        $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                        $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -942,11 +934,7 @@ class PraktikPoliEdit extends PraktikPoli
                     } else {
                         $filterWrk = "`id`" . SearchString("=", $this->fasilitas_rumah_sakit_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $lookupFilter = function() {
-                        return (CurrentUserLevel() == -1) ? "" : "`rumah_sakit_id` = ".CurrentUserInfo("rumah_sakit_id");
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
+                    $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1316,10 +1304,6 @@ class PraktikPoliEdit extends PraktikPoli
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_fasilitas_rumah_sakit_id":
-                    $lookupFilter = function () {
-                        return (CurrentUserLevel() == -1) ? "" : "`rumah_sakit_id` = ".CurrentUserInfo("rumah_sakit_id");
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 case "x_dokter_id":
                     break;

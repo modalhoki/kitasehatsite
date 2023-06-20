@@ -20,7 +20,7 @@ loadjs.ready("head", function () {
     if (!ew.vars.tables.fasilitas_rumah_sakit)
         ew.vars.tables.fasilitas_rumah_sakit = currentTable;
     ffasilitas_rumah_sakitaddopt.addFields([
-        ["rumah_sakit_id", [fields.rumah_sakit_id.visible && fields.rumah_sakit_id.required ? ew.Validators.required(fields.rumah_sakit_id.caption) : null], fields.rumah_sakit_id.isInvalid],
+        ["rumah_sakit_id", [fields.rumah_sakit_id.visible && fields.rumah_sakit_id.required ? ew.Validators.required(fields.rumah_sakit_id.caption) : null, ew.Validators.integer], fields.rumah_sakit_id.isInvalid],
         ["fasilitas_id", [fields.fasilitas_id.visible && fields.fasilitas_id.required ? ew.Validators.required(fields.fasilitas_id.caption) : null], fields.fasilitas_id.isInvalid],
         ["hari_buka", [fields.hari_buka.visible && fields.hari_buka.required ? ew.Validators.required(fields.hari_buka.caption) : null], fields.hari_buka.isInvalid],
         ["jam_buka", [fields.jam_buka.visible && fields.jam_buka.required ? ew.Validators.required(fields.jam_buka.caption) : null], fields.jam_buka.isInvalid]
@@ -101,17 +101,29 @@ loadjs.ready("head", function () {
 <input type="hidden" name="addopt" id="addopt" value="1">
 <?php if ($Page->rumah_sakit_id->Visible) { // rumah_sakit_id ?>
     <div class="form-group row">
-        <label class="col-sm-2 col-form-label ew-label" for="x_rumah_sakit_id"><?= $Page->rumah_sakit_id->caption() ?><?= $Page->rumah_sakit_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label class="col-sm-2 col-form-label ew-label"><?= $Page->rumah_sakit_id->caption() ?><?= $Page->rumah_sakit_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="col-sm-10">
-<div class="input-group ew-lookup-list">
-    <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x_rumah_sakit_id"><?= EmptyValue(strval($Page->rumah_sakit_id->ViewValue)) ? $Language->phrase("PleaseSelect") : $Page->rumah_sakit_id->ViewValue ?></div>
-    <div class="input-group-append">
-        <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Page->rumah_sakit_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Page->rumah_sakit_id->ReadOnly || $Page->rumah_sakit_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x_rumah_sakit_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
+<?php
+$onchange = $Page->rumah_sakit_id->EditAttrs->prepend("onchange", "");
+$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
+$Page->rumah_sakit_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x_rumah_sakit_id" class="ew-auto-suggest">
+    <div class="input-group flex-nowrap">
+        <input type="<?= $Page->rumah_sakit_id->getInputTextType() ?>" class="form-control" name="sv_x_rumah_sakit_id" id="sv_x_rumah_sakit_id" value="<?= RemoveHtml($Page->rumah_sakit_id->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Page->rumah_sakit_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->rumah_sakit_id->getPlaceHolder()) ?>"<?= $Page->rumah_sakit_id->editAttributes() ?>>
+        <div class="input-group-append">
+            <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Page->rumah_sakit_id->caption()), $Language->phrase("LookupLink", true))) ?>" onclick="ew.modalLookupShow({lnk:this,el:'x_rumah_sakit_id',m:0,n:10,srch:true});" class="ew-lookup-btn btn btn-default"<?= ($Page->rumah_sakit_id->ReadOnly || $Page->rumah_sakit_id->Disabled) ? " disabled" : "" ?>><i class="fas fa-search ew-icon"></i></button>
+        </div>
     </div>
-</div>
+</span>
+<input type="hidden" is="selection-list" class="form-control" data-table="fasilitas_rumah_sakit" data-field="x_rumah_sakit_id" data-input="sv_x_rumah_sakit_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->rumah_sakit_id->displayValueSeparatorAttribute() ?>" name="x_rumah_sakit_id" id="x_rumah_sakit_id" value="<?= HtmlEncode($Page->rumah_sakit_id->CurrentValue) ?>"<?= $onchange ?>>
 <div class="invalid-feedback"><?= $Page->rumah_sakit_id->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["ffasilitas_rumah_sakitaddopt"], function() {
+    ffasilitas_rumah_sakitaddopt.createAutoSuggest(Object.assign({"id":"x_rumah_sakit_id","forceSelect":false}, ew.vars.tables.fasilitas_rumah_sakit.fields.rumah_sakit_id.autoSuggestOptions));
+});
+</script>
 <?= $Page->rumah_sakit_id->Lookup->getParamTag($Page, "p_x_rumah_sakit_id") ?>
-<input type="hidden" is="selection-list" data-table="fasilitas_rumah_sakit" data-field="x_rumah_sakit_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->rumah_sakit_id->displayValueSeparatorAttribute() ?>" name="x_rumah_sakit_id" id="x_rumah_sakit_id" value="<?= $Page->rumah_sakit_id->CurrentValue ?>"<?= $Page->rumah_sakit_id->editAttributes() ?>>
 </div>
     </div>
 <?php } ?>

@@ -728,10 +728,6 @@ class PraktikPoliPreview extends PraktikPoli
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_fasilitas_rumah_sakit_id":
-                    $lookupFilter = function () {
-                        return (CurrentUserLevel() == -1) ? "" : "`rumah_sakit_id` = ".CurrentUserInfo("rumah_sakit_id");
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 case "x_dokter_id":
                     break;
