@@ -1,5 +1,7 @@
 FROM php:7.4.33-apache
 
+ENV PHP_MEMORY_LIMIT=512M
+
 WORKDIR /var/www/html/kitasehat/
 
 COPY kitasehat.conf /etc/apache2/sites-available/000-default.conf
