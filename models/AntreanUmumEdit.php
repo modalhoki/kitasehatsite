@@ -600,7 +600,7 @@ class AntreanUmumEdit extends AntreanUmum
                 }
                 break;
             case "update": // Update
-                $returnUrl = $this->getReturnUrl();
+                $returnUrl = "antreanumumlist";
                 if (GetPageName($returnUrl) == "antreanumumlist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }

@@ -18,11 +18,8 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
-<<<<<<< HEAD
 $sideMenu->addMenuItem(60, "mi_antrean_bpjs_rs", $MenuLanguage->MenuPhrase("60", "MenuText"), $MenuRelativePath . "antreanbpjsrslist", -1, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}antrean_bpjs_rs'), false, false, "", "", false);
 $sideMenu->addMenuItem(61, "mi_antrean_umum_rs", $MenuLanguage->MenuPhrase("61", "MenuText"), $MenuRelativePath . "antreanumumrslist", -1, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}antrean_umum_rs'), false, false, "", "", false);
-=======
->>>>>>> parent of 72b00b1 (rumah sakit views refinements)
 $sideMenu->addMenuItem(1, "mi_antrean_bpjs", $MenuLanguage->MenuPhrase("1", "MenuText"), $MenuRelativePath . "antreanbpjslist", -1, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}antrean_bpjs'), false, false, "", "", false);
 $sideMenu->addMenuItem(2, "mi_antrean_umum", $MenuLanguage->MenuPhrase("2", "MenuText"), $MenuRelativePath . "antreanumumlist", -1, "", AllowListMenu('{6882EE26-EB4F-42D3-AF9E-95D0FA907878}antrean_umum'), false, false, "", "", false);
 $sideMenu->addMenuItem(10, "mci_Master", $MenuLanguage->MenuPhrase("10", "MenuText"), "", -1, "", true, false, true, "", "", false);

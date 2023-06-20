@@ -1552,7 +1552,6 @@ class FasilitasRumahSakitGrid extends FasilitasRumahSakit
             $this->id->ViewCustomAttributes = "";
 
             // rumah_sakit_id
-            $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
             $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
             if ($curVal != "") {
                 $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);

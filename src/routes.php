@@ -264,7 +264,6 @@ return function (App $app) {
         }
     );
 
-<<<<<<< HEAD
     // antrean_bpjs_rs
     $app->any('/antreanbpjsrslist[/{id}]', AntreanBpjsRsController::class . ':list')->add(PermissionMiddleware::class)->setName('antreanbpjsrslist-antrean_bpjs_rs-list'); // list
     $app->any('/antreanbpjsrsedit[/{id}]', AntreanBpjsRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('antreanbpjsrsedit-antrean_bpjs_rs-edit'); // edit
@@ -291,8 +290,6 @@ return function (App $app) {
         }
     );
 
-=======
->>>>>>> parent of 72b00b1 (rumah sakit views refinements)
     // error
     $app->any('/error', OthersController::class . ':error')->add(PermissionMiddleware::class)->setName('error');
 

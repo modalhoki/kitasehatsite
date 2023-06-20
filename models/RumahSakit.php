@@ -212,7 +212,7 @@ class RumahSakit extends DbTable
     public function getSqlWhere() // Where
     {
         $where = ($this->SqlWhere != "") ? $this->SqlWhere : "";
-        $this->DefaultFilter = "";
+        $this->DefaultFilter = "`id` = ".CurrentUserInfo("rumah_sakit_id");
         AddFilter($where, $this->DefaultFilter);
         return $where;
     }

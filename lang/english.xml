@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2023/6/19" version="17.0.5" id="en" name="English" desc="English" author="e.World Technology Limited">
+<ew-language date="2023/6/21" version="17.0.5" id="en" name="English" desc="English" author="e.World Technology Limited">
   <!--
     *** Important Notes:
     1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -925,23 +925,20 @@
   <project>
     <phrase id="bodytitle" value="Kitasehat" />
     <phrase id="footertext" value="&amp;copy;2023 Sistem Informasi ITS. All rights reserved." />
-<<<<<<< HEAD
     <menu id="60">
       <phrase id="menutext" value="Antrean BPJS" />
     </menu>
     <menu id="61">
       <phrase id="menutext" value="Antrean Umum" />
     </menu>
-=======
->>>>>>> parent of 72b00b1 (rumah sakit views refinements)
     <menu id="37">
       <phrase id="menutext" value="image slider" />
     </menu>
     <menu id="1">
-      <phrase id="menutext" value="Antrean BPJS" />
+      <phrase id="menutext" value="Antrean BPJS superuser View" />
     </menu>
     <menu id="2">
-      <phrase id="menutext" value="Antrean Umum" />
+      <phrase id="menutext" value="Antrean Umum superuser View" />
     </menu>
     <menu id="10">
       <phrase id="menutext" value="Master" />
@@ -995,7 +992,7 @@
       <phrase id="menutext" value="Durasi" />
     </menu>
     <table id="antrean_bpjs">
-      <phrase id="tblcaption" value="Antrean BPJS" />
+      <phrase id="tblcaption" value="Antrean BPJS superuser View" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
@@ -1030,7 +1027,7 @@
       </field>
     </table>
     <table id="antrean_umum">
-      <phrase id="tblcaption" value="Antrean Umum" />
+      <phrase id="tblcaption" value="Antrean Umum superuser View" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
@@ -1279,7 +1276,7 @@
         <phrase id="fldcaption" value="Rumah Sakit" />
       </field>
       <field id="administrator_rumah_sakit">
-        <phrase id="fldcaption" value="Foto" />
+        <phrase id="fldcaption" value="Atasan" />
       </field>
     </table>
     <table id="kontak_darurat">
@@ -1393,7 +1390,6 @@
         <phrase id="fldcaption" value="userlevelname" />
       </field>
     </table>
-<<<<<<< HEAD
     <table id="antrean_bpjs_rs">
       <phrase id="tblcaption" value="Antrean BPJS" />
       <field id="id">
@@ -1464,7 +1460,5 @@
         <phrase id="fldcaption" value="keluhan awal" />
       </field>
     </table>
-=======
->>>>>>> parent of 72b00b1 (rumah sakit views refinements)
   </project>
 </ew-language>

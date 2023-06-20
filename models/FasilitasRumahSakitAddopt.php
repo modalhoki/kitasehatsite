@@ -646,7 +646,6 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
             $this->id->ViewCustomAttributes = "";
 
             // rumah_sakit_id
-            $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
             $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
             if ($curVal != "") {
                 $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
@@ -717,26 +716,37 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
             $this->jam_buka->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // rumah_sakit_id
-            $this->rumah_sakit_id->EditAttrs["class"] = "form-control";
             $this->rumah_sakit_id->EditCustomAttributes = "";
-            $this->rumah_sakit_id->EditValue = HtmlEncode($this->rumah_sakit_id->CurrentValue);
             $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
             if ($curVal != "") {
-                $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
-                if ($this->rumah_sakit_id->EditValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->displayValue($arwrk);
-                    } else {
-                        $this->rumah_sakit_id->EditValue = HtmlEncode($this->rumah_sakit_id->CurrentValue);
-                    }
-                }
+                $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
             } else {
-                $this->rumah_sakit_id->EditValue = null;
+                $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->Lookup !== null && is_array($this->rumah_sakit_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->rumah_sakit_id->ViewValue !== null) { // Load from cache
+                $this->rumah_sakit_id->EditValue = array_values($this->rumah_sakit_id->Lookup->Options);
+                if ($this->rumah_sakit_id->ViewValue == "") {
+                    $this->rumah_sakit_id->ViewValue = $Language->phrase("PleaseSelect");
+                }
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "`id`" . SearchString("=", $this->rumah_sakit_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->rumah_sakit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->displayValue($arwrk);
+                } else {
+                    $this->rumah_sakit_id->ViewValue = $Language->phrase("PleaseSelect");
+                }
+                $arwrk = $rswrk;
+                foreach ($arwrk as &$row)
+                    $row = $this->rumah_sakit_id->Lookup->renderViewRow($row);
+                $this->rumah_sakit_id->EditValue = $arwrk;
             }
             $this->rumah_sakit_id->PlaceHolder = RemoveHtml($this->rumah_sakit_id->caption());
 
@@ -832,9 +842,6 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
             if (!$this->rumah_sakit_id->IsDetailKey && EmptyValue($this->rumah_sakit_id->FormValue)) {
                 $this->rumah_sakit_id->addErrorMessage(str_replace("%s", $this->rumah_sakit_id->caption(), $this->rumah_sakit_id->RequiredErrorMessage));
             }
-        }
-        if (!CheckInteger($this->rumah_sakit_id->FormValue)) {
-            $this->rumah_sakit_id->addErrorMessage($this->rumah_sakit_id->getErrorMessage(false));
         }
         if ($this->fasilitas_id->Required) {
             if (!$this->fasilitas_id->IsDetailKey && EmptyValue($this->fasilitas_id->FormValue)) {

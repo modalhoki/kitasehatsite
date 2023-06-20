@@ -201,7 +201,7 @@ class Webusers extends DbTable
     public function getSqlWhere() // Where
     {
         $where = ($this->SqlWhere != "") ? $this->SqlWhere : "";
-        $this->DefaultFilter = (CurrentUserLevel() == -1) ? "" : "`rumah_sakit_id` = ".CurrentUserInfo("rumah_sakit_id");
+        $this->DefaultFilter = "";
         AddFilter($where, $this->DefaultFilter);
         return $where;
     }
