@@ -39,10 +39,16 @@ $USER_LEVEL_PRIVS = [["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}antrean_bpjs","-2",
     ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}userlevelpermissions","-2","0"],
     ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}userlevelpermissions","0","0"],
     ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}userlevels","-2","0"],
-    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}userlevels","0","0"]];
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}userlevels","0","0"],
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}antrean_bpjs_rs","-2","0"],
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}antrean_bpjs_rs","0","0"],
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}antrean_umum_rs","-2","0"],
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}antrean_umum_rs","0","0"],
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}webusers_rs","-2","0"],
+    ["{6882EE26-EB4F-42D3-AF9E-95D0FA907878}webusers_rs","0","0"]];
 // User level table info
-$USER_LEVEL_TABLES = [["antrean_bpjs","antrean_bpjs","Antrean BPJS",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","antreanbpjslist"],
-    ["antrean_umum","antrean_umum","Antrean Umum",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","antreanumumlist"],
+$USER_LEVEL_TABLES = [["antrean_bpjs","antrean_bpjs","Antrean BPJS superuser View",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","antreanbpjslist"],
+    ["antrean_umum","antrean_umum","Antrean Umum superuser View",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","antreanumumlist"],
     ["daerah","daerah","Daerah",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","daerahlist"],
     ["dokter","dokter","Data Dokter",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","dokterlist"],
     ["fasilitas","fasilitas","Fasilitas/Layanan",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","fasilitaslist"],
@@ -56,4 +62,7 @@ $USER_LEVEL_TABLES = [["antrean_bpjs","antrean_bpjs","Antrean BPJS",true,"{6882E
     ["audittrail","audittrail","audittrail",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","audittraillist"],
     ["data_durasi","data_durasi","data durasi",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","datadurasilist"],
     ["userlevelpermissions","userlevelpermissions","userlevelpermissions",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","userlevelpermissionslist"],
-    ["userlevels","userlevels","userlevels",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","userlevelslist"]];
+    ["userlevels","userlevels","userlevels",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","userlevelslist"],
+    ["antrean_bpjs_rs","antrean_bpjs_rs","Antrean BPJS",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","antreanbpjsrslist"],
+    ["antrean_umum_rs","antrean_umum_rs","Antrean Umum",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","antreanumumrslist"],
+    ["webusers_rs","webusers_rs","Users",true,"{6882EE26-EB4F-42D3-AF9E-95D0FA907878}","webusersrslist"]];

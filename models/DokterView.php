@@ -662,16 +662,6 @@ class DokterView extends Dokter
         }
         $item->Visible = ($this->EditUrl != "" && $Security->canEdit());
 
-        // Copy
-        $item = &$option->add("copy");
-        $copycaption = HtmlTitle($Language->phrase("ViewPageCopyLink"));
-        if ($this->IsModal) {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'AddBtn',url:'" . HtmlEncode(GetUrl($this->CopyUrl)) . "'});\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        }
-        $item->Visible = ($this->CopyUrl != "" && $Security->canAdd());
-
         // Delete
         $item = &$option->add("delete");
         if ($this->IsModal) { // Handle as inline delete
@@ -705,13 +695,6 @@ class DokterView extends Dokter
                 $detailEditTblVar .= ",";
             }
             $detailEditTblVar .= "praktik_poli";
-        }
-        if ($detailPageObj->DetailAdd && $Security->canAdd() && $Security->allowAdd(CurrentProjectID() . 'dokter')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailCopyLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=praktik_poli"))) . "\">" . HtmlImageAndText($Language->phrase("MasterDetailCopyLink")) . "</a></li>";
-            if ($detailCopyTblVar != "") {
-                $detailCopyTblVar .= ",";
-            }
-            $detailCopyTblVar .= "praktik_poli";
         }
         if ($links != "") {
             $body .= "<button class=\"dropdown-toggle btn btn-default ew-detail\" data-toggle=\"dropdown\"></button>";

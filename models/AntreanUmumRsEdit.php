@@ -7,7 +7,7 @@ use Doctrine\DBAL\ParameterType;
 /**
  * Page class
  */
-class AntreanUmumEdit extends AntreanUmum
+class AntreanUmumRsEdit extends AntreanUmumRs
 {
     use MessagesTrait;
 
@@ -18,16 +18,16 @@ class AntreanUmumEdit extends AntreanUmum
     public $ProjectID = PROJECT_ID;
 
     // Table name
-    public $TableName = 'antrean_umum';
+    public $TableName = 'antrean_umum_rs';
 
     // Page object name
-    public $PageObjName = "AntreanUmumEdit";
+    public $PageObjName = "AntreanUmumRsEdit";
 
     // Rendering View
     public $RenderingView = false;
 
     // Audit Trail
-    public $AuditTrailOnAdd = false;
+    public $AuditTrailOnAdd = true;
     public $AuditTrailOnEdit = true;
     public $AuditTrailOnDelete = true;
     public $AuditTrailOnView = false;
@@ -135,9 +135,9 @@ class AntreanUmumEdit extends AntreanUmum
         // Parent constuctor
         parent::__construct();
 
-        // Table object (antrean_umum)
-        if (!isset($GLOBALS["antrean_umum"]) || get_class($GLOBALS["antrean_umum"]) == PROJECT_NAMESPACE . "antrean_umum") {
-            $GLOBALS["antrean_umum"] = &$this;
+        // Table object (antrean_umum_rs)
+        if (!isset($GLOBALS["antrean_umum_rs"]) || get_class($GLOBALS["antrean_umum_rs"]) == PROJECT_NAMESPACE . "antrean_umum_rs") {
+            $GLOBALS["antrean_umum_rs"] = &$this;
         }
 
         // Page URL
@@ -145,7 +145,7 @@ class AntreanUmumEdit extends AntreanUmum
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'antrean_umum');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'antrean_umum_rs');
         }
 
         // Start timer
@@ -230,7 +230,7 @@ class AntreanUmumEdit extends AntreanUmum
             }
             $class = PROJECT_NAMESPACE . Config("EXPORT_CLASSES." . $this->CustomExport);
             if (class_exists($class)) {
-                $doc = new $class(Container("antrean_umum"));
+                $doc = new $class(Container("antrean_umum_rs"));
                 $doc->Text = @$content;
                 if ($this->isExport("email")) {
                     echo $this->exportEmail($doc->Text);
@@ -274,7 +274,7 @@ class AntreanUmumEdit extends AntreanUmum
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "antreanumumview") {
+                    if ($pageName == "antreanumumrsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -475,18 +475,19 @@ class AntreanUmumEdit extends AntreanUmum
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->Visible = false;
+        $this->id->setVisibility();
         $this->nomor_antrean->setVisibility();
         $this->waktu->setVisibility();
         $this->pasien_id->setVisibility();
         $this->fasilitas_id->setVisibility();
         $this->rumah_sakit_id->setVisibility();
         $this->status->setVisibility();
-        $this->keluhan_awal->Visible = false;
+        $this->keluhan_awal->setVisibility();
         $this->hideFieldsForAddEdit();
         $this->pasien_id->Required = false;
         $this->fasilitas_id->Required = false;
         $this->rumah_sakit_id->Required = false;
+        $this->keluhan_awal->Required = false;
 
         // Do not use lookup cache
         $this->setUseLookupCache(false);
@@ -595,13 +596,13 @@ class AntreanUmumEdit extends AntreanUmum
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("antreanumumlist"); // No matching record, return to list
+                    $this->terminate("antreanumumrslist"); // No matching record, return to list
                     return;
                 }
                 break;
             case "update": // Update
-                $returnUrl = "antreanumumlist";
-                if (GetPageName($returnUrl) == "antreanumumlist") {
+                $returnUrl = $this->getReturnUrl();
+                if (GetPageName($returnUrl) == "antreanumumrslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -669,6 +670,12 @@ class AntreanUmumEdit extends AntreanUmum
         // Load from form
         global $CurrentForm;
 
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey) {
+            $this->id->setFormValue($val);
+        }
+
         // Check field name 'nomor_antrean' first before field var 'x_nomor_antrean'
         $val = $CurrentForm->hasValue("nomor_antrean") ? $CurrentForm->getValue("nomor_antrean") : $CurrentForm->getValue("x_nomor_antrean");
         if (!$this->nomor_antrean->IsDetailKey) {
@@ -730,10 +737,14 @@ class AntreanUmumEdit extends AntreanUmum
             }
         }
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
+        // Check field name 'keluhan_awal' first before field var 'x_keluhan_awal'
+        $val = $CurrentForm->hasValue("keluhan_awal") ? $CurrentForm->getValue("keluhan_awal") : $CurrentForm->getValue("x_keluhan_awal");
+        if (!$this->keluhan_awal->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->keluhan_awal->Visible = false; // Disable update for API request
+            } else {
+                $this->keluhan_awal->setFormValue($val);
+            }
         }
     }
 
@@ -749,6 +760,7 @@ class AntreanUmumEdit extends AntreanUmum
         $this->fasilitas_id->CurrentValue = $this->fasilitas_id->FormValue;
         $this->rumah_sakit_id->CurrentValue = $this->rumah_sakit_id->FormValue;
         $this->status->CurrentValue = $this->status->FormValue;
+        $this->keluhan_awal->CurrentValue = $this->keluhan_awal->FormValue;
     }
 
     /**
@@ -908,7 +920,11 @@ class AntreanUmumEdit extends AntreanUmum
                 $this->fasilitas_id->ViewValue = $this->fasilitas_id->lookupCacheOption($curVal);
                 if ($this->fasilitas_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->fasilitas_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $lookupFilter = function() {
+                        return (CurrentUserLevel() == -1) ? "" : "`id` IN (SELECT fasilitas_rumah_sakit.fasilitas_id FROM fasilitas_rumah_sakit WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").)";
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->fasilitas_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -924,7 +940,6 @@ class AntreanUmumEdit extends AntreanUmum
             $this->fasilitas_id->ViewCustomAttributes = "";
 
             // rumah_sakit_id
-            $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
             $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
             if ($curVal != "") {
                 $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
@@ -957,6 +972,11 @@ class AntreanUmumEdit extends AntreanUmum
             $this->keluhan_awal->ViewValue = $this->keluhan_awal->CurrentValue;
             $this->keluhan_awal->ViewCustomAttributes = "";
 
+            // id
+            $this->id->LinkCustomAttributes = "";
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
+
             // nomor_antrean
             $this->nomor_antrean->LinkCustomAttributes = "";
             $this->nomor_antrean->HrefValue = "";
@@ -986,7 +1006,18 @@ class AntreanUmumEdit extends AntreanUmum
             $this->status->LinkCustomAttributes = "";
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
+
+            // keluhan_awal
+            $this->keluhan_awal->LinkCustomAttributes = "";
+            $this->keluhan_awal->HrefValue = "";
+            $this->keluhan_awal->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
+            // id
+            $this->id->EditAttrs["class"] = "form-control";
+            $this->id->EditCustomAttributes = "";
+            $this->id->EditValue = $this->id->CurrentValue;
+            $this->id->ViewCustomAttributes = "";
+
             // nomor_antrean
             $this->nomor_antrean->EditAttrs["class"] = "form-control";
             $this->nomor_antrean->EditCustomAttributes = "";
@@ -1032,7 +1063,11 @@ class AntreanUmumEdit extends AntreanUmum
                 $this->fasilitas_id->EditValue = $this->fasilitas_id->lookupCacheOption($curVal);
                 if ($this->fasilitas_id->EditValue === null) { // Lookup from database
                     $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->fasilitas_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $lookupFilter = function() {
+                        return (CurrentUserLevel() == -1) ? "" : "`id` IN (SELECT fasilitas_rumah_sakit.fasilitas_id FROM fasilitas_rumah_sakit WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").)";
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->fasilitas_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1050,7 +1085,6 @@ class AntreanUmumEdit extends AntreanUmum
             // rumah_sakit_id
             $this->rumah_sakit_id->EditAttrs["class"] = "form-control";
             $this->rumah_sakit_id->EditCustomAttributes = "";
-            $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->CurrentValue;
             $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
             if ($curVal != "") {
                 $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
@@ -1076,7 +1110,18 @@ class AntreanUmumEdit extends AntreanUmum
             $this->status->EditValue = $this->status->options(false);
             $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
+            // keluhan_awal
+            $this->keluhan_awal->EditAttrs["class"] = "form-control";
+            $this->keluhan_awal->EditCustomAttributes = "";
+            $this->keluhan_awal->EditValue = $this->keluhan_awal->CurrentValue;
+            $this->keluhan_awal->ViewCustomAttributes = "";
+
             // Edit refer script
+
+            // id
+            $this->id->LinkCustomAttributes = "";
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
 
             // nomor_antrean
             $this->nomor_antrean->LinkCustomAttributes = "";
@@ -1106,6 +1151,11 @@ class AntreanUmumEdit extends AntreanUmum
             // status
             $this->status->LinkCustomAttributes = "";
             $this->status->HrefValue = "";
+
+            // keluhan_awal
+            $this->keluhan_awal->LinkCustomAttributes = "";
+            $this->keluhan_awal->HrefValue = "";
+            $this->keluhan_awal->TooltipValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1125,6 +1175,11 @@ class AntreanUmumEdit extends AntreanUmum
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
+        }
+        if ($this->id->Required) {
+            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
+                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
+            }
         }
         if ($this->nomor_antrean->Required) {
             if (!$this->nomor_antrean->IsDetailKey && EmptyValue($this->nomor_antrean->FormValue)) {
@@ -1154,6 +1209,11 @@ class AntreanUmumEdit extends AntreanUmum
         if ($this->status->Required) {
             if ($this->status->FormValue == "") {
                 $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
+            }
+        }
+        if ($this->keluhan_awal->Required) {
+            if (!$this->keluhan_awal->IsDetailKey && EmptyValue($this->keluhan_awal->FormValue)) {
+                $this->keluhan_awal->addErrorMessage(str_replace("%s", $this->keluhan_awal->caption(), $this->keluhan_awal->RequiredErrorMessage));
             }
         }
 
@@ -1241,7 +1301,7 @@ class AntreanUmumEdit extends AntreanUmum
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("antreanumumlist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("antreanumumrslist"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }
@@ -1262,6 +1322,10 @@ class AntreanUmumEdit extends AntreanUmum
                 case "x_pasien_id":
                     break;
                 case "x_fasilitas_id":
+                    $lookupFilter = function () {
+                        return (CurrentUserLevel() == -1) ? "" : "`id` IN (SELECT fasilitas_rumah_sakit.fasilitas_id FROM fasilitas_rumah_sakit WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").)";
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 case "x_rumah_sakit_id":
                     break;

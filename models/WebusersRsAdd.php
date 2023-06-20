@@ -7,7 +7,7 @@ use Doctrine\DBAL\ParameterType;
 /**
  * Page class
  */
-class FasilitasRumahSakitAdd extends FasilitasRumahSakit
+class WebusersRsAdd extends WebusersRs
 {
     use MessagesTrait;
 
@@ -18,13 +18,21 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
     public $ProjectID = PROJECT_ID;
 
     // Table name
-    public $TableName = 'fasilitas_rumah_sakit';
+    public $TableName = 'webusers_rs';
 
     // Page object name
-    public $PageObjName = "FasilitasRumahSakitAdd";
+    public $PageObjName = "WebusersRsAdd";
 
     // Rendering View
     public $RenderingView = false;
+
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
 
     // Page headings
     public $Heading = "";
@@ -127,9 +135,9 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
         // Parent constuctor
         parent::__construct();
 
-        // Table object (fasilitas_rumah_sakit)
-        if (!isset($GLOBALS["fasilitas_rumah_sakit"]) || get_class($GLOBALS["fasilitas_rumah_sakit"]) == PROJECT_NAMESPACE . "fasilitas_rumah_sakit") {
-            $GLOBALS["fasilitas_rumah_sakit"] = &$this;
+        // Table object (webusers_rs)
+        if (!isset($GLOBALS["webusers_rs"]) || get_class($GLOBALS["webusers_rs"]) == PROJECT_NAMESPACE . "webusers_rs") {
+            $GLOBALS["webusers_rs"] = &$this;
         }
 
         // Page URL
@@ -137,7 +145,7 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'fasilitas_rumah_sakit');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'webusers_rs');
         }
 
         // Start timer
@@ -222,7 +230,7 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
             }
             $class = PROJECT_NAMESPACE . Config("EXPORT_CLASSES." . $this->CustomExport);
             if (class_exists($class)) {
-                $doc = new $class(Container("fasilitas_rumah_sakit"));
+                $doc = new $class(Container("webusers_rs"));
                 $doc->Text = @$content;
                 if ($this->isExport("email")) {
                     echo $this->exportEmail($doc->Text);
@@ -266,7 +274,7 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "fasilitasrumahsakitview") {
+                    if ($pageName == "webusersrsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -465,10 +473,11 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
         $this->id->Visible = false;
+        $this->_username->setVisibility();
+        $this->_password->setVisibility();
+        $this->role->setVisibility();
         $this->rumah_sakit_id->Visible = false;
-        $this->fasilitas_id->setVisibility();
-        $this->hari_buka->setVisibility();
-        $this->jam_buka->setVisibility();
+        $this->administrator_rumah_sakit->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -484,7 +493,7 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
 
         // Set up lookup cache
         $this->setupLookupOptions($this->rumah_sakit_id);
-        $this->setupLookupOptions($this->fasilitas_id);
+        $this->setupLookupOptions($this->administrator_rumah_sakit);
 
         // Check modal
         if ($this->IsModal) {
@@ -519,17 +528,10 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
         // Load old record / default values
         $loaded = $this->loadOldRecord();
 
-        // Set up master/detail parameters
-        // NOTE: must be after loadOldRecord to prevent master key values overwritten
-        $this->setupMasterParms();
-
         // Load form values
         if ($postBack) {
             $this->loadFormValues(); // Load form values
         }
-
-        // Set up detail parameters
-        $this->setupDetailParms();
 
         // Validate form if post back
         if ($postBack) {
@@ -552,12 +554,9 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("fasilitasrumahsakitlist"); // No matching record, return to list
+                    $this->terminate("webusersrslist"); // No matching record, return to list
                     return;
                 }
-
-                // Set up detail parameters
-                $this->setupDetailParms();
                 break;
             case "insert": // Add new record
                 $this->SendEmail = true; // Send email on add success
@@ -565,14 +564,10 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
                     if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
-                    if ($this->getCurrentDetailTable() != "") { // Master/detail add
-                        $returnUrl = $this->getDetailUrl();
-                    } else {
-                        $returnUrl = $this->getReturnUrl();
-                    }
-                    if (GetPageName($returnUrl) == "fasilitasrumahsakitlist") {
+                    $returnUrl = $this->getReturnUrl();
+                    if (GetPageName($returnUrl) == "webusersrslist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "fasilitasrumahsakitview") {
+                    } elseif (GetPageName($returnUrl) == "webusersrsview") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -588,9 +583,6 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Add failed, restore form values
-
-                    // Set up detail parameters
-                    $this->setupDetailParms();
                 }
         }
 
@@ -636,14 +628,16 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
     {
         $this->id->CurrentValue = null;
         $this->id->OldValue = $this->id->CurrentValue;
+        $this->_username->CurrentValue = null;
+        $this->_username->OldValue = $this->_username->CurrentValue;
+        $this->_password->CurrentValue = null;
+        $this->_password->OldValue = $this->_password->CurrentValue;
+        $this->role->CurrentValue = null;
+        $this->role->OldValue = $this->role->CurrentValue;
         $this->rumah_sakit_id->CurrentValue = null;
         $this->rumah_sakit_id->OldValue = $this->rumah_sakit_id->CurrentValue;
-        $this->fasilitas_id->CurrentValue = null;
-        $this->fasilitas_id->OldValue = $this->fasilitas_id->CurrentValue;
-        $this->hari_buka->CurrentValue = null;
-        $this->hari_buka->OldValue = $this->hari_buka->CurrentValue;
-        $this->jam_buka->CurrentValue = null;
-        $this->jam_buka->OldValue = $this->jam_buka->CurrentValue;
+        $this->administrator_rumah_sakit->CurrentValue = null;
+        $this->administrator_rumah_sakit->OldValue = $this->administrator_rumah_sakit->CurrentValue;
     }
 
     // Load form values
@@ -652,33 +646,43 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
         // Load from form
         global $CurrentForm;
 
-        // Check field name 'fasilitas_id' first before field var 'x_fasilitas_id'
-        $val = $CurrentForm->hasValue("fasilitas_id") ? $CurrentForm->getValue("fasilitas_id") : $CurrentForm->getValue("x_fasilitas_id");
-        if (!$this->fasilitas_id->IsDetailKey) {
+        // Check field name 'username' first before field var 'x__username'
+        $val = $CurrentForm->hasValue("username") ? $CurrentForm->getValue("username") : $CurrentForm->getValue("x__username");
+        if (!$this->_username->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->fasilitas_id->Visible = false; // Disable update for API request
+                $this->_username->Visible = false; // Disable update for API request
             } else {
-                $this->fasilitas_id->setFormValue($val);
+                $this->_username->setFormValue($val);
             }
         }
 
-        // Check field name 'hari_buka' first before field var 'x_hari_buka'
-        $val = $CurrentForm->hasValue("hari_buka") ? $CurrentForm->getValue("hari_buka") : $CurrentForm->getValue("x_hari_buka");
-        if (!$this->hari_buka->IsDetailKey) {
+        // Check field name 'password' first before field var 'x__password'
+        $val = $CurrentForm->hasValue("password") ? $CurrentForm->getValue("password") : $CurrentForm->getValue("x__password");
+        if (!$this->_password->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->hari_buka->Visible = false; // Disable update for API request
+                $this->_password->Visible = false; // Disable update for API request
             } else {
-                $this->hari_buka->setFormValue($val);
+                $this->_password->setFormValue($val);
             }
         }
 
-        // Check field name 'jam_buka' first before field var 'x_jam_buka'
-        $val = $CurrentForm->hasValue("jam_buka") ? $CurrentForm->getValue("jam_buka") : $CurrentForm->getValue("x_jam_buka");
-        if (!$this->jam_buka->IsDetailKey) {
+        // Check field name 'role' first before field var 'x_role'
+        $val = $CurrentForm->hasValue("role") ? $CurrentForm->getValue("role") : $CurrentForm->getValue("x_role");
+        if (!$this->role->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->jam_buka->Visible = false; // Disable update for API request
+                $this->role->Visible = false; // Disable update for API request
             } else {
-                $this->jam_buka->setFormValue($val);
+                $this->role->setFormValue($val);
+            }
+        }
+
+        // Check field name 'administrator_rumah_sakit' first before field var 'x_administrator_rumah_sakit'
+        $val = $CurrentForm->hasValue("administrator_rumah_sakit") ? $CurrentForm->getValue("administrator_rumah_sakit") : $CurrentForm->getValue("x_administrator_rumah_sakit");
+        if (!$this->administrator_rumah_sakit->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->administrator_rumah_sakit->Visible = false; // Disable update for API request
+            } else {
+                $this->administrator_rumah_sakit->setFormValue($val);
             }
         }
 
@@ -690,9 +694,10 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
     public function restoreFormValues()
     {
         global $CurrentForm;
-        $this->fasilitas_id->CurrentValue = $this->fasilitas_id->FormValue;
-        $this->hari_buka->CurrentValue = $this->hari_buka->FormValue;
-        $this->jam_buka->CurrentValue = $this->jam_buka->FormValue;
+        $this->_username->CurrentValue = $this->_username->FormValue;
+        $this->_password->CurrentValue = $this->_password->FormValue;
+        $this->role->CurrentValue = $this->role->FormValue;
+        $this->administrator_rumah_sakit->CurrentValue = $this->administrator_rumah_sakit->FormValue;
     }
 
     /**
@@ -743,10 +748,11 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
             return;
         }
         $this->id->setDbValue($row['id']);
+        $this->_username->setDbValue($row['username']);
+        $this->_password->setDbValue($row['password']);
+        $this->role->setDbValue($row['role']);
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
-        $this->fasilitas_id->setDbValue($row['fasilitas_id']);
-        $this->hari_buka->setDbValue($row['hari_buka']);
-        $this->jam_buka->setDbValue($row['jam_buka']);
+        $this->administrator_rumah_sakit->setDbValue($row['administrator_rumah_sakit']);
     }
 
     // Return a row with default values
@@ -755,10 +761,11 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
         $this->loadDefaultValues();
         $row = [];
         $row['id'] = $this->id->CurrentValue;
+        $row['username'] = $this->_username->CurrentValue;
+        $row['password'] = $this->_password->CurrentValue;
+        $row['role'] = $this->role->CurrentValue;
         $row['rumah_sakit_id'] = $this->rumah_sakit_id->CurrentValue;
-        $row['fasilitas_id'] = $this->fasilitas_id->CurrentValue;
-        $row['hari_buka'] = $this->hari_buka->CurrentValue;
-        $row['jam_buka'] = $this->jam_buka->CurrentValue;
+        $row['administrator_rumah_sakit'] = $this->administrator_rumah_sakit->CurrentValue;
         return $row;
     }
 
@@ -792,17 +799,31 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
 
         // id
 
+        // username
+
+        // password
+
+        // role
+
         // rumah_sakit_id
 
-        // fasilitas_id
-
-        // hari_buka
-
-        // jam_buka
+        // administrator_rumah_sakit
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
             $this->id->ViewCustomAttributes = "";
+
+            // username
+            $this->_username->ViewValue = $this->_username->CurrentValue;
+            $this->_username->ViewCustomAttributes = "";
+
+            // password
+            $this->_password->ViewValue = $Language->phrase("PasswordMask");
+            $this->_password->ViewCustomAttributes = "";
+
+            // role
+            $this->role->ViewValue = FormatNumber($this->role->ViewValue, 0, -2, -2, -2);
+            $this->role->ViewCustomAttributes = "";
 
             // rumah_sakit_id
             $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
@@ -825,114 +846,116 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
             }
             $this->rumah_sakit_id->ViewCustomAttributes = "";
 
-            // fasilitas_id
-            $curVal = trim(strval($this->fasilitas_id->CurrentValue));
+            // administrator_rumah_sakit
+            $curVal = trim(strval($this->administrator_rumah_sakit->CurrentValue));
             if ($curVal != "") {
-                $this->fasilitas_id->ViewValue = $this->fasilitas_id->lookupCacheOption($curVal);
-                if ($this->fasilitas_id->ViewValue === null) { // Lookup from database
+                $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->lookupCacheOption($curVal);
+                if ($this->administrator_rumah_sakit->ViewValue === null) { // Lookup from database
                     $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->fasilitas_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $sqlWrk = $this->administrator_rumah_sakit->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->fasilitas_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->fasilitas_id->ViewValue = $this->fasilitas_id->displayValue($arwrk);
+                        $arwrk = $this->administrator_rumah_sakit->Lookup->renderViewRow($rswrk[0]);
+                        $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->displayValue($arwrk);
                     } else {
-                        $this->fasilitas_id->ViewValue = $this->fasilitas_id->CurrentValue;
+                        $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->CurrentValue;
                     }
                 }
             } else {
-                $this->fasilitas_id->ViewValue = null;
+                $this->administrator_rumah_sakit->ViewValue = null;
             }
-            $this->fasilitas_id->ViewCustomAttributes = "";
+            $this->administrator_rumah_sakit->ViewCustomAttributes = "";
 
-            // hari_buka
-            $this->hari_buka->ViewValue = $this->hari_buka->CurrentValue;
-            $this->hari_buka->ViewCustomAttributes = "";
+            // username
+            $this->_username->LinkCustomAttributes = "";
+            $this->_username->HrefValue = "";
+            $this->_username->TooltipValue = "";
 
-            // jam_buka
-            $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
-            $this->jam_buka->ViewCustomAttributes = "";
+            // password
+            $this->_password->LinkCustomAttributes = "";
+            $this->_password->HrefValue = "";
+            $this->_password->TooltipValue = "";
 
-            // fasilitas_id
-            $this->fasilitas_id->LinkCustomAttributes = "";
-            $this->fasilitas_id->HrefValue = "";
-            $this->fasilitas_id->TooltipValue = "";
+            // role
+            $this->role->LinkCustomAttributes = "";
+            $this->role->HrefValue = "";
+            $this->role->TooltipValue = "";
 
-            // hari_buka
-            $this->hari_buka->LinkCustomAttributes = "";
-            $this->hari_buka->HrefValue = "";
-            $this->hari_buka->TooltipValue = "";
-
-            // jam_buka
-            $this->jam_buka->LinkCustomAttributes = "";
-            $this->jam_buka->HrefValue = "";
-            $this->jam_buka->TooltipValue = "";
+            // administrator_rumah_sakit
+            $this->administrator_rumah_sakit->LinkCustomAttributes = "";
+            $this->administrator_rumah_sakit->HrefValue = "";
+            $this->administrator_rumah_sakit->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
-            // fasilitas_id
-            $this->fasilitas_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->fasilitas_id->CurrentValue));
-            if ($curVal != "") {
-                $this->fasilitas_id->ViewValue = $this->fasilitas_id->lookupCacheOption($curVal);
-            } else {
-                $this->fasilitas_id->ViewValue = $this->fasilitas_id->Lookup !== null && is_array($this->fasilitas_id->Lookup->Options) ? $curVal : null;
+            // username
+            $this->_username->EditAttrs["class"] = "form-control";
+            $this->_username->EditCustomAttributes = "";
+            if (!$this->_username->Raw) {
+                $this->_username->CurrentValue = HtmlDecode($this->_username->CurrentValue);
             }
-            if ($this->fasilitas_id->ViewValue !== null) { // Load from cache
-                $this->fasilitas_id->EditValue = array_values($this->fasilitas_id->Lookup->Options);
-                if ($this->fasilitas_id->ViewValue == "") {
-                    $this->fasilitas_id->ViewValue = $Language->phrase("PleaseSelect");
+            $this->_username->EditValue = HtmlEncode($this->_username->CurrentValue);
+            $this->_username->PlaceHolder = RemoveHtml($this->_username->caption());
+
+            // password
+            $this->_password->EditAttrs["class"] = "form-control";
+            $this->_password->EditCustomAttributes = "";
+            $this->_password->PlaceHolder = RemoveHtml($this->_password->caption());
+
+            // role
+            $this->role->EditAttrs["class"] = "form-control";
+            $this->role->EditCustomAttributes = "";
+            $this->role->PlaceHolder = RemoveHtml($this->role->caption());
+
+            // administrator_rumah_sakit
+            $this->administrator_rumah_sakit->EditCustomAttributes = "";
+            $curVal = trim(strval($this->administrator_rumah_sakit->CurrentValue));
+            if ($curVal != "") {
+                $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->lookupCacheOption($curVal);
+            } else {
+                $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->Lookup !== null && is_array($this->administrator_rumah_sakit->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->administrator_rumah_sakit->ViewValue !== null) { // Load from cache
+                $this->administrator_rumah_sakit->EditValue = array_values($this->administrator_rumah_sakit->Lookup->Options);
+                if ($this->administrator_rumah_sakit->ViewValue == "") {
+                    $this->administrator_rumah_sakit->ViewValue = $Language->phrase("PleaseSelect");
                 }
             } else { // Lookup from database
                 if ($curVal == "") {
                     $filterWrk = "0=1";
                 } else {
-                    $filterWrk = "`id`" . SearchString("=", $this->fasilitas_id->CurrentValue, DATATYPE_NUMBER, "");
+                    $filterWrk = "`id`" . SearchString("=", $this->administrator_rumah_sakit->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->fasilitas_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $sqlWrk = $this->administrator_rumah_sakit->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->fasilitas_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->fasilitas_id->ViewValue = $this->fasilitas_id->displayValue($arwrk);
+                    $arwrk = $this->administrator_rumah_sakit->Lookup->renderViewRow($rswrk[0]);
+                    $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->displayValue($arwrk);
                 } else {
-                    $this->fasilitas_id->ViewValue = $Language->phrase("PleaseSelect");
+                    $this->administrator_rumah_sakit->ViewValue = $Language->phrase("PleaseSelect");
                 }
                 $arwrk = $rswrk;
-                $this->fasilitas_id->EditValue = $arwrk;
+                $this->administrator_rumah_sakit->EditValue = $arwrk;
             }
-            $this->fasilitas_id->PlaceHolder = RemoveHtml($this->fasilitas_id->caption());
-
-            // hari_buka
-            $this->hari_buka->EditAttrs["class"] = "form-control";
-            $this->hari_buka->EditCustomAttributes = "";
-            if (!$this->hari_buka->Raw) {
-                $this->hari_buka->CurrentValue = HtmlDecode($this->hari_buka->CurrentValue);
-            }
-            $this->hari_buka->EditValue = HtmlEncode($this->hari_buka->CurrentValue);
-            $this->hari_buka->PlaceHolder = RemoveHtml($this->hari_buka->caption());
-
-            // jam_buka
-            $this->jam_buka->EditAttrs["class"] = "form-control";
-            $this->jam_buka->EditCustomAttributes = "";
-            if (!$this->jam_buka->Raw) {
-                $this->jam_buka->CurrentValue = HtmlDecode($this->jam_buka->CurrentValue);
-            }
-            $this->jam_buka->EditValue = HtmlEncode($this->jam_buka->CurrentValue);
-            $this->jam_buka->PlaceHolder = RemoveHtml($this->jam_buka->caption());
+            $this->administrator_rumah_sakit->PlaceHolder = RemoveHtml($this->administrator_rumah_sakit->caption());
 
             // Add refer script
 
-            // fasilitas_id
-            $this->fasilitas_id->LinkCustomAttributes = "";
-            $this->fasilitas_id->HrefValue = "";
+            // username
+            $this->_username->LinkCustomAttributes = "";
+            $this->_username->HrefValue = "";
 
-            // hari_buka
-            $this->hari_buka->LinkCustomAttributes = "";
-            $this->hari_buka->HrefValue = "";
+            // password
+            $this->_password->LinkCustomAttributes = "";
+            $this->_password->HrefValue = "";
 
-            // jam_buka
-            $this->jam_buka->LinkCustomAttributes = "";
-            $this->jam_buka->HrefValue = "";
+            // role
+            $this->role->LinkCustomAttributes = "";
+            $this->role->HrefValue = "";
+
+            // administrator_rumah_sakit
+            $this->administrator_rumah_sakit->LinkCustomAttributes = "";
+            $this->administrator_rumah_sakit->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -953,27 +976,28 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
         if (!Config("SERVER_VALIDATE")) {
             return true;
         }
-        if ($this->fasilitas_id->Required) {
-            if (!$this->fasilitas_id->IsDetailKey && EmptyValue($this->fasilitas_id->FormValue)) {
-                $this->fasilitas_id->addErrorMessage(str_replace("%s", $this->fasilitas_id->caption(), $this->fasilitas_id->RequiredErrorMessage));
+        if ($this->_username->Required) {
+            if (!$this->_username->IsDetailKey && EmptyValue($this->_username->FormValue)) {
+                $this->_username->addErrorMessage(str_replace("%s", $this->_username->caption(), $this->_username->RequiredErrorMessage));
             }
         }
-        if ($this->hari_buka->Required) {
-            if (!$this->hari_buka->IsDetailKey && EmptyValue($this->hari_buka->FormValue)) {
-                $this->hari_buka->addErrorMessage(str_replace("%s", $this->hari_buka->caption(), $this->hari_buka->RequiredErrorMessage));
+        if ($this->_password->Required) {
+            if (!$this->_password->IsDetailKey && EmptyValue($this->_password->FormValue)) {
+                $this->_password->addErrorMessage(str_replace("%s", $this->_password->caption(), $this->_password->RequiredErrorMessage));
             }
         }
-        if ($this->jam_buka->Required) {
-            if (!$this->jam_buka->IsDetailKey && EmptyValue($this->jam_buka->FormValue)) {
-                $this->jam_buka->addErrorMessage(str_replace("%s", $this->jam_buka->caption(), $this->jam_buka->RequiredErrorMessage));
+        if (!$this->_password->Raw && Config("REMOVE_XSS") && CheckPassword($this->_password->FormValue)) {
+            $this->_password->addErrorMessage($Language->phrase("InvalidPasswordChars"));
+        }
+        if ($this->role->Required) {
+            if (!$this->role->IsDetailKey && EmptyValue($this->role->FormValue)) {
+                $this->role->addErrorMessage(str_replace("%s", $this->role->caption(), $this->role->RequiredErrorMessage));
             }
         }
-
-        // Validate detail grid
-        $detailTblVar = explode(",", $this->getCurrentDetailTable());
-        $detailPage = Container("PraktikPoliGrid");
-        if (in_array("praktik_poli", $detailTblVar) && $detailPage->DetailAdd) {
-            $detailPage->validateGridForm();
+        if ($this->administrator_rumah_sakit->Required) {
+            if (!$this->administrator_rumah_sakit->IsDetailKey && EmptyValue($this->administrator_rumah_sakit->FormValue)) {
+                $this->administrator_rumah_sakit->addErrorMessage(str_replace("%s", $this->administrator_rumah_sakit->caption(), $this->administrator_rumah_sakit->RequiredErrorMessage));
+            }
         }
 
         // Return validate result
@@ -992,30 +1016,7 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
     protected function addRow($rsold = null)
     {
         global $Language, $Security;
-
-        // Check referential integrity for master table 'fasilitas_rumah_sakit'
-        $validMasterRecord = true;
-        $masterFilter = $this->sqlMasterFilter_rumah_sakit();
-        if ($this->rumah_sakit_id->getSessionValue() != "") {
-        $masterFilter = str_replace("@id@", AdjustSql($this->rumah_sakit_id->getSessionValue(), "DB"), $masterFilter);
-        } else {
-            $validMasterRecord = false;
-        }
-        if ($validMasterRecord) {
-            $rsmaster = Container("rumah_sakit")->loadRs($masterFilter)->fetch();
-            $validMasterRecord = $rsmaster !== false;
-        }
-        if (!$validMasterRecord) {
-            $relatedRecordMsg = str_replace("%t", "rumah_sakit", $Language->phrase("RelatedRecordRequired"));
-            $this->setFailureMessage($relatedRecordMsg);
-            return false;
-        }
         $conn = $this->getConnection();
-
-        // Begin transaction
-        if ($this->getCurrentDetailTable() != "") {
-            $conn->beginTransaction();
-        }
 
         // Load db values from rsold
         $this->loadDbValues($rsold);
@@ -1023,19 +1024,19 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
         }
         $rsnew = [];
 
-        // fasilitas_id
-        $this->fasilitas_id->setDbValueDef($rsnew, $this->fasilitas_id->CurrentValue, 0, false);
+        // username
+        $this->_username->setDbValueDef($rsnew, $this->_username->CurrentValue, "", false);
 
-        // hari_buka
-        $this->hari_buka->setDbValueDef($rsnew, $this->hari_buka->CurrentValue, null, false);
-
-        // jam_buka
-        $this->jam_buka->setDbValueDef($rsnew, $this->jam_buka->CurrentValue, null, false);
-
-        // rumah_sakit_id
-        if ($this->rumah_sakit_id->getSessionValue() != "") {
-            $rsnew['rumah_sakit_id'] = $this->rumah_sakit_id->getSessionValue();
+        // password
+        if (!IsMaskedPassword($this->_password->CurrentValue)) {
+            $this->_password->setDbValueDef($rsnew, $this->_password->CurrentValue, "", false);
         }
+
+        // role
+        $this->role->setDbValueDef($rsnew, $this->role->CurrentValue, 0, false);
+
+        // administrator_rumah_sakit
+        $this->administrator_rumah_sakit->setDbValueDef($rsnew, $this->administrator_rumah_sakit->CurrentValue, null, false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
@@ -1059,30 +1060,6 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
             }
             $addRow = false;
         }
-
-        // Add detail records
-        if ($addRow) {
-            $detailTblVar = explode(",", $this->getCurrentDetailTable());
-            $detailPage = Container("PraktikPoliGrid");
-            if (in_array("praktik_poli", $detailTblVar) && $detailPage->DetailAdd) {
-                $detailPage->fasilitas_rumah_sakit_id->setSessionValue($this->id->CurrentValue); // Set master key
-                $Security->loadCurrentUserLevel($this->ProjectID . "praktik_poli"); // Load user level of detail table
-                $addRow = $detailPage->gridInsert();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-                if (!$addRow) {
-                $detailPage->fasilitas_rumah_sakit_id->setSessionValue(""); // Clear master key if insert failed
-                }
-            }
-        }
-
-        // Commit/Rollback transaction
-        if ($this->getCurrentDetailTable() != "") {
-            if ($addRow) {
-                $conn->commit(); // Commit transaction
-            } else {
-                $conn->rollback(); // Rollback transaction
-            }
-        }
         if ($addRow) {
             // Call Row Inserted event
             $this->rowInserted($rsold, $rsnew);
@@ -1100,116 +1077,13 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
         return $addRow;
     }
 
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "rumah_sakit") {
-                $validMaster = true;
-                $masterTbl = Container("rumah_sakit");
-                if (($parm = Get("fk_id", Get("rumah_sakit_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->rumah_sakit_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->rumah_sakit_id->setSessionValue($this->rumah_sakit_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "rumah_sakit") {
-                $validMaster = true;
-                $masterTbl = Container("rumah_sakit");
-                if (($parm = Post("fk_id", Post("rumah_sakit_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->rumah_sakit_id->setFormValue($masterTbl->id->FormValue);
-                    $this->rumah_sakit_id->setSessionValue($this->rumah_sakit_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "rumah_sakit") {
-                if ($this->rumah_sakit_id->CurrentValue == "") {
-                    $this->rumah_sakit_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilter(); // Get master filter
-        $this->DbDetailFilter = $this->getDetailFilter(); // Get detail filter
-    }
-
-    // Set up detail parms based on QueryString
-    protected function setupDetailParms()
-    {
-        // Get the keys for master table
-        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
-        if ($detailTblVar !== null) {
-            $this->setCurrentDetailTable($detailTblVar);
-        } else {
-            $detailTblVar = $this->getCurrentDetailTable();
-        }
-        if ($detailTblVar != "") {
-            $detailTblVar = explode(",", $detailTblVar);
-            if (in_array("praktik_poli", $detailTblVar)) {
-                $detailPageObj = Container("PraktikPoliGrid");
-                if ($detailPageObj->DetailAdd) {
-                    if ($this->CopyRecord) {
-                        $detailPageObj->CurrentMode = "copy";
-                    } else {
-                        $detailPageObj->CurrentMode = "add";
-                    }
-                    $detailPageObj->CurrentAction = "gridadd";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->fasilitas_rumah_sakit_id->IsDetailKey = true;
-                    $detailPageObj->fasilitas_rumah_sakit_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->fasilitas_rumah_sakit_id->setSessionValue($detailPageObj->fasilitas_rumah_sakit_id->CurrentValue);
-                    $detailPageObj->dokter_id->setSessionValue(""); // Clear session key
-                }
-            }
-        }
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("fasilitasrumahsakitlist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("webusersrslist"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }
@@ -1229,7 +1103,7 @@ class FasilitasRumahSakitAdd extends FasilitasRumahSakit
             switch ($fld->FieldVar) {
                 case "x_rumah_sakit_id":
                     break;
-                case "x_fasilitas_id":
+                case "x_administrator_rumah_sakit":
                     break;
                 default:
                     $lookupFilter = "";

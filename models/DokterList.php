@@ -1151,12 +1151,6 @@ class DokterList extends Dokter
         $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canAdd();
-        $item->OnLeft = false;
-
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
@@ -1245,19 +1239,6 @@ class DokterList extends Dokter
                 $opt->Body = "";
             }
 
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if ($Security->canAdd()) {
-                if (IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"dokter\" data-caption=\"" . $copycaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'AddBtn',url:'" . HtmlEncode(GetUrl($this->CopyUrl)) . "'});\">" . $Language->phrase("CopyLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
             // "delete"
             $opt = $this->ListOptions["delete"];
             if ($Security->canDelete()) {
@@ -1325,15 +1306,6 @@ class DokterList extends Dokter
                     $detailEditTblVar .= ",";
                 }
                 $detailEditTblVar .= "praktik_poli";
-            }
-            if ($detailPage->DetailAdd && $Security->canAdd() && $Security->allowAdd(CurrentProjectID() . 'dokter')) {
-                $caption = $Language->phrase("MasterDetailCopyLink");
-                $url = $this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=praktik_poli");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . HtmlImageAndText($caption) . "</a></li>";
-                if ($detailCopyTblVar != "") {
-                    $detailCopyTblVar .= ",";
-                }
-                $detailCopyTblVar .= "praktik_poli";
             }
             if ($links != "") {
                 $body .= "<button class=\"dropdown-toggle btn btn-default ew-detail\" data-toggle=\"dropdown\"></button>";

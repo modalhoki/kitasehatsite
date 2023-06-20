@@ -7,7 +7,7 @@ use Doctrine\DBAL\ParameterType;
 /**
  * Page class
  */
-class PraktikPoliList extends PraktikPoli
+class WebusersRsList extends WebusersRs
 {
     use MessagesTrait;
 
@@ -18,16 +18,16 @@ class PraktikPoliList extends PraktikPoli
     public $ProjectID = PROJECT_ID;
 
     // Table name
-    public $TableName = 'praktik_poli';
+    public $TableName = 'webusers_rs';
 
     // Page object name
-    public $PageObjName = "PraktikPoliList";
+    public $PageObjName = "WebusersRsList";
 
     // Rendering View
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "fpraktik_polilist";
+    public $FormName = "fwebusers_rslist";
     public $FormActionName = "k_action";
     public $FormBlankRowName = "k_blankrow";
     public $FormKeyCountName = "key_count";
@@ -63,6 +63,14 @@ class PraktikPoliList extends PraktikPoli
     public $GridEditUrl;
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
+
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
 
     // Page headings
     public $Heading = "";
@@ -165,9 +173,9 @@ class PraktikPoliList extends PraktikPoli
         // Parent constuctor
         parent::__construct();
 
-        // Table object (praktik_poli)
-        if (!isset($GLOBALS["praktik_poli"]) || get_class($GLOBALS["praktik_poli"]) == PROJECT_NAMESPACE . "praktik_poli") {
-            $GLOBALS["praktik_poli"] = &$this;
+        // Table object (webusers_rs)
+        if (!isset($GLOBALS["webusers_rs"]) || get_class($GLOBALS["webusers_rs"]) == PROJECT_NAMESPACE . "webusers_rs") {
+            $GLOBALS["webusers_rs"] = &$this;
         }
 
         // Page URL
@@ -181,16 +189,16 @@ class PraktikPoliList extends PraktikPoli
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "praktikpoliadd";
+        $this->AddUrl = "webusersrsadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "praktikpolidelete";
-        $this->MultiUpdateUrl = "praktikpoliupdate";
+        $this->MultiDeleteUrl = "webusersrsdelete";
+        $this->MultiUpdateUrl = "webusersrsupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'praktik_poli');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'webusers_rs');
         }
 
         // Start timer
@@ -230,7 +238,7 @@ class PraktikPoliList extends PraktikPoli
 
         // Filter options
         $this->FilterOptions = new ListOptions("div");
-        $this->FilterOptions->TagClassName = "ew-filter-option fpraktik_polilistsrch";
+        $this->FilterOptions->TagClassName = "ew-filter-option fwebusers_rslistsrch";
 
         // List actions
         $this->ListActions = new ListActions();
@@ -305,7 +313,7 @@ class PraktikPoliList extends PraktikPoli
             }
             $class = PROJECT_NAMESPACE . Config("EXPORT_CLASSES." . $this->CustomExport);
             if (class_exists($class)) {
-                $doc = new $class(Container("praktik_poli"));
+                $doc = new $class(Container("webusers_rs"));
                 $doc->Text = @$content;
                 if ($this->isExport("email")) {
                     echo $this->exportEmail($doc->Text);
@@ -558,9 +566,6 @@ class PraktikPoliList extends PraktikPoli
     public function run()
     {
         global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm;
-
-        // Create form object
-        $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
 
         // Get grid add count
@@ -571,11 +576,12 @@ class PraktikPoliList extends PraktikPoli
 
         // Set up list options
         $this->setupListOptions();
-        $this->id->Visible = false;
-        $this->fasilitas_rumah_sakit_id->Visible = false;
-        $this->dokter_id->setVisibility();
-        $this->hari_praktik->setVisibility();
-        $this->jam_praktik->setVisibility();
+        $this->id->setVisibility();
+        $this->_username->setVisibility();
+        $this->_password->setVisibility();
+        $this->role->setVisibility();
+        $this->rumah_sakit_id->Visible = false;
+        $this->administrator_rumah_sakit->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -585,9 +591,6 @@ class PraktikPoliList extends PraktikPoli
         if (method_exists($this, "pageLoad")) {
             $this->pageLoad();
         }
-
-        // Set up master detail parameters
-        $this->setupMasterParms();
 
         // Setup other options
         $this->setupOtherOptions();
@@ -606,8 +609,8 @@ class PraktikPoliList extends PraktikPoli
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->fasilitas_rumah_sakit_id);
-        $this->setupLookupOptions($this->dokter_id);
+        $this->setupLookupOptions($this->rumah_sakit_id);
+        $this->setupLookupOptions($this->administrator_rumah_sakit);
 
         // Search filters
         $srchAdvanced = ""; // Advanced search filter
@@ -634,64 +637,6 @@ class PraktikPoliList extends PraktikPoli
                 $this->setupBreadcrumb();
             }
 
-            // Check QueryString parameters
-            if (Get("action") !== null) {
-                $this->CurrentAction = Get("action");
-
-                // Clear inline mode
-                if ($this->isCancel()) {
-                    $this->clearInlineMode();
-                }
-
-                // Switch to grid edit mode
-                if ($this->isGridEdit()) {
-                    $this->gridEditMode();
-                }
-
-                // Switch to grid add mode
-                if ($this->isGridAdd()) {
-                    $this->gridAddMode();
-                }
-            } else {
-                if (Post("action") !== null) {
-                    $this->CurrentAction = Post("action"); // Get action
-
-                    // Grid Update
-                    if (($this->isGridUpdate() || $this->isGridOverwrite()) && Session(SESSION_INLINE_MODE) == "gridedit") {
-                        if ($this->validateGridForm()) {
-                            $gridUpdate = $this->gridUpdate();
-                        } else {
-                            $gridUpdate = false;
-                        }
-                        if ($gridUpdate) {
-                        } else {
-                            $this->EventCancelled = true;
-                            $this->gridEditMode(); // Stay in Grid edit mode
-                        }
-                    }
-
-                    // Grid Insert
-                    if ($this->isGridInsert() && Session(SESSION_INLINE_MODE) == "gridadd") {
-                        if ($this->validateGridForm()) {
-                            $gridInsert = $this->gridInsert();
-                        } else {
-                            $gridInsert = false;
-                        }
-                        if ($gridInsert) {
-                        } else {
-                            $this->EventCancelled = true;
-                            $this->gridAddMode(); // Stay in Grid add mode
-                        }
-                    }
-                } elseif (Session(SESSION_INLINE_MODE) == "gridedit") { // Previously in grid edit mode
-                    if (Get(Config("TABLE_START_REC")) !== null || Get(Config("TABLE_PAGE_NO")) !== null) { // Stay in grid edit mode if paging
-                        $this->gridEditMode();
-                    } else { // Reset grid edit
-                        $this->clearInlineMode();
-                    }
-                }
-            }
-
             // Hide list options
             if ($this->isExport()) {
                 $this->ListOptions->hideAllOptions(["sequence"]);
@@ -715,26 +660,23 @@ class PraktikPoliList extends PraktikPoli
                 $this->OtherOptions->hideAllOptions();
             }
 
-            // Show grid delete link for grid add / grid edit
-            if ($this->AllowAddDeleteRow) {
-                if ($this->isGridAdd() || $this->isGridEdit()) {
-                    $item = $this->ListOptions["griddelete"];
-                    if ($item) {
-                        $item->Visible = true;
-                    }
-                }
-            }
-
             // Get default search criteria
             AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+            AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
 
             // Get basic search values
             $this->loadBasicSearchValues();
+
+            // Get and validate search values for advanced search
+            $this->loadSearchValues(); // Get search values
 
             // Process filter list
             if ($this->processFilterList()) {
                 $this->terminate();
                 return;
+            }
+            if (!$this->validateSearch()) {
+                // Nothing to do
             }
 
             // Restore search parms from Session if not searching / reset / export
@@ -751,6 +693,11 @@ class PraktikPoliList extends PraktikPoli
             // Get basic search criteria
             if (!$this->hasInvalidFields()) {
                 $srchBasic = $this->basicSearchWhere();
+            }
+
+            // Get search criteria for advanced search
+            if (!$this->hasInvalidFields()) {
+                $srchAdvanced = $this->advancedSearchWhere();
             }
         }
 
@@ -774,6 +721,16 @@ class PraktikPoliList extends PraktikPoli
             if ($this->BasicSearch->Keyword != "") {
                 $srchBasic = $this->basicSearchWhere();
             }
+
+            // Load advanced search from default
+            if ($this->loadAdvancedSearchDefault()) {
+                $srchAdvanced = $this->advancedSearchWhere();
+            }
+        }
+
+        // Restore search settings from Session
+        if (!$this->hasInvalidFields()) {
+            $this->loadAdvancedSearch();
         }
 
         // Build search criteria
@@ -797,44 +754,8 @@ class PraktikPoliList extends PraktikPoli
         if (!$Security->canList()) {
             $filter = "(0=1)"; // Filter all records
         }
-
-        // Restore master/detail filter
-        $this->DbMasterFilter = $this->getMasterFilter(); // Restore master filter
-        $this->DbDetailFilter = $this->getDetailFilter(); // Restore detail filter
         AddFilter($filter, $this->DbDetailFilter);
         AddFilter($filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "fasilitas_rumah_sakit") {
-            $masterTbl = Container("fasilitas_rumah_sakit");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetch(\PDO::FETCH_ASSOC);
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("fasilitasrumahsakitlist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = ROWTYPE_MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "dokter") {
-            $masterTbl = Container("dokter");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetch(\PDO::FETCH_ASSOC);
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("dokterlist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = ROWTYPE_MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Set up filter
         if ($this->Command == "json") {
@@ -871,6 +792,13 @@ class PraktikPoliList extends PraktikPoli
                 } else {
                     $this->setWarningMessage($Language->phrase("NoRecord"));
                 }
+            }
+
+            // Audit trail on search
+            if ($this->AuditTrailOnSearch && $this->Command == "search" && !$this->RestoreSearch) {
+                $searchParm = ServerVar("QUERY_STRING");
+                $searchSql = $this->getSessionWhere();
+                $this->writeAuditTrailOnSearch($searchParm, $searchSql);
             }
         }
 
@@ -936,133 +864,6 @@ class PraktikPoliList extends PraktikPoli
         }
     }
 
-    // Exit inline mode
-    protected function clearInlineMode()
-    {
-        $this->LastAction = $this->CurrentAction; // Save last action
-        $this->CurrentAction = ""; // Clear action
-        $_SESSION[SESSION_INLINE_MODE] = ""; // Clear inline mode
-    }
-
-    // Switch to Grid Add mode
-    protected function gridAddMode()
-    {
-        $this->CurrentAction = "gridadd";
-        $_SESSION[SESSION_INLINE_MODE] = "gridadd";
-        $this->hideFieldsForAddEdit();
-    }
-
-    // Switch to Grid Edit mode
-    protected function gridEditMode()
-    {
-        $this->CurrentAction = "gridedit";
-        $_SESSION[SESSION_INLINE_MODE] = "gridedit";
-        $this->hideFieldsForAddEdit();
-    }
-
-    // Perform update to grid
-    public function gridUpdate()
-    {
-        global $Language, $CurrentForm;
-        $gridUpdate = true;
-
-        // Get old recordset
-        $this->CurrentFilter = $this->buildKeyFilter();
-        if ($this->CurrentFilter == "") {
-            $this->CurrentFilter = "0=1";
-        }
-        $sql = $this->getCurrentSql();
-        $conn = $this->getConnection();
-        if ($rs = $conn->executeQuery($sql)) {
-            $rsold = $rs->fetchAll();
-            $rs->closeCursor();
-        }
-
-        // Call Grid Updating event
-        if (!$this->gridUpdating($rsold)) {
-            if ($this->getFailureMessage() == "") {
-                $this->setFailureMessage($Language->phrase("GridEditCancelled")); // Set grid edit cancelled message
-            }
-            return false;
-        }
-
-        // Begin transaction
-        $conn->beginTransaction();
-        $key = "";
-
-        // Update row index and get row key
-        $CurrentForm->Index = -1;
-        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
-        if ($rowcnt == "" || !is_numeric($rowcnt)) {
-            $rowcnt = 0;
-        }
-
-        // Update all rows based on key
-        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-            $CurrentForm->Index = $rowindex;
-            $this->setKey($CurrentForm->getValue($this->OldKeyName));
-            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
-
-            // Load all values and keys
-            if ($rowaction != "insertdelete") { // Skip insert then deleted rows
-                $this->loadFormValues(); // Get form values
-                if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
-                    $gridUpdate = $this->OldKey != ""; // Key must not be empty
-                } else {
-                    $gridUpdate = true;
-                }
-
-                // Skip empty row
-                if ($rowaction == "insert" && $this->emptyRow()) {
-                // Validate form and insert/update/delete record
-                } elseif ($gridUpdate) {
-                    if ($rowaction == "delete") {
-                        $this->CurrentFilter = $this->getRecordFilter();
-                        $gridUpdate = $this->deleteRows(); // Delete this row
-                    //} elseif (!$this->validateForm()) { // Already done in validateGridForm
-                    //    $gridUpdate = false; // Form error, reset action
-                    } else {
-                        if ($rowaction == "insert") {
-                            $gridUpdate = $this->addRow(); // Insert this row
-                        } else {
-                            if ($this->OldKey != "") {
-                                $this->SendEmail = false; // Do not send email on update success
-                                $gridUpdate = $this->editRow(); // Update this row
-                            }
-                        } // End update
-                    }
-                }
-                if ($gridUpdate) {
-                    if ($key != "") {
-                        $key .= ", ";
-                    }
-                    $key .= $this->OldKey;
-                } else {
-                    break;
-                }
-            }
-        }
-        if ($gridUpdate) {
-            $conn->commit(); // Commit transaction
-
-            // Get new records
-            $rsnew = $conn->fetchAll($sql);
-
-            // Call Grid_Updated event
-            $this->gridUpdated($rsold, $rsnew);
-            if ($this->getSuccessMessage() == "") {
-                $this->setSuccessMessage($Language->phrase("UpdateSuccess")); // Set up update success message
-            }
-            $this->clearInlineMode(); // Clear inline edit mode
-        } else {
-            $conn->rollback(); // Rollback transaction
-            if ($this->getFailureMessage() == "") {
-                $this->setFailureMessage($Language->phrase("UpdateFailed")); // Set update failed message
-            }
-        }
-        return $gridUpdate;
-    }
-
     // Build filter for all keys
     protected function buildKeyFilter()
     {
@@ -1094,203 +895,6 @@ class PraktikPoliList extends PraktikPoli
         return $wrkFilter;
     }
 
-    // Perform Grid Add
-    public function gridInsert()
-    {
-        global $Language, $CurrentForm;
-        $rowindex = 1;
-        $gridInsert = false;
-        $conn = $this->getConnection();
-
-        // Call Grid Inserting event
-        if (!$this->gridInserting()) {
-            if ($this->getFailureMessage() == "") {
-                $this->setFailureMessage($Language->phrase("GridAddCancelled")); // Set grid add cancelled message
-            }
-            return false;
-        }
-
-        // Begin transaction
-        $conn->beginTransaction();
-
-        // Init key filter
-        $wrkfilter = "";
-        $addcnt = 0;
-        $key = "";
-
-        // Get row count
-        $CurrentForm->Index = -1;
-        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
-        if ($rowcnt == "" || !is_numeric($rowcnt)) {
-            $rowcnt = 0;
-        }
-
-        // Insert all rows
-        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-            // Load current row values
-            $CurrentForm->Index = $rowindex;
-            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
-            if ($rowaction != "" && $rowaction != "insert") {
-                continue; // Skip
-            }
-            if ($rowaction == "insert") {
-                $this->OldKey = strval($CurrentForm->getValue($this->OldKeyName));
-                $this->loadOldRecord(); // Load old record
-            }
-            $this->loadFormValues(); // Get form values
-            if (!$this->emptyRow()) {
-                $addcnt++;
-                $this->SendEmail = false; // Do not send email on insert success
-
-                // Validate form // Already done in validateGridForm
-                //if (!$this->validateForm()) {
-                //    $gridInsert = false; // Form error, reset action
-                //} else {
-                    $gridInsert = $this->addRow($this->OldRecordset); // Insert this row
-                //}
-                if ($gridInsert) {
-                    if ($key != "") {
-                        $key .= Config("COMPOSITE_KEY_SEPARATOR");
-                    }
-                    $key .= $this->id->CurrentValue;
-
-                    // Add filter for this record
-                    $filter = $this->getRecordFilter();
-                    if ($wrkfilter != "") {
-                        $wrkfilter .= " OR ";
-                    }
-                    $wrkfilter .= $filter;
-                } else {
-                    break;
-                }
-            }
-        }
-        if ($addcnt == 0) { // No record inserted
-            $this->setFailureMessage($Language->phrase("NoAddRecord"));
-            $gridInsert = false;
-        }
-        if ($gridInsert) {
-            $conn->commit(); // Commit transaction
-
-            // Get new records
-            $this->CurrentFilter = $wrkfilter;
-            $sql = $this->getCurrentSql();
-            $rsnew = $conn->fetchAll($sql);
-
-            // Call Grid_Inserted event
-            $this->gridInserted($rsnew);
-            if ($this->getSuccessMessage() == "") {
-                $this->setSuccessMessage($Language->phrase("InsertSuccess")); // Set up insert success message
-            }
-            $this->clearInlineMode(); // Clear grid add mode
-        } else {
-            $conn->rollback(); // Rollback transaction
-            if ($this->getFailureMessage() == "") {
-                $this->setFailureMessage($Language->phrase("InsertFailed")); // Set insert failed message
-            }
-        }
-        return $gridInsert;
-    }
-
-    // Check if empty row
-    public function emptyRow()
-    {
-        global $CurrentForm;
-        if ($CurrentForm->hasValue("x_dokter_id") && $CurrentForm->hasValue("o_dokter_id") && $this->dokter_id->CurrentValue != $this->dokter_id->OldValue) {
-            return false;
-        }
-        if ($CurrentForm->hasValue("x_hari_praktik") && $CurrentForm->hasValue("o_hari_praktik") && $this->hari_praktik->CurrentValue != $this->hari_praktik->OldValue) {
-            return false;
-        }
-        if ($CurrentForm->hasValue("x_jam_praktik") && $CurrentForm->hasValue("o_jam_praktik") && $this->jam_praktik->CurrentValue != $this->jam_praktik->OldValue) {
-            return false;
-        }
-        return true;
-    }
-
-    // Validate grid form
-    public function validateGridForm()
-    {
-        global $CurrentForm;
-        // Get row count
-        $CurrentForm->Index = -1;
-        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
-        if ($rowcnt == "" || !is_numeric($rowcnt)) {
-            $rowcnt = 0;
-        }
-
-        // Validate all records
-        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-            // Load current row values
-            $CurrentForm->Index = $rowindex;
-            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
-            if ($rowaction != "delete" && $rowaction != "insertdelete") {
-                $this->loadFormValues(); // Get form values
-                if ($rowaction == "insert" && $this->emptyRow()) {
-                    // Ignore
-                } elseif (!$this->validateForm()) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    // Get all form values of the grid
-    public function getGridFormValues()
-    {
-        global $CurrentForm;
-        // Get row count
-        $CurrentForm->Index = -1;
-        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
-        if ($rowcnt == "" || !is_numeric($rowcnt)) {
-            $rowcnt = 0;
-        }
-        $rows = [];
-
-        // Loop through all records
-        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-            // Load current row values
-            $CurrentForm->Index = $rowindex;
-            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
-            if ($rowaction != "delete" && $rowaction != "insertdelete") {
-                $this->loadFormValues(); // Get form values
-                if ($rowaction == "insert" && $this->emptyRow()) {
-                    // Ignore
-                } else {
-                    $rows[] = $this->getFieldValues("FormValue"); // Return row as array
-                }
-            }
-        }
-        return $rows; // Return as array of array
-    }
-
-    // Restore form values for current row
-    public function restoreCurrentRowFormValues($idx)
-    {
-        global $CurrentForm;
-
-        // Get row based on current index
-        $CurrentForm->Index = $idx;
-        $rowaction = strval($CurrentForm->getValue($this->FormActionName));
-        $this->loadFormValues(); // Load form values
-        // Set up invalid status correctly
-        $this->resetFormError();
-        if ($rowaction == "insert" && $this->emptyRow()) {
-            // Ignore
-        } else {
-            $this->validateForm();
-        }
-    }
-
-    // Reset form status
-    public function resetFormError()
-    {
-        $this->dokter_id->clearErrorMessage();
-        $this->hari_praktik->clearErrorMessage();
-        $this->jam_praktik->clearErrorMessage();
-    }
-
     // Get list of filters
     public function getFilterList()
     {
@@ -1300,10 +904,11 @@ class PraktikPoliList extends PraktikPoli
         $filterList = "";
         $savedFilterList = "";
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->fasilitas_rumah_sakit_id->AdvancedSearch->toJson(), ","); // Field fasilitas_rumah_sakit_id
-        $filterList = Concat($filterList, $this->dokter_id->AdvancedSearch->toJson(), ","); // Field dokter_id
-        $filterList = Concat($filterList, $this->hari_praktik->AdvancedSearch->toJson(), ","); // Field hari_praktik
-        $filterList = Concat($filterList, $this->jam_praktik->AdvancedSearch->toJson(), ","); // Field jam_praktik
+        $filterList = Concat($filterList, $this->_username->AdvancedSearch->toJson(), ","); // Field username
+        $filterList = Concat($filterList, $this->_password->AdvancedSearch->toJson(), ","); // Field password
+        $filterList = Concat($filterList, $this->role->AdvancedSearch->toJson(), ","); // Field role
+        $filterList = Concat($filterList, $this->rumah_sakit_id->AdvancedSearch->toJson(), ","); // Field rumah_sakit_id
+        $filterList = Concat($filterList, $this->administrator_rumah_sakit->AdvancedSearch->toJson(), ","); // Field administrator_rumah_sakit
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1325,7 +930,7 @@ class PraktikPoliList extends PraktikPoli
         global $UserProfile;
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            $UserProfile->setSearchFilters(CurrentUserName(), "fpraktik_polilistsrch", $filters);
+            $UserProfile->setSearchFilters(CurrentUserName(), "fwebusers_rslistsrch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1352,47 +957,146 @@ class PraktikPoliList extends PraktikPoli
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
-        // Field fasilitas_rumah_sakit_id
-        $this->fasilitas_rumah_sakit_id->AdvancedSearch->SearchValue = @$filter["x_fasilitas_rumah_sakit_id"];
-        $this->fasilitas_rumah_sakit_id->AdvancedSearch->SearchOperator = @$filter["z_fasilitas_rumah_sakit_id"];
-        $this->fasilitas_rumah_sakit_id->AdvancedSearch->SearchCondition = @$filter["v_fasilitas_rumah_sakit_id"];
-        $this->fasilitas_rumah_sakit_id->AdvancedSearch->SearchValue2 = @$filter["y_fasilitas_rumah_sakit_id"];
-        $this->fasilitas_rumah_sakit_id->AdvancedSearch->SearchOperator2 = @$filter["w_fasilitas_rumah_sakit_id"];
-        $this->fasilitas_rumah_sakit_id->AdvancedSearch->save();
+        // Field username
+        $this->_username->AdvancedSearch->SearchValue = @$filter["x__username"];
+        $this->_username->AdvancedSearch->SearchOperator = @$filter["z__username"];
+        $this->_username->AdvancedSearch->SearchCondition = @$filter["v__username"];
+        $this->_username->AdvancedSearch->SearchValue2 = @$filter["y__username"];
+        $this->_username->AdvancedSearch->SearchOperator2 = @$filter["w__username"];
+        $this->_username->AdvancedSearch->save();
 
-        // Field dokter_id
-        $this->dokter_id->AdvancedSearch->SearchValue = @$filter["x_dokter_id"];
-        $this->dokter_id->AdvancedSearch->SearchOperator = @$filter["z_dokter_id"];
-        $this->dokter_id->AdvancedSearch->SearchCondition = @$filter["v_dokter_id"];
-        $this->dokter_id->AdvancedSearch->SearchValue2 = @$filter["y_dokter_id"];
-        $this->dokter_id->AdvancedSearch->SearchOperator2 = @$filter["w_dokter_id"];
-        $this->dokter_id->AdvancedSearch->save();
+        // Field password
+        $this->_password->AdvancedSearch->SearchValue = @$filter["x__password"];
+        $this->_password->AdvancedSearch->SearchOperator = @$filter["z__password"];
+        $this->_password->AdvancedSearch->SearchCondition = @$filter["v__password"];
+        $this->_password->AdvancedSearch->SearchValue2 = @$filter["y__password"];
+        $this->_password->AdvancedSearch->SearchOperator2 = @$filter["w__password"];
+        $this->_password->AdvancedSearch->save();
 
-        // Field hari_praktik
-        $this->hari_praktik->AdvancedSearch->SearchValue = @$filter["x_hari_praktik"];
-        $this->hari_praktik->AdvancedSearch->SearchOperator = @$filter["z_hari_praktik"];
-        $this->hari_praktik->AdvancedSearch->SearchCondition = @$filter["v_hari_praktik"];
-        $this->hari_praktik->AdvancedSearch->SearchValue2 = @$filter["y_hari_praktik"];
-        $this->hari_praktik->AdvancedSearch->SearchOperator2 = @$filter["w_hari_praktik"];
-        $this->hari_praktik->AdvancedSearch->save();
+        // Field role
+        $this->role->AdvancedSearch->SearchValue = @$filter["x_role"];
+        $this->role->AdvancedSearch->SearchOperator = @$filter["z_role"];
+        $this->role->AdvancedSearch->SearchCondition = @$filter["v_role"];
+        $this->role->AdvancedSearch->SearchValue2 = @$filter["y_role"];
+        $this->role->AdvancedSearch->SearchOperator2 = @$filter["w_role"];
+        $this->role->AdvancedSearch->save();
 
-        // Field jam_praktik
-        $this->jam_praktik->AdvancedSearch->SearchValue = @$filter["x_jam_praktik"];
-        $this->jam_praktik->AdvancedSearch->SearchOperator = @$filter["z_jam_praktik"];
-        $this->jam_praktik->AdvancedSearch->SearchCondition = @$filter["v_jam_praktik"];
-        $this->jam_praktik->AdvancedSearch->SearchValue2 = @$filter["y_jam_praktik"];
-        $this->jam_praktik->AdvancedSearch->SearchOperator2 = @$filter["w_jam_praktik"];
-        $this->jam_praktik->AdvancedSearch->save();
+        // Field rumah_sakit_id
+        $this->rumah_sakit_id->AdvancedSearch->SearchValue = @$filter["x_rumah_sakit_id"];
+        $this->rumah_sakit_id->AdvancedSearch->SearchOperator = @$filter["z_rumah_sakit_id"];
+        $this->rumah_sakit_id->AdvancedSearch->SearchCondition = @$filter["v_rumah_sakit_id"];
+        $this->rumah_sakit_id->AdvancedSearch->SearchValue2 = @$filter["y_rumah_sakit_id"];
+        $this->rumah_sakit_id->AdvancedSearch->SearchOperator2 = @$filter["w_rumah_sakit_id"];
+        $this->rumah_sakit_id->AdvancedSearch->save();
+
+        // Field administrator_rumah_sakit
+        $this->administrator_rumah_sakit->AdvancedSearch->SearchValue = @$filter["x_administrator_rumah_sakit"];
+        $this->administrator_rumah_sakit->AdvancedSearch->SearchOperator = @$filter["z_administrator_rumah_sakit"];
+        $this->administrator_rumah_sakit->AdvancedSearch->SearchCondition = @$filter["v_administrator_rumah_sakit"];
+        $this->administrator_rumah_sakit->AdvancedSearch->SearchValue2 = @$filter["y_administrator_rumah_sakit"];
+        $this->administrator_rumah_sakit->AdvancedSearch->SearchOperator2 = @$filter["w_administrator_rumah_sakit"];
+        $this->administrator_rumah_sakit->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
+    }
+
+    // Advanced search WHERE clause based on QueryString
+    protected function advancedSearchWhere($default = false)
+    {
+        global $Security;
+        $where = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $this->buildSearchSql($where, $this->id, $default, false); // id
+        $this->buildSearchSql($where, $this->_username, $default, false); // username
+        $this->buildSearchSql($where, $this->_password, $default, false); // password
+        $this->buildSearchSql($where, $this->role, $default, false); // role
+        $this->buildSearchSql($where, $this->rumah_sakit_id, $default, false); // rumah_sakit_id
+        $this->buildSearchSql($where, $this->administrator_rumah_sakit, $default, false); // administrator_rumah_sakit
+
+        // Set up search parm
+        if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
+            $this->Command = "search";
+        }
+        if (!$default && $this->Command == "search") {
+            $this->id->AdvancedSearch->save(); // id
+            $this->_username->AdvancedSearch->save(); // username
+            $this->_password->AdvancedSearch->save(); // password
+            $this->role->AdvancedSearch->save(); // role
+            $this->rumah_sakit_id->AdvancedSearch->save(); // rumah_sakit_id
+            $this->administrator_rumah_sakit->AdvancedSearch->save(); // administrator_rumah_sakit
+        }
+        return $where;
+    }
+
+    // Build search SQL
+    protected function buildSearchSql(&$where, &$fld, $default, $multiValue)
+    {
+        $fldParm = $fld->Param;
+        $fldVal = ($default) ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
+        $fldOpr = ($default) ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
+        $fldCond = ($default) ? $fld->AdvancedSearch->SearchConditionDefault : $fld->AdvancedSearch->SearchCondition;
+        $fldVal2 = ($default) ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
+        $fldOpr2 = ($default) ? $fld->AdvancedSearch->SearchOperator2Default : $fld->AdvancedSearch->SearchOperator2;
+        $wrk = "";
+        if (is_array($fldVal)) {
+            $fldVal = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal);
+        }
+        if (is_array($fldVal2)) {
+            $fldVal2 = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal2);
+        }
+        $fldOpr = strtoupper(trim($fldOpr));
+        if ($fldOpr == "") {
+            $fldOpr = "=";
+        }
+        $fldOpr2 = strtoupper(trim($fldOpr2));
+        if ($fldOpr2 == "") {
+            $fldOpr2 = "=";
+        }
+        if (Config("SEARCH_MULTI_VALUE_OPTION") == 1 || !IsMultiSearchOperator($fldOpr)) {
+            $multiValue = false;
+        }
+        if ($multiValue) {
+            $wrk1 = ($fldVal != "") ? GetMultiSearchSql($fld, $fldOpr, $fldVal, $this->Dbid) : ""; // Field value 1
+            $wrk2 = ($fldVal2 != "") ? GetMultiSearchSql($fld, $fldOpr2, $fldVal2, $this->Dbid) : ""; // Field value 2
+            $wrk = $wrk1; // Build final SQL
+            if ($wrk2 != "") {
+                $wrk = ($wrk != "") ? "($wrk) $fldCond ($wrk2)" : $wrk2;
+            }
+        } else {
+            $fldVal = $this->convertSearchValue($fld, $fldVal);
+            $fldVal2 = $this->convertSearchValue($fld, $fldVal2);
+            $wrk = GetSearchSql($fld, $fldVal, $fldOpr, $fldCond, $fldVal2, $fldOpr2, $this->Dbid);
+        }
+        AddFilter($where, $wrk);
+    }
+
+    // Convert search value
+    protected function convertSearchValue(&$fld, $fldVal)
+    {
+        if ($fldVal == Config("NULL_VALUE") || $fldVal == Config("NOT_NULL_VALUE")) {
+            return $fldVal;
+        }
+        $value = $fldVal;
+        if ($fld->isBoolean()) {
+            if ($fldVal != "") {
+                $value = (SameText($fldVal, "1") || SameText($fldVal, "y") || SameText($fldVal, "t")) ? $fld->TrueValue : $fld->FalseValue;
+            }
+        } elseif ($fld->DataType == DATATYPE_DATE || $fld->DataType == DATATYPE_TIME) {
+            if ($fldVal != "") {
+                $value = UnFormatDateTime($fldVal, $fld->DateTimeFormat);
+            }
+        }
+        return $value;
     }
 
     // Return basic search SQL
     protected function basicSearchSql($arKeywords, $type)
     {
         $where = "";
-        $this->buildBasicSearchSql($where, $this->hari_praktik, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->jam_praktik, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->_username, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->_password, $arKeywords, $type);
         return $where;
     }
 
@@ -1513,6 +1217,24 @@ class PraktikPoliList extends PraktikPoli
         if ($this->BasicSearch->issetSession()) {
             return true;
         }
+        if ($this->id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->_username->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->_password->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->role->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->rumah_sakit_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->administrator_rumah_sakit->AdvancedSearch->issetSession()) {
+            return true;
+        }
         return false;
     }
 
@@ -1525,6 +1247,9 @@ class PraktikPoliList extends PraktikPoli
 
         // Clear basic search parameters
         $this->resetBasicSearchParms();
+
+        // Clear advanced search parameters
+        $this->resetAdvancedSearchParms();
     }
 
     // Load advanced search default values
@@ -1539,6 +1264,17 @@ class PraktikPoliList extends PraktikPoli
         $this->BasicSearch->unsetSession();
     }
 
+    // Clear all advanced search parameters
+    protected function resetAdvancedSearchParms()
+    {
+                $this->id->AdvancedSearch->unsetSession();
+                $this->_username->AdvancedSearch->unsetSession();
+                $this->_password->AdvancedSearch->unsetSession();
+                $this->role->AdvancedSearch->unsetSession();
+                $this->rumah_sakit_id->AdvancedSearch->unsetSession();
+                $this->administrator_rumah_sakit->AdvancedSearch->unsetSession();
+    }
+
     // Restore all search parameters
     protected function restoreSearchParms()
     {
@@ -1546,6 +1282,14 @@ class PraktikPoliList extends PraktikPoli
 
         // Restore basic search values
         $this->BasicSearch->load();
+
+        // Restore advanced search values
+                $this->id->AdvancedSearch->load();
+                $this->_username->AdvancedSearch->load();
+                $this->_password->AdvancedSearch->load();
+                $this->role->AdvancedSearch->load();
+                $this->rumah_sakit_id->AdvancedSearch->load();
+                $this->administrator_rumah_sakit->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -1555,9 +1299,11 @@ class PraktikPoliList extends PraktikPoli
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->dokter_id); // dokter_id
-            $this->updateSort($this->hari_praktik); // hari_praktik
-            $this->updateSort($this->jam_praktik); // jam_praktik
+            $this->updateSort($this->id); // id
+            $this->updateSort($this->_username); // username
+            $this->updateSort($this->_password); // password
+            $this->updateSort($this->role); // role
+            $this->updateSort($this->administrator_rumah_sakit); // administrator_rumah_sakit
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1593,24 +1339,16 @@ class PraktikPoliList extends PraktikPoli
                 $this->resetSearchParms();
             }
 
-            // Reset master/detail keys
-            if ($this->Command == "resetall") {
-                $this->setCurrentMasterTable(""); // Clear master table
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-                        $this->fasilitas_rumah_sakit_id->setSessionValue("");
-                        $this->dokter_id->setSessionValue("");
-            }
-
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->fasilitas_rumah_sakit_id->setSort("");
-                $this->dokter_id->setSort("");
-                $this->hari_praktik->setSort("");
-                $this->jam_praktik->setSort("");
+                $this->_username->setSort("");
+                $this->_password->setSort("");
+                $this->role->setSort("");
+                $this->rumah_sakit_id->setSort("");
+                $this->administrator_rumah_sakit->setSort("");
             }
 
             // Reset start position
@@ -1624,14 +1362,6 @@ class PraktikPoliList extends PraktikPoli
     {
         global $Security, $Language;
 
-        // "griddelete"
-        if ($this->AllowAddDeleteRow) {
-            $item = &$this->ListOptions->add("griddelete");
-            $item->CssClass = "text-nowrap";
-            $item->OnLeft = false;
-            $item->Visible = false; // Default hidden
-        }
-
         // Add group option item
         $item = &$this->ListOptions->add($this->ListOptions->GroupOptionName);
         $item->Body = "";
@@ -1642,6 +1372,12 @@ class PraktikPoliList extends PraktikPoli
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canEdit();
+        $item->OnLeft = false;
+
+        // "copy"
+        $item = &$this->ListOptions->add("copy");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canAdd();
         $item->OnLeft = false;
 
         // "delete"
@@ -1691,45 +1427,30 @@ class PraktikPoliList extends PraktikPoli
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
-
-        // Set up row action and key
-        if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
-            $CurrentForm->Index = $this->RowIndex;
-            $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
-            $oldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->OldKeyName);
-            $blankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
-            if ($this->RowAction != "") {
-                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $actionName . "\" id=\"" . $actionName . "\" value=\"" . $this->RowAction . "\">";
-            }
-            $oldKey = $this->getKey(false); // Get from OldValue
-            if ($oldKeyName != "" && $oldKey != "") {
-                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $oldKeyName . "\" id=\"" . $oldKeyName . "\" value=\"" . HtmlEncode($oldKey) . "\">";
-            }
-            if ($this->RowAction == "insert" && $this->isConfirm() && $this->emptyRow()) {
-                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $blankRowName . "\" id=\"" . $blankRowName . "\" value=\"1\">";
-            }
-        }
-
-        // "delete"
-        if ($this->AllowAddDeleteRow) {
-            if ($this->isGridAdd() || $this->isGridEdit()) {
-                $options = &$this->ListOptions;
-                $options->UseButtonGroup = true; // Use button group for grid delete button
-                $opt = $options["griddelete"];
-                if (!$Security->canDelete() && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
-                    $opt->Body = "&nbsp;";
-                } else {
-                    $opt->Body = "<a class=\"ew-grid-link ew-grid-delete\" title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" onclick=\"return ew.deleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->phrase("DeleteLink") . "</a>";
-                }
-            }
-        }
         $pageUrl = $this->pageUrl();
         if ($this->CurrentMode == "view") {
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
             if ($Security->canEdit()) {
-                $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+                if (IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"webusers_rs\" data-caption=\"" . $editcaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'SaveBtn',url:'" . HtmlEncode(GetUrl($this->EditUrl)) . "'});\">" . $Language->phrase("EditLink") . "</a>";
+                }
+            } else {
+                $opt->Body = "";
+            }
+
+            // "copy"
+            $opt = $this->ListOptions["copy"];
+            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
+            if ($Security->canAdd()) {
+                if (IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"webusers_rs\" data-caption=\"" . $copycaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'AddBtn',url:'" . HtmlEncode(GetUrl($this->CopyUrl)) . "'});\">" . $Language->phrase("CopyLink") . "</a>";
+                }
             } else {
                 $opt->Body = "";
             }
@@ -1796,18 +1517,9 @@ class PraktikPoliList extends PraktikPoli
         if (IsMobile()) {
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         } else {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"praktik_poli\" data-caption=\"" . $addcaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'AddBtn',url:'" . HtmlEncode(GetUrl($this->AddUrl)) . "'});\">" . $Language->phrase("AddLink") . "</a>";
+            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"webusers_rs\" data-caption=\"" . $addcaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'AddBtn',url:'" . HtmlEncode(GetUrl($this->AddUrl)) . "'});\">" . $Language->phrase("AddLink") . "</a>";
         }
         $item->Visible = $this->AddUrl != "" && $Security->canAdd();
-        $item = &$option->add("gridadd");
-        $item->Body = "<a class=\"ew-add-edit ew-grid-add\" title=\"" . HtmlTitle($Language->phrase("GridAddLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridAddLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->GridAddUrl)) . "\">" . $Language->phrase("GridAddLink") . "</a>";
-        $item->Visible = $this->GridAddUrl != "" && $Security->canAdd();
-
-        // Add grid edit
-        $option = $options["addedit"];
-        $item = &$option->add("gridedit");
-        $item->Body = "<a class=\"ew-add-edit ew-grid-edit\" title=\"" . HtmlTitle($Language->phrase("GridEditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->GridEditUrl)) . "\">" . $Language->phrase("GridEditLink") . "</a>";
-        $item->Visible = $this->GridEditUrl != "" && $Security->canEdit();
         $option = $options["action"];
 
         // Set up options default
@@ -1825,10 +1537,10 @@ class PraktikPoliList extends PraktikPoli
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fpraktik_polilistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fwebusers_rslistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fpraktik_polilistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fwebusers_rslistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1845,75 +1557,27 @@ class PraktikPoliList extends PraktikPoli
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
-        if (!$this->isGridAdd() && !$this->isGridEdit()) { // Not grid add/edit mode
+        $option = $options["action"];
+        // Set up list action buttons
+        foreach ($this->ListActions->Items as $listaction) {
+            if ($listaction->Select == ACTION_MULTIPLE) {
+                $item = &$option->add("custom_" . $listaction->Action);
+                $caption = $listaction->Caption;
+                $icon = ($listaction->Icon != "") ? '<i class="' . HtmlEncode($listaction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
+                $item->Body = '<a class="ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" href="#" onclick="return ew.submitAction(event,jQuery.extend({f:document.fwebusers_rslist},' . $listaction->toJson(true) . '));">' . $icon . '</a>';
+                $item->Visible = $listaction->Allow;
+            }
+        }
+
+        // Hide grid edit and other options
+        if ($this->TotalRecords <= 0) {
+            $option = $options["addedit"];
+            $item = $option["gridedit"];
+            if ($item) {
+                $item->Visible = false;
+            }
             $option = $options["action"];
-            // Set up list action buttons
-            foreach ($this->ListActions->Items as $listaction) {
-                if ($listaction->Select == ACTION_MULTIPLE) {
-                    $item = &$option->add("custom_" . $listaction->Action);
-                    $caption = $listaction->Caption;
-                    $icon = ($listaction->Icon != "") ? '<i class="' . HtmlEncode($listaction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                    $item->Body = '<a class="ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" href="#" onclick="return ew.submitAction(event,jQuery.extend({f:document.fpraktik_polilist},' . $listaction->toJson(true) . '));">' . $icon . '</a>';
-                    $item->Visible = $listaction->Allow;
-                }
-            }
-
-            // Hide grid edit and other options
-            if ($this->TotalRecords <= 0) {
-                $option = $options["addedit"];
-                $item = $option["gridedit"];
-                if ($item) {
-                    $item->Visible = false;
-                }
-                $option = $options["action"];
-                $option->hideAllOptions();
-            }
-        } else { // Grid add/edit mode
-            // Hide all options first
-            foreach ($options as $option) {
-                $option->hideAllOptions();
-            }
-            $pageUrl = $this->pageUrl();
-
-            // Grid-Add
-            if ($this->isGridAdd()) {
-                if ($this->AllowAddDeleteRow) {
-                    // Add add blank row
-                    $option = $options["addedit"];
-                    $option->UseDropDownButton = false;
-                    $item = &$option->add("addblankrow");
-                    $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" href=\"#\" onclick=\"return ew.addGridRow(this);\">" . $Language->phrase("AddBlankRow") . "</a>";
-                    $item->Visible = $Security->canAdd();
-                }
-                $option = $options["action"];
-                $option->UseDropDownButton = false;
-                // Add grid insert
-                $item = &$option->add("gridinsert");
-                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"ew.forms.get(this).submit(event, '" . $this->pageName() . "'); return false;\">" . $Language->phrase("GridInsertLink") . "</a>";
-                // Add grid cancel
-                $item = &$option->add("gridcancel");
-                $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
-                $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
-            }
-
-            // Grid-Edit
-            if ($this->isGridEdit()) {
-                if ($this->AllowAddDeleteRow) {
-                    // Add add blank row
-                    $option = $options["addedit"];
-                    $option->UseDropDownButton = false;
-                    $item = &$option->add("addblankrow");
-                    $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" href=\"#\" onclick=\"return ew.addGridRow(this);\">" . $Language->phrase("AddBlankRow") . "</a>";
-                    $item->Visible = $Security->canAdd();
-                }
-                $option = $options["action"];
-                $option->UseDropDownButton = false;
-                    $item = &$option->add("gridsave");
-                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"ew.forms.get(this).submit(event, '" . $this->pageName() . "'); return false;\">" . $Language->phrase("GridSaveLink") . "</a>";
-                    $item = &$option->add("gridcancel");
-                    $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
-                    $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
-            }
+            $option->hideAllOptions();
         }
     }
 
@@ -2012,21 +1676,6 @@ class PraktikPoliList extends PraktikPoli
         global $Security, $Language;
     }
 
-    // Load default values
-    protected function loadDefaultValues()
-    {
-        $this->id->CurrentValue = null;
-        $this->id->OldValue = $this->id->CurrentValue;
-        $this->fasilitas_rumah_sakit_id->CurrentValue = null;
-        $this->fasilitas_rumah_sakit_id->OldValue = $this->fasilitas_rumah_sakit_id->CurrentValue;
-        $this->dokter_id->CurrentValue = null;
-        $this->dokter_id->OldValue = $this->dokter_id->CurrentValue;
-        $this->hari_praktik->CurrentValue = null;
-        $this->hari_praktik->OldValue = $this->hari_praktik->CurrentValue;
-        $this->jam_praktik->CurrentValue = null;
-        $this->jam_praktik->OldValue = $this->jam_praktik->CurrentValue;
-    }
-
     // Load basic search values
     protected function loadBasicSearchValues()
     {
@@ -2037,68 +1686,60 @@ class PraktikPoliList extends PraktikPoli
         $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
     }
 
-    // Load form values
-    protected function loadFormValues()
+    // Load search values for validation
+    protected function loadSearchValues()
     {
-        // Load from form
-        global $CurrentForm;
+        // Load search values
+        $hasValue = false;
 
-        // Check field name 'dokter_id' first before field var 'x_dokter_id'
-        $val = $CurrentForm->hasValue("dokter_id") ? $CurrentForm->getValue("dokter_id") : $CurrentForm->getValue("x_dokter_id");
-        if (!$this->dokter_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->dokter_id->Visible = false; // Disable update for API request
-            } else {
-                $this->dokter_id->setFormValue($val);
+        // id
+        if (!$this->isAddOrEdit() && $this->id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->id->AdvancedSearch->SearchValue != "" || $this->id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
             }
         }
-        if ($CurrentForm->hasValue("o_dokter_id")) {
-            $this->dokter_id->setOldValue($CurrentForm->getValue("o_dokter_id"));
-        }
 
-        // Check field name 'hari_praktik' first before field var 'x_hari_praktik'
-        $val = $CurrentForm->hasValue("hari_praktik") ? $CurrentForm->getValue("hari_praktik") : $CurrentForm->getValue("x_hari_praktik");
-        if (!$this->hari_praktik->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->hari_praktik->Visible = false; // Disable update for API request
-            } else {
-                $this->hari_praktik->setFormValue($val);
+        // username
+        if (!$this->isAddOrEdit() && $this->_username->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->_username->AdvancedSearch->SearchValue != "" || $this->_username->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
             }
         }
-        if ($CurrentForm->hasValue("o_hari_praktik")) {
-            $this->hari_praktik->setOldValue($CurrentForm->getValue("o_hari_praktik"));
-        }
 
-        // Check field name 'jam_praktik' first before field var 'x_jam_praktik'
-        $val = $CurrentForm->hasValue("jam_praktik") ? $CurrentForm->getValue("jam_praktik") : $CurrentForm->getValue("x_jam_praktik");
-        if (!$this->jam_praktik->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->jam_praktik->Visible = false; // Disable update for API request
-            } else {
-                $this->jam_praktik->setFormValue($val);
+        // password
+        if (!$this->isAddOrEdit() && $this->_password->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->_password->AdvancedSearch->SearchValue != "" || $this->_password->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
             }
         }
-        if ($CurrentForm->hasValue("o_jam_praktik")) {
-            $this->jam_praktik->setOldValue($CurrentForm->getValue("o_jam_praktik"));
+
+        // role
+        if (!$this->isAddOrEdit() && $this->role->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->role->AdvancedSearch->SearchValue != "" || $this->role->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
         }
 
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->setFormValue($val);
+        // rumah_sakit_id
+        if (!$this->isAddOrEdit() && $this->rumah_sakit_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->rumah_sakit_id->AdvancedSearch->SearchValue != "" || $this->rumah_sakit_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
         }
-    }
 
-    // Restore form values
-    public function restoreFormValues()
-    {
-        global $CurrentForm;
-        if (!$this->isGridAdd() && !$this->isAdd()) {
-            $this->id->CurrentValue = $this->id->FormValue;
+        // administrator_rumah_sakit
+        if (!$this->isAddOrEdit() && $this->administrator_rumah_sakit->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->administrator_rumah_sakit->AdvancedSearch->SearchValue != "" || $this->administrator_rumah_sakit->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
         }
-        $this->dokter_id->CurrentValue = $this->dokter_id->FormValue;
-        $this->hari_praktik->CurrentValue = $this->hari_praktik->FormValue;
-        $this->jam_praktik->CurrentValue = $this->jam_praktik->FormValue;
+        return $hasValue;
     }
 
     // Load recordset
@@ -2144,9 +1785,6 @@ class PraktikPoliList extends PraktikPoli
         if ($row) {
             $res = true;
             $this->loadRowValues($row); // Load row values
-            if (!$this->EventCancelled) {
-                $this->HashValue = $this->getRowHash($row); // Get hash value for record
-            }
         }
         return $res;
     }
@@ -2173,22 +1811,23 @@ class PraktikPoliList extends PraktikPoli
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->fasilitas_rumah_sakit_id->setDbValue($row['fasilitas_rumah_sakit_id']);
-        $this->dokter_id->setDbValue($row['dokter_id']);
-        $this->hari_praktik->setDbValue($row['hari_praktik']);
-        $this->jam_praktik->setDbValue($row['jam_praktik']);
+        $this->_username->setDbValue($row['username']);
+        $this->_password->setDbValue($row['password']);
+        $this->role->setDbValue($row['role']);
+        $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
+        $this->administrator_rumah_sakit->setDbValue($row['administrator_rumah_sakit']);
     }
 
     // Return a row with default values
     protected function newRow()
     {
-        $this->loadDefaultValues();
         $row = [];
-        $row['id'] = $this->id->CurrentValue;
-        $row['fasilitas_rumah_sakit_id'] = $this->fasilitas_rumah_sakit_id->CurrentValue;
-        $row['dokter_id'] = $this->dokter_id->CurrentValue;
-        $row['hari_praktik'] = $this->hari_praktik->CurrentValue;
-        $row['jam_praktik'] = $this->jam_praktik->CurrentValue;
+        $row['id'] = null;
+        $row['username'] = null;
+        $row['password'] = null;
+        $row['role'] = null;
+        $row['rumah_sakit_id'] = null;
+        $row['administrator_rumah_sakit'] = null;
         return $row;
     }
 
@@ -2228,267 +1867,104 @@ class PraktikPoliList extends PraktikPoli
 
         // id
 
-        // fasilitas_rumah_sakit_id
+        // username
 
-        // dokter_id
+        // password
 
-        // hari_praktik
+        // role
 
-        // jam_praktik
+        // rumah_sakit_id
+
+        // administrator_rumah_sakit
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
             $this->id->ViewCustomAttributes = "";
 
-            // fasilitas_rumah_sakit_id
-            $curVal = trim(strval($this->fasilitas_rumah_sakit_id->CurrentValue));
+            // username
+            $this->_username->ViewValue = $this->_username->CurrentValue;
+            $this->_username->ViewCustomAttributes = "";
+
+            // password
+            $this->_password->ViewValue = $Language->phrase("PasswordMask");
+            $this->_password->ViewCustomAttributes = "";
+
+            // role
+            $this->role->ViewValue = FormatNumber($this->role->ViewValue, 0, -2, -2, -2);
+            $this->role->ViewCustomAttributes = "";
+
+            // rumah_sakit_id
+            $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
             if ($curVal != "") {
-                $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->lookupCacheOption($curVal);
-                if ($this->fasilitas_rumah_sakit_id->ViewValue === null) { // Lookup from database
+                $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
+                if ($this->rumah_sakit_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $lookupFilter = function() {
-                        return (CurrentUserLevel() == -1) ? "" : "`rumah_sakit_id` = ".CurrentUserInfo("rumah_sakit_id");
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                    $sqlWrk = $this->rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->displayValue($arwrk);
+                        $arwrk = $this->rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->displayValue($arwrk);
                     } else {
-                        $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->CurrentValue;
+                        $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
                     }
                 }
             } else {
-                $this->fasilitas_rumah_sakit_id->ViewValue = null;
+                $this->rumah_sakit_id->ViewValue = null;
             }
-            $this->fasilitas_rumah_sakit_id->ViewCustomAttributes = "";
+            $this->rumah_sakit_id->ViewCustomAttributes = "";
 
-            // dokter_id
-            $curVal = trim(strval($this->dokter_id->CurrentValue));
+            // administrator_rumah_sakit
+            $curVal = trim(strval($this->administrator_rumah_sakit->CurrentValue));
             if ($curVal != "") {
-                $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-                if ($this->dokter_id->ViewValue === null) { // Lookup from database
+                $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->lookupCacheOption($curVal);
+                if ($this->administrator_rumah_sakit->ViewValue === null) { // Lookup from database
                     $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $sqlWrk = $this->administrator_rumah_sakit->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
+                        $arwrk = $this->administrator_rumah_sakit->Lookup->renderViewRow($rswrk[0]);
+                        $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->displayValue($arwrk);
                     } else {
-                        $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
+                        $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->CurrentValue;
                     }
                 }
             } else {
-                $this->dokter_id->ViewValue = null;
+                $this->administrator_rumah_sakit->ViewValue = null;
             }
-            $this->dokter_id->ViewCustomAttributes = "";
+            $this->administrator_rumah_sakit->ViewCustomAttributes = "";
 
-            // hari_praktik
-            $this->hari_praktik->ViewValue = $this->hari_praktik->CurrentValue;
-            $this->hari_praktik->ViewCustomAttributes = "";
-
-            // jam_praktik
-            $this->jam_praktik->ViewValue = $this->jam_praktik->CurrentValue;
-            $this->jam_praktik->ViewCustomAttributes = "";
-
-            // dokter_id
-            $this->dokter_id->LinkCustomAttributes = "";
-            $this->dokter_id->HrefValue = "";
-            $this->dokter_id->TooltipValue = "";
-
-            // hari_praktik
-            $this->hari_praktik->LinkCustomAttributes = "";
-            $this->hari_praktik->HrefValue = "";
-            $this->hari_praktik->TooltipValue = "";
-
-            // jam_praktik
-            $this->jam_praktik->LinkCustomAttributes = "";
-            $this->jam_praktik->HrefValue = "";
-            $this->jam_praktik->TooltipValue = "";
-        } elseif ($this->RowType == ROWTYPE_ADD) {
-            // dokter_id
-            $this->dokter_id->EditCustomAttributes = "";
-            if ($this->dokter_id->getSessionValue() != "") {
-                $this->dokter_id->CurrentValue = GetForeignKeyValue($this->dokter_id->getSessionValue());
-                $this->dokter_id->OldValue = $this->dokter_id->CurrentValue;
-                $curVal = trim(strval($this->dokter_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-                    if ($this->dokter_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                        } else {
-                            $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->dokter_id->ViewValue = null;
-                }
-                $this->dokter_id->ViewCustomAttributes = "";
-            } else {
-                $curVal = trim(strval($this->dokter_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-                } else {
-                    $this->dokter_id->ViewValue = $this->dokter_id->Lookup !== null && is_array($this->dokter_id->Lookup->Options) ? $curVal : null;
-                }
-                if ($this->dokter_id->ViewValue !== null) { // Load from cache
-                    $this->dokter_id->EditValue = array_values($this->dokter_id->Lookup->Options);
-                    if ($this->dokter_id->ViewValue == "") {
-                        $this->dokter_id->ViewValue = $Language->phrase("PleaseSelect");
-                    }
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = "`id`" . SearchString("=", $this->dokter_id->CurrentValue, DATATYPE_NUMBER, "");
-                    }
-                    $sqlWrk = $this->dokter_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                    } else {
-                        $this->dokter_id->ViewValue = $Language->phrase("PleaseSelect");
-                    }
-                    $arwrk = $rswrk;
-                    $this->dokter_id->EditValue = $arwrk;
-                }
-                $this->dokter_id->PlaceHolder = RemoveHtml($this->dokter_id->caption());
+            // id
+            $this->id->LinkCustomAttributes = "";
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
+            if (!$this->isExport()) {
+                $this->id->ViewValue = $this->highlightValue($this->id);
             }
 
-            // hari_praktik
-            $this->hari_praktik->EditAttrs["class"] = "form-control";
-            $this->hari_praktik->EditCustomAttributes = "";
-            if (!$this->hari_praktik->Raw) {
-                $this->hari_praktik->CurrentValue = HtmlDecode($this->hari_praktik->CurrentValue);
-            }
-            $this->hari_praktik->EditValue = HtmlEncode($this->hari_praktik->CurrentValue);
-            $this->hari_praktik->PlaceHolder = RemoveHtml($this->hari_praktik->caption());
-
-            // jam_praktik
-            $this->jam_praktik->EditAttrs["class"] = "form-control";
-            $this->jam_praktik->EditCustomAttributes = "";
-            if (!$this->jam_praktik->Raw) {
-                $this->jam_praktik->CurrentValue = HtmlDecode($this->jam_praktik->CurrentValue);
-            }
-            $this->jam_praktik->EditValue = HtmlEncode($this->jam_praktik->CurrentValue);
-            $this->jam_praktik->PlaceHolder = RemoveHtml($this->jam_praktik->caption());
-
-            // Add refer script
-
-            // dokter_id
-            $this->dokter_id->LinkCustomAttributes = "";
-            $this->dokter_id->HrefValue = "";
-
-            // hari_praktik
-            $this->hari_praktik->LinkCustomAttributes = "";
-            $this->hari_praktik->HrefValue = "";
-
-            // jam_praktik
-            $this->jam_praktik->LinkCustomAttributes = "";
-            $this->jam_praktik->HrefValue = "";
-        } elseif ($this->RowType == ROWTYPE_EDIT) {
-            // dokter_id
-            $this->dokter_id->EditCustomAttributes = "";
-            if ($this->dokter_id->getSessionValue() != "") {
-                $this->dokter_id->CurrentValue = GetForeignKeyValue($this->dokter_id->getSessionValue());
-                $this->dokter_id->OldValue = $this->dokter_id->CurrentValue;
-                $curVal = trim(strval($this->dokter_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-                    if ($this->dokter_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                        } else {
-                            $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->dokter_id->ViewValue = null;
-                }
-                $this->dokter_id->ViewCustomAttributes = "";
-            } else {
-                $curVal = trim(strval($this->dokter_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-                } else {
-                    $this->dokter_id->ViewValue = $this->dokter_id->Lookup !== null && is_array($this->dokter_id->Lookup->Options) ? $curVal : null;
-                }
-                if ($this->dokter_id->ViewValue !== null) { // Load from cache
-                    $this->dokter_id->EditValue = array_values($this->dokter_id->Lookup->Options);
-                    if ($this->dokter_id->ViewValue == "") {
-                        $this->dokter_id->ViewValue = $Language->phrase("PleaseSelect");
-                    }
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = "`id`" . SearchString("=", $this->dokter_id->CurrentValue, DATATYPE_NUMBER, "");
-                    }
-                    $sqlWrk = $this->dokter_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
-                    } else {
-                        $this->dokter_id->ViewValue = $Language->phrase("PleaseSelect");
-                    }
-                    $arwrk = $rswrk;
-                    $this->dokter_id->EditValue = $arwrk;
-                }
-                $this->dokter_id->PlaceHolder = RemoveHtml($this->dokter_id->caption());
+            // username
+            $this->_username->LinkCustomAttributes = "";
+            $this->_username->HrefValue = "";
+            $this->_username->TooltipValue = "";
+            if (!$this->isExport()) {
+                $this->_username->ViewValue = $this->highlightValue($this->_username);
             }
 
-            // hari_praktik
-            $this->hari_praktik->EditAttrs["class"] = "form-control";
-            $this->hari_praktik->EditCustomAttributes = "";
-            if (!$this->hari_praktik->Raw) {
-                $this->hari_praktik->CurrentValue = HtmlDecode($this->hari_praktik->CurrentValue);
-            }
-            $this->hari_praktik->EditValue = HtmlEncode($this->hari_praktik->CurrentValue);
-            $this->hari_praktik->PlaceHolder = RemoveHtml($this->hari_praktik->caption());
+            // password
+            $this->_password->LinkCustomAttributes = "";
+            $this->_password->HrefValue = "";
+            $this->_password->TooltipValue = "";
 
-            // jam_praktik
-            $this->jam_praktik->EditAttrs["class"] = "form-control";
-            $this->jam_praktik->EditCustomAttributes = "";
-            if (!$this->jam_praktik->Raw) {
-                $this->jam_praktik->CurrentValue = HtmlDecode($this->jam_praktik->CurrentValue);
-            }
-            $this->jam_praktik->EditValue = HtmlEncode($this->jam_praktik->CurrentValue);
-            $this->jam_praktik->PlaceHolder = RemoveHtml($this->jam_praktik->caption());
+            // role
+            $this->role->LinkCustomAttributes = "";
+            $this->role->HrefValue = "";
+            $this->role->TooltipValue = "";
 
-            // Edit refer script
-
-            // dokter_id
-            $this->dokter_id->LinkCustomAttributes = "";
-            $this->dokter_id->HrefValue = "";
-
-            // hari_praktik
-            $this->hari_praktik->LinkCustomAttributes = "";
-            $this->hari_praktik->HrefValue = "";
-
-            // jam_praktik
-            $this->jam_praktik->LinkCustomAttributes = "";
-            $this->jam_praktik->HrefValue = "";
-        }
-        if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
-            $this->setupFieldTitles();
+            // administrator_rumah_sakit
+            $this->administrator_rumah_sakit->LinkCustomAttributes = "";
+            $this->administrator_rumah_sakit->HrefValue = "";
+            $this->administrator_rumah_sakit->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2497,285 +1973,35 @@ class PraktikPoliList extends PraktikPoli
         }
     }
 
-    // Validate form
-    protected function validateForm()
+    // Validate search
+    protected function validateSearch()
     {
-        global $Language;
-
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
         }
-        if ($this->dokter_id->Required) {
-            if (!$this->dokter_id->IsDetailKey && EmptyValue($this->dokter_id->FormValue)) {
-                $this->dokter_id->addErrorMessage(str_replace("%s", $this->dokter_id->caption(), $this->dokter_id->RequiredErrorMessage));
-            }
-        }
-        if ($this->hari_praktik->Required) {
-            if (!$this->hari_praktik->IsDetailKey && EmptyValue($this->hari_praktik->FormValue)) {
-                $this->hari_praktik->addErrorMessage(str_replace("%s", $this->hari_praktik->caption(), $this->hari_praktik->RequiredErrorMessage));
-            }
-        }
-        if ($this->jam_praktik->Required) {
-            if (!$this->jam_praktik->IsDetailKey && EmptyValue($this->jam_praktik->FormValue)) {
-                $this->jam_praktik->addErrorMessage(str_replace("%s", $this->jam_praktik->caption(), $this->jam_praktik->RequiredErrorMessage));
-            }
-        }
 
         // Return validate result
-        $validateForm = !$this->hasInvalidFields();
+        $validateSearch = !$this->hasInvalidFields();
 
         // Call Form_CustomValidate event
         $formCustomError = "";
-        $validateForm = $validateForm && $this->formCustomValidate($formCustomError);
+        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
         if ($formCustomError != "") {
             $this->setFailureMessage($formCustomError);
         }
-        return $validateForm;
+        return $validateSearch;
     }
 
-    // Delete records based on current filter
-    protected function deleteRows()
+    // Load advanced search
+    public function loadAdvancedSearch()
     {
-        global $Language, $Security;
-        if (!$Security->canDelete()) {
-            $this->setFailureMessage($Language->phrase("NoDeletePermission")); // No delete permission
-            return false;
-        }
-        $deleteRows = true;
-        $sql = $this->getCurrentSql();
-        $conn = $this->getConnection();
-        $rows = $conn->fetchAll($sql);
-        if (count($rows) == 0) {
-            $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
-            return false;
-        }
-
-        // Clone old rows
-        $rsold = $rows;
-
-        // Call row deleting event
-        if ($deleteRows) {
-            foreach ($rsold as $row) {
-                $deleteRows = $this->rowDeleting($row);
-                if (!$deleteRows) {
-                    break;
-                }
-            }
-        }
-        if ($deleteRows) {
-            $key = "";
-            foreach ($rsold as $row) {
-                $thisKey = "";
-                if ($thisKey != "") {
-                    $thisKey .= Config("COMPOSITE_KEY_SEPARATOR");
-                }
-                $thisKey .= $row['id'];
-                if (Config("DELETE_UPLOADED_FILES")) { // Delete old files
-                    $this->deleteUploadedFiles($row);
-                }
-                $deleteRows = $this->delete($row); // Delete
-                if ($deleteRows === false) {
-                    break;
-                }
-                if ($key != "") {
-                    $key .= ", ";
-                }
-                $key .= $thisKey;
-            }
-        }
-        if (!$deleteRows) {
-            // Set up error message
-            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
-                // Use the message, do nothing
-            } elseif ($this->CancelMessage != "") {
-                $this->setFailureMessage($this->CancelMessage);
-                $this->CancelMessage = "";
-            } else {
-                $this->setFailureMessage($Language->phrase("DeleteCancelled"));
-            }
-        }
-
-        // Call Row Deleted event
-        if ($deleteRows) {
-            foreach ($rsold as $row) {
-                $this->rowDeleted($row);
-            }
-        }
-
-        // Write JSON for API request
-        if (IsApi() && $deleteRows) {
-            $row = $this->getRecordsFromRecordset($rsold);
-            WriteJson(["success" => true, $this->TableVar => $row]);
-        }
-        return $deleteRows;
-    }
-
-    // Update record based on key values
-    protected function editRow()
-    {
-        global $Security, $Language;
-        $oldKeyFilter = $this->getRecordFilter();
-        $filter = $this->applyUserIDFilters($oldKeyFilter);
-        $conn = $this->getConnection();
-        $this->CurrentFilter = $filter;
-        $sql = $this->getCurrentSql();
-        $rsold = $conn->fetchAssoc($sql);
-        $editRow = false;
-        if (!$rsold) {
-            $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
-            $editRow = false; // Update Failed
-        } else {
-            // Save old values
-            $this->loadDbValues($rsold);
-            $rsnew = [];
-
-            // dokter_id
-            if ($this->dokter_id->getSessionValue() != "") {
-                $this->dokter_id->ReadOnly = true;
-            }
-            $this->dokter_id->setDbValueDef($rsnew, $this->dokter_id->CurrentValue, 0, $this->dokter_id->ReadOnly);
-
-            // hari_praktik
-            $this->hari_praktik->setDbValueDef($rsnew, $this->hari_praktik->CurrentValue, null, $this->hari_praktik->ReadOnly);
-
-            // jam_praktik
-            $this->jam_praktik->setDbValueDef($rsnew, $this->jam_praktik->CurrentValue, null, $this->jam_praktik->ReadOnly);
-
-            // Call Row Updating event
-            $updateRow = $this->rowUpdating($rsold, $rsnew);
-            if ($updateRow) {
-                if (count($rsnew) > 0) {
-                    try {
-                        $editRow = $this->update($rsnew, "", $rsold);
-                    } catch (\Exception $e) {
-                        $this->setFailureMessage($e->getMessage());
-                    }
-                } else {
-                    $editRow = true; // No field to update
-                }
-                if ($editRow) {
-                }
-            } else {
-                if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
-                    // Use the message, do nothing
-                } elseif ($this->CancelMessage != "") {
-                    $this->setFailureMessage($this->CancelMessage);
-                    $this->CancelMessage = "";
-                } else {
-                    $this->setFailureMessage($Language->phrase("UpdateCancelled"));
-                }
-                $editRow = false;
-            }
-        }
-
-        // Call Row_Updated event
-        if ($editRow) {
-            $this->rowUpdated($rsold, $rsnew);
-        }
-
-        // Clean upload path if any
-        if ($editRow) {
-        }
-
-        // Write JSON for API request
-        if (IsApi() && $editRow) {
-            $row = $this->getRecordsFromRecordset([$rsnew], true);
-            WriteJson(["success" => true, $this->TableVar => $row]);
-        }
-        return $editRow;
-    }
-
-    // Load row hash
-    protected function loadRowHash()
-    {
-        $filter = $this->getRecordFilter();
-
-        // Load SQL based on filter
-        $this->CurrentFilter = $filter;
-        $sql = $this->getCurrentSql();
-        $conn = $this->getConnection();
-        $row = $conn->fetchAssoc($sql);
-        $this->HashValue = $row ? $this->getRowHash($row) : ""; // Get hash value for record
-    }
-
-    // Get Row Hash
-    public function getRowHash(&$rs)
-    {
-        if (!$rs) {
-            return "";
-        }
-        $row = ($rs instanceof Recordset) ? $rs->fields : $rs;
-        $hash = "";
-        $hash .= GetFieldHash($row['dokter_id']); // dokter_id
-        $hash .= GetFieldHash($row['hari_praktik']); // hari_praktik
-        $hash .= GetFieldHash($row['jam_praktik']); // jam_praktik
-        return md5($hash);
-    }
-
-    // Add record
-    protected function addRow($rsold = null)
-    {
-        global $Language, $Security;
-        $conn = $this->getConnection();
-
-        // Load db values from rsold
-        $this->loadDbValues($rsold);
-        if ($rsold) {
-        }
-        $rsnew = [];
-
-        // dokter_id
-        $this->dokter_id->setDbValueDef($rsnew, $this->dokter_id->CurrentValue, 0, false);
-
-        // hari_praktik
-        $this->hari_praktik->setDbValueDef($rsnew, $this->hari_praktik->CurrentValue, null, false);
-
-        // jam_praktik
-        $this->jam_praktik->setDbValueDef($rsnew, $this->jam_praktik->CurrentValue, null, false);
-
-        // fasilitas_rumah_sakit_id
-        if ($this->fasilitas_rumah_sakit_id->getSessionValue() != "") {
-            $rsnew['fasilitas_rumah_sakit_id'] = $this->fasilitas_rumah_sakit_id->getSessionValue();
-        }
-
-        // Call Row Inserting event
-        $insertRow = $this->rowInserting($rsold, $rsnew);
-        $addRow = false;
-        if ($insertRow) {
-            try {
-                $addRow = $this->insert($rsnew);
-            } catch (\Exception $e) {
-                $this->setFailureMessage($e->getMessage());
-            }
-            if ($addRow) {
-            }
-        } else {
-            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
-                // Use the message, do nothing
-            } elseif ($this->CancelMessage != "") {
-                $this->setFailureMessage($this->CancelMessage);
-                $this->CancelMessage = "";
-            } else {
-                $this->setFailureMessage($Language->phrase("InsertCancelled"));
-            }
-            $addRow = false;
-        }
-        if ($addRow) {
-            // Call Row Inserted event
-            $this->rowInserted($rsold, $rsnew);
-        }
-
-        // Clean upload path if any
-        if ($addRow) {
-        }
-
-        // Write JSON for API request
-        if (IsApi() && $addRow) {
-            $row = $this->getRecordsFromRecordset([$rsnew], true);
-            WriteJson(["success" => true, $this->TableVar => $row]);
-        }
-        return $addRow;
+        $this->id->AdvancedSearch->load();
+        $this->_username->AdvancedSearch->load();
+        $this->_password->AdvancedSearch->load();
+        $this->role->AdvancedSearch->load();
+        $this->rumah_sakit_id->AdvancedSearch->load();
+        $this->administrator_rumah_sakit->AdvancedSearch->load();
     }
 
     // Set up search options
@@ -2789,13 +2015,27 @@ class PraktikPoliList extends PraktikPoli
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" href=\"#\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"fpraktik_polilistsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" href=\"#\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"fwebusers_rslistsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button
         $item = &$this->SearchOptions->add("showall");
         $item->Body = "<a class=\"btn btn-default ew-show-all\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
         $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
+
+        // Advanced search button
+        $item = &$this->SearchOptions->add("advancedsearch");
+        if (IsMobile()) {
+            $item->Body = "<a class=\"btn btn-default ew-advanced-search\" title=\"" . $Language->phrase("AdvancedSearch") . "\" data-caption=\"" . $Language->phrase("AdvancedSearch") . "\" href=\"webusersrssearch\">" . $Language->phrase("AdvancedSearchBtn") . "</a>";
+        } else {
+            $item->Body = "<a class=\"btn btn-default ew-advanced-search\" title=\"" . $Language->phrase("AdvancedSearch") . "\" data-table=\"webusers_rs\" data-caption=\"" . $Language->phrase("AdvancedSearch") . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'SearchBtn',url:'webusersrssearch'});\">" . $Language->phrase("AdvancedSearchBtn") . "</a>";
+        }
+        $item->Visible = true;
+
+        // Search highlight button
+        $item = &$this->SearchOptions->add("searchhighlight");
+        $item->Body = "<a class=\"btn btn-default ew-highlight active\" href=\"#\" role=\"button\" title=\"" . $Language->phrase("Highlight") . "\" data-caption=\"" . $Language->phrase("Highlight") . "\" data-toggle=\"button\" data-form=\"fwebusers_rslistsrch\" data-name=\"" . $this->highlightName() . "\">" . $Language->phrase("HighlightBtn") . "</a>";
+        $item->Visible = ($this->SearchWhere != "" && $this->TotalRecords > 0);
 
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
@@ -2815,114 +2055,6 @@ class PraktikPoliList extends PraktikPoli
             $this->SearchOptions->hideAllOptions();
             $this->FilterOptions->hideAllOptions();
         }
-    }
-
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "fasilitas_rumah_sakit") {
-                $validMaster = true;
-                $masterTbl = Container("fasilitas_rumah_sakit");
-                if (($parm = Get("fk_id", Get("fasilitas_rumah_sakit_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->fasilitas_rumah_sakit_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->fasilitas_rumah_sakit_id->setSessionValue($this->fasilitas_rumah_sakit_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-            if ($masterTblVar == "dokter") {
-                $validMaster = true;
-                $masterTbl = Container("dokter");
-                if (($parm = Get("fk_id", Get("dokter_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->dokter_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->dokter_id->setSessionValue($this->dokter_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "fasilitas_rumah_sakit") {
-                $validMaster = true;
-                $masterTbl = Container("fasilitas_rumah_sakit");
-                if (($parm = Post("fk_id", Post("fasilitas_rumah_sakit_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->fasilitas_rumah_sakit_id->setFormValue($masterTbl->id->FormValue);
-                    $this->fasilitas_rumah_sakit_id->setSessionValue($this->fasilitas_rumah_sakit_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-            if ($masterTblVar == "dokter") {
-                $validMaster = true;
-                $masterTbl = Container("dokter");
-                if (($parm = Post("fk_id", Post("dokter_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->dokter_id->setFormValue($masterTbl->id->FormValue);
-                    $this->dokter_id->setSessionValue($this->dokter_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Update URL
-            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
-            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
-            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
-            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "fasilitas_rumah_sakit") {
-                if ($this->fasilitas_rumah_sakit_id->CurrentValue == "") {
-                    $this->fasilitas_rumah_sakit_id->setSessionValue("");
-                }
-            }
-            if ($masterTblVar != "dokter") {
-                if ($this->dokter_id->CurrentValue == "") {
-                    $this->dokter_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilter(); // Get master filter
-        $this->DbDetailFilter = $this->getDetailFilter(); // Get detail filter
     }
 
     // Set up Breadcrumb
@@ -2948,13 +2080,9 @@ class PraktikPoliList extends PraktikPoli
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_fasilitas_rumah_sakit_id":
-                    $lookupFilter = function () {
-                        return (CurrentUserLevel() == -1) ? "" : "`rumah_sakit_id` = ".CurrentUserInfo("rumah_sakit_id");
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
+                case "x_rumah_sakit_id":
                     break;
-                case "x_dokter_id":
+                case "x_administrator_rumah_sakit":
                     break;
                 default:
                     $lookupFilter = "";

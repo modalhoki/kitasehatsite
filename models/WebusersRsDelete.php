@@ -7,7 +7,7 @@ use Doctrine\DBAL\ParameterType;
 /**
  * Page class
  */
-class PraktikPoliDelete extends PraktikPoli
+class WebusersRsDelete extends WebusersRs
 {
     use MessagesTrait;
 
@@ -18,13 +18,21 @@ class PraktikPoliDelete extends PraktikPoli
     public $ProjectID = PROJECT_ID;
 
     // Table name
-    public $TableName = 'praktik_poli';
+    public $TableName = 'webusers_rs';
 
     // Page object name
-    public $PageObjName = "PraktikPoliDelete";
+    public $PageObjName = "WebusersRsDelete";
 
     // Rendering View
     public $RenderingView = false;
+
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
 
     // Page headings
     public $Heading = "";
@@ -127,9 +135,9 @@ class PraktikPoliDelete extends PraktikPoli
         // Parent constuctor
         parent::__construct();
 
-        // Table object (praktik_poli)
-        if (!isset($GLOBALS["praktik_poli"]) || get_class($GLOBALS["praktik_poli"]) == PROJECT_NAMESPACE . "praktik_poli") {
-            $GLOBALS["praktik_poli"] = &$this;
+        // Table object (webusers_rs)
+        if (!isset($GLOBALS["webusers_rs"]) || get_class($GLOBALS["webusers_rs"]) == PROJECT_NAMESPACE . "webusers_rs") {
+            $GLOBALS["webusers_rs"] = &$this;
         }
 
         // Page URL
@@ -137,7 +145,7 @@ class PraktikPoliDelete extends PraktikPoli
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'praktik_poli');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'webusers_rs');
         }
 
         // Start timer
@@ -222,7 +230,7 @@ class PraktikPoliDelete extends PraktikPoli
             }
             $class = PROJECT_NAMESPACE . Config("EXPORT_CLASSES." . $this->CustomExport);
             if (class_exists($class)) {
-                $doc = new $class(Container("praktik_poli"));
+                $doc = new $class(Container("webusers_rs"));
                 $doc->Text = @$content;
                 if ($this->isExport("email")) {
                     echo $this->exportEmail($doc->Text);
@@ -374,11 +382,12 @@ class PraktikPoliDelete extends PraktikPoli
     {
         global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm;
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->Visible = false;
-        $this->fasilitas_rumah_sakit_id->Visible = false;
-        $this->dokter_id->setVisibility();
-        $this->hari_praktik->setVisibility();
-        $this->jam_praktik->setVisibility();
+        $this->id->setVisibility();
+        $this->_username->setVisibility();
+        $this->_password->setVisibility();
+        $this->role->setVisibility();
+        $this->rumah_sakit_id->Visible = false;
+        $this->administrator_rumah_sakit->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -393,11 +402,8 @@ class PraktikPoliDelete extends PraktikPoli
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->fasilitas_rumah_sakit_id);
-        $this->setupLookupOptions($this->dokter_id);
-
-        // Set up master/detail parameters
-        $this->setupMasterParms();
+        $this->setupLookupOptions($this->rumah_sakit_id);
+        $this->setupLookupOptions($this->administrator_rumah_sakit);
 
         // Set up Breadcrumb
         $this->setupBreadcrumb();
@@ -406,7 +412,7 @@ class PraktikPoliDelete extends PraktikPoli
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("praktikpolilist"); // Prevent SQL injection, return to list
+            $this->terminate("webusersrslist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -452,7 +458,7 @@ class PraktikPoliDelete extends PraktikPoli
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("praktikpolilist"); // Return to list
+                $this->terminate("webusersrslist"); // Return to list
                 return;
             }
         }
@@ -547,10 +553,11 @@ class PraktikPoliDelete extends PraktikPoli
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->fasilitas_rumah_sakit_id->setDbValue($row['fasilitas_rumah_sakit_id']);
-        $this->dokter_id->setDbValue($row['dokter_id']);
-        $this->hari_praktik->setDbValue($row['hari_praktik']);
-        $this->jam_praktik->setDbValue($row['jam_praktik']);
+        $this->_username->setDbValue($row['username']);
+        $this->_password->setDbValue($row['password']);
+        $this->role->setDbValue($row['role']);
+        $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
+        $this->administrator_rumah_sakit->setDbValue($row['administrator_rumah_sakit']);
     }
 
     // Return a row with default values
@@ -558,10 +565,11 @@ class PraktikPoliDelete extends PraktikPoli
     {
         $row = [];
         $row['id'] = null;
-        $row['fasilitas_rumah_sakit_id'] = null;
-        $row['dokter_id'] = null;
-        $row['hari_praktik'] = null;
-        $row['jam_praktik'] = null;
+        $row['username'] = null;
+        $row['password'] = null;
+        $row['role'] = null;
+        $row['rumah_sakit_id'] = null;
+        $row['administrator_rumah_sakit'] = null;
         return $row;
     }
 
@@ -579,86 +587,98 @@ class PraktikPoliDelete extends PraktikPoli
 
         // id
 
-        // fasilitas_rumah_sakit_id
+        // username
 
-        // dokter_id
+        // password
 
-        // hari_praktik
+        // role
 
-        // jam_praktik
+        // rumah_sakit_id
+
+        // administrator_rumah_sakit
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
             $this->id->ViewCustomAttributes = "";
 
-            // fasilitas_rumah_sakit_id
-            $curVal = trim(strval($this->fasilitas_rumah_sakit_id->CurrentValue));
+            // username
+            $this->_username->ViewValue = $this->_username->CurrentValue;
+            $this->_username->ViewCustomAttributes = "";
+
+            // password
+            $this->_password->ViewValue = $Language->phrase("PasswordMask");
+            $this->_password->ViewCustomAttributes = "";
+
+            // role
+            $this->role->ViewValue = FormatNumber($this->role->ViewValue, 0, -2, -2, -2);
+            $this->role->ViewCustomAttributes = "";
+
+            // rumah_sakit_id
+            $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
             if ($curVal != "") {
-                $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->lookupCacheOption($curVal);
-                if ($this->fasilitas_rumah_sakit_id->ViewValue === null) { // Lookup from database
+                $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
+                if ($this->rumah_sakit_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $lookupFilter = function() {
-                        return (CurrentUserLevel() == -1) ? "" : "`rumah_sakit_id` = ".CurrentUserInfo("rumah_sakit_id");
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->fasilitas_rumah_sakit_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                    $sqlWrk = $this->rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->fasilitas_rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->displayValue($arwrk);
+                        $arwrk = $this->rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->displayValue($arwrk);
                     } else {
-                        $this->fasilitas_rumah_sakit_id->ViewValue = $this->fasilitas_rumah_sakit_id->CurrentValue;
+                        $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
                     }
                 }
             } else {
-                $this->fasilitas_rumah_sakit_id->ViewValue = null;
+                $this->rumah_sakit_id->ViewValue = null;
             }
-            $this->fasilitas_rumah_sakit_id->ViewCustomAttributes = "";
+            $this->rumah_sakit_id->ViewCustomAttributes = "";
 
-            // dokter_id
-            $curVal = trim(strval($this->dokter_id->CurrentValue));
+            // administrator_rumah_sakit
+            $curVal = trim(strval($this->administrator_rumah_sakit->CurrentValue));
             if ($curVal != "") {
-                $this->dokter_id->ViewValue = $this->dokter_id->lookupCacheOption($curVal);
-                if ($this->dokter_id->ViewValue === null) { // Lookup from database
+                $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->lookupCacheOption($curVal);
+                if ($this->administrator_rumah_sakit->ViewValue === null) { // Lookup from database
                     $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->dokter_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $sqlWrk = $this->administrator_rumah_sakit->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->dokter_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->dokter_id->ViewValue = $this->dokter_id->displayValue($arwrk);
+                        $arwrk = $this->administrator_rumah_sakit->Lookup->renderViewRow($rswrk[0]);
+                        $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->displayValue($arwrk);
                     } else {
-                        $this->dokter_id->ViewValue = $this->dokter_id->CurrentValue;
+                        $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->CurrentValue;
                     }
                 }
             } else {
-                $this->dokter_id->ViewValue = null;
+                $this->administrator_rumah_sakit->ViewValue = null;
             }
-            $this->dokter_id->ViewCustomAttributes = "";
+            $this->administrator_rumah_sakit->ViewCustomAttributes = "";
 
-            // hari_praktik
-            $this->hari_praktik->ViewValue = $this->hari_praktik->CurrentValue;
-            $this->hari_praktik->ViewCustomAttributes = "";
+            // id
+            $this->id->LinkCustomAttributes = "";
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
 
-            // jam_praktik
-            $this->jam_praktik->ViewValue = $this->jam_praktik->CurrentValue;
-            $this->jam_praktik->ViewCustomAttributes = "";
+            // username
+            $this->_username->LinkCustomAttributes = "";
+            $this->_username->HrefValue = "";
+            $this->_username->TooltipValue = "";
 
-            // dokter_id
-            $this->dokter_id->LinkCustomAttributes = "";
-            $this->dokter_id->HrefValue = "";
-            $this->dokter_id->TooltipValue = "";
+            // password
+            $this->_password->LinkCustomAttributes = "";
+            $this->_password->HrefValue = "";
+            $this->_password->TooltipValue = "";
 
-            // hari_praktik
-            $this->hari_praktik->LinkCustomAttributes = "";
-            $this->hari_praktik->HrefValue = "";
-            $this->hari_praktik->TooltipValue = "";
+            // role
+            $this->role->LinkCustomAttributes = "";
+            $this->role->HrefValue = "";
+            $this->role->TooltipValue = "";
 
-            // jam_praktik
-            $this->jam_praktik->LinkCustomAttributes = "";
-            $this->jam_praktik->HrefValue = "";
-            $this->jam_praktik->TooltipValue = "";
+            // administrator_rumah_sakit
+            $this->administrator_rumah_sakit->LinkCustomAttributes = "";
+            $this->administrator_rumah_sakit->HrefValue = "";
+            $this->administrator_rumah_sakit->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -684,6 +704,9 @@ class PraktikPoliDelete extends PraktikPoli
             return false;
         }
         $conn->beginTransaction();
+        if ($this->AuditTrailOnDelete) {
+            $this->writeAuditTrailDummy($Language->phrase("BatchDeleteBegin")); // Batch delete begin
+        }
 
         // Clone old rows
         $rsold = $rows;
@@ -731,8 +754,14 @@ class PraktikPoliDelete extends PraktikPoli
         }
         if ($deleteRows) {
             $conn->commit(); // Commit the changes
+            if ($this->AuditTrailOnDelete) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchDeleteSuccess")); // Batch delete success
+            }
         } else {
             $conn->rollback(); // Rollback changes
+            if ($this->AuditTrailOnDelete) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchDeleteRollback")); // Batch delete rollback
+            }
         }
 
         // Call Row Deleted event
@@ -750,115 +779,13 @@ class PraktikPoliDelete extends PraktikPoli
         return $deleteRows;
     }
 
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "fasilitas_rumah_sakit") {
-                $validMaster = true;
-                $masterTbl = Container("fasilitas_rumah_sakit");
-                if (($parm = Get("fk_id", Get("fasilitas_rumah_sakit_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->fasilitas_rumah_sakit_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->fasilitas_rumah_sakit_id->setSessionValue($this->fasilitas_rumah_sakit_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-            if ($masterTblVar == "dokter") {
-                $validMaster = true;
-                $masterTbl = Container("dokter");
-                if (($parm = Get("fk_id", Get("dokter_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->dokter_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->dokter_id->setSessionValue($this->dokter_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "fasilitas_rumah_sakit") {
-                $validMaster = true;
-                $masterTbl = Container("fasilitas_rumah_sakit");
-                if (($parm = Post("fk_id", Post("fasilitas_rumah_sakit_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->fasilitas_rumah_sakit_id->setFormValue($masterTbl->id->FormValue);
-                    $this->fasilitas_rumah_sakit_id->setSessionValue($this->fasilitas_rumah_sakit_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-            if ($masterTblVar == "dokter") {
-                $validMaster = true;
-                $masterTbl = Container("dokter");
-                if (($parm = Post("fk_id", Post("dokter_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->dokter_id->setFormValue($masterTbl->id->FormValue);
-                    $this->dokter_id->setSessionValue($this->dokter_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "fasilitas_rumah_sakit") {
-                if ($this->fasilitas_rumah_sakit_id->CurrentValue == "") {
-                    $this->fasilitas_rumah_sakit_id->setSessionValue("");
-                }
-            }
-            if ($masterTblVar != "dokter") {
-                if ($this->dokter_id->CurrentValue == "") {
-                    $this->dokter_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilter(); // Get master filter
-        $this->DbDetailFilter = $this->getDetailFilter(); // Get detail filter
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("praktikpolilist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("webusersrslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }
@@ -876,13 +803,9 @@ class PraktikPoliDelete extends PraktikPoli
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_fasilitas_rumah_sakit_id":
-                    $lookupFilter = function () {
-                        return (CurrentUserLevel() == -1) ? "" : "`rumah_sakit_id` = ".CurrentUserInfo("rumah_sakit_id");
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
+                case "x_rumah_sakit_id":
                     break;
-                case "x_dokter_id":
+                case "x_administrator_rumah_sakit":
                     break;
                 default:
                     $lookupFilter = "";

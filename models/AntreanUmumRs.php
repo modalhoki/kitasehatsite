@@ -5,9 +5,9 @@ namespace PHPMaker2021\Kitasehat;
 use Doctrine\DBAL\ParameterType;
 
 /**
- * Table class for rumah_sakit
+ * Table class for antrean_umum_rs
  */
-class RumahSakit extends DbTable
+class AntreanUmumRs extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -24,15 +24,26 @@ class RumahSakit extends DbTable
     public $OffsetColumnClass = "col-sm-10 offset-sm-2";
     public $TableLeftColumnClass = "w-col-2";
 
+    // Audit trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Export
     public $ExportDoc;
 
     // Fields
     public $id;
-    public $nama;
-    public $alamat;
-    public $daerah_id;
-    public $foto_rumah_sakit;
+    public $nomor_antrean;
+    public $waktu;
+    public $pasien_id;
+    public $fasilitas_id;
+    public $rumah_sakit_id;
+    public $status;
+    public $keluhan_awal;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -45,12 +56,12 @@ class RumahSakit extends DbTable
 
         // Language object
         $Language = Container("language");
-        $this->TableVar = 'rumah_sakit';
-        $this->TableName = 'rumah_sakit';
-        $this->TableType = 'TABLE';
+        $this->TableVar = 'antrean_umum_rs';
+        $this->TableName = 'antrean_umum_rs';
+        $this->TableType = 'CUSTOMVIEW';
 
         // Update Table
-        $this->UpdateTable = "`rumah_sakit`";
+        $this->UpdateTable = "antrean_umum";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -71,48 +82,81 @@ class RumahSakit extends DbTable
         $this->BasicSearch->TypeDefault = "OR";
 
         // id
-        $this->id = new DbField('rumah_sakit', 'rumah_sakit', 'x_id', 'id', '`id`', '`id`', 20, 20, -1, false, '`id`', false, false, false, 'FORMATTED TEXT', 'NO');
+        $this->id = new DbField('antrean_umum_rs', 'antrean_umum_rs', 'x_id', 'id', '`id`', '`id`', 20, 20, -1, false, '`id`', false, false, false, 'FORMATTED TEXT', 'NO');
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
-        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
-        // nama
-        $this->nama = new DbField('rumah_sakit', 'rumah_sakit', 'x_nama', 'nama', '`nama`', '`nama`', 200, 255, -1, false, '`nama`', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->nama->Nullable = false; // NOT NULL field
-        $this->nama->Required = true; // Required field
-        $this->nama->Sortable = true; // Allow sort
-        $this->nama->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->nama->Param, "CustomMsg");
-        $this->Fields['nama'] = &$this->nama;
+        // nomor_antrean
+        $this->nomor_antrean = new DbField('antrean_umum_rs', 'antrean_umum_rs', 'x_nomor_antrean', 'nomor_antrean', '`nomor_antrean`', '`nomor_antrean`', 3, 11, -1, false, '`nomor_antrean`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->nomor_antrean->Sortable = true; // Allow sort
+        $this->nomor_antrean->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->nomor_antrean->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->nomor_antrean->Param, "CustomMsg");
+        $this->Fields['nomor_antrean'] = &$this->nomor_antrean;
 
-        // alamat
-        $this->alamat = new DbField('rumah_sakit', 'rumah_sakit', 'x_alamat', 'alamat', '`alamat`', '`alamat`', 200, 255, -1, false, '`alamat`', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->alamat->Nullable = false; // NOT NULL field
-        $this->alamat->Required = true; // Required field
-        $this->alamat->Sortable = true; // Allow sort
-        $this->alamat->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->alamat->Param, "CustomMsg");
-        $this->Fields['alamat'] = &$this->alamat;
+        // waktu
+        $this->waktu = new DbField('antrean_umum_rs', 'antrean_umum_rs', 'x_waktu', 'waktu', '`waktu`', CastDateFieldForLike("`waktu`", 0, "DB"), 135, 19, 0, false, '`waktu`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->waktu->Sortable = true; // Allow sort
+        $this->waktu->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->waktu->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->waktu->Param, "CustomMsg");
+        $this->Fields['waktu'] = &$this->waktu;
 
-        // daerah_id
-        $this->daerah_id = new DbField('rumah_sakit', 'rumah_sakit', 'x_daerah_id', 'daerah_id', '`daerah_id`', '`daerah_id`', 3, 11, -1, false, '`daerah_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->daerah_id->Nullable = false; // NOT NULL field
-        $this->daerah_id->Required = true; // Required field
-        $this->daerah_id->Sortable = true; // Allow sort
-        $this->daerah_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->daerah_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->daerah_id->Lookup = new Lookup('daerah_id', 'daerah', false, 'id', ["jenis","nama_daerah","",""], [], [], [], [], [], [], '', '');
-        $this->daerah_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->daerah_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->daerah_id->Param, "CustomMsg");
-        $this->Fields['daerah_id'] = &$this->daerah_id;
+        // pasien_id
+        $this->pasien_id = new DbField('antrean_umum_rs', 'antrean_umum_rs', 'x_pasien_id', 'pasien_id', '`pasien_id`', '`pasien_id`', 20, 20, -1, false, '`pasien_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->pasien_id->Nullable = false; // NOT NULL field
+        $this->pasien_id->Required = true; // Required field
+        $this->pasien_id->Sortable = true; // Allow sort
+        $this->pasien_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->pasien_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->pasien_id->Lookup = new Lookup('pasien_id', 'pasien', false, 'id', ["nama","jenis_kelamin","tanggal_lahir",""], [], [], [], [], [], [], '', '');
+        $this->pasien_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->pasien_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->pasien_id->Param, "CustomMsg");
+        $this->Fields['pasien_id'] = &$this->pasien_id;
 
-        // foto_rumah_sakit
-        $this->foto_rumah_sakit = new DbField('rumah_sakit', 'rumah_sakit', 'x_foto_rumah_sakit', 'foto_rumah_sakit', '`foto_rumah_sakit`', '`foto_rumah_sakit`', 200, 255, -1, false, '`foto_rumah_sakit`', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->foto_rumah_sakit->Sortable = true; // Allow sort
-        $this->foto_rumah_sakit->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->foto_rumah_sakit->Param, "CustomMsg");
-        $this->Fields['foto_rumah_sakit'] = &$this->foto_rumah_sakit;
+        // fasilitas_id
+        $this->fasilitas_id = new DbField('antrean_umum_rs', 'antrean_umum_rs', 'x_fasilitas_id', 'fasilitas_id', '`fasilitas_id`', '`fasilitas_id`', 3, 11, -1, false, '`fasilitas_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->fasilitas_id->Nullable = false; // NOT NULL field
+        $this->fasilitas_id->Required = true; // Required field
+        $this->fasilitas_id->Sortable = true; // Allow sort
+        $this->fasilitas_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->fasilitas_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->fasilitas_id->Lookup = new Lookup('fasilitas_id', 'fasilitas', false, 'id', ["nama_layanan","","",""], [], [], [], [], [], [], '', '');
+        $this->fasilitas_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->fasilitas_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->fasilitas_id->Param, "CustomMsg");
+        $this->Fields['fasilitas_id'] = &$this->fasilitas_id;
+
+        // rumah_sakit_id
+        $this->rumah_sakit_id = new DbField('antrean_umum_rs', 'antrean_umum_rs', 'x_rumah_sakit_id', 'rumah_sakit_id', '`rumah_sakit_id`', '`rumah_sakit_id`', 20, 20, -1, false, '`rumah_sakit_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->rumah_sakit_id->Nullable = false; // NOT NULL field
+        $this->rumah_sakit_id->Required = true; // Required field
+        $this->rumah_sakit_id->Sortable = true; // Allow sort
+        $this->rumah_sakit_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->rumah_sakit_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->rumah_sakit_id->Lookup = new Lookup('rumah_sakit_id', 'rumah_sakit', false, 'id', ["nama","","",""], [], [], [], [], [], [], '', '');
+        $this->rumah_sakit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->rumah_sakit_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->rumah_sakit_id->Param, "CustomMsg");
+        $this->Fields['rumah_sakit_id'] = &$this->rumah_sakit_id;
+
+        // status
+        $this->status = new DbField('antrean_umum_rs', 'antrean_umum_rs', 'x_status', 'status', '`status`', '`status`', 202, 13, -1, false, '`status`', false, false, false, 'FORMATTED TEXT', 'RADIO');
+        $this->status->Nullable = false; // NOT NULL field
+        $this->status->Required = true; // Required field
+        $this->status->Sortable = true; // Allow sort
+        $this->status->Lookup = new Lookup('status', 'antrean_umum_rs', false, '', ["","","",""], [], [], [], [], [], [], '', '');
+        $this->status->OptionCount = 4;
+        $this->status->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->status->Param, "CustomMsg");
+        $this->Fields['status'] = &$this->status;
+
+        // keluhan_awal
+        $this->keluhan_awal = new DbField('antrean_umum_rs', 'antrean_umum_rs', 'x_keluhan_awal', 'keluhan_awal', '`keluhan_awal`', '`keluhan_awal`', 200, 255, -1, false, '`keluhan_awal`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->keluhan_awal->Nullable = false; // NOT NULL field
+        $this->keluhan_awal->Required = true; // Required field
+        $this->keluhan_awal->Sortable = true; // Allow sort
+        $this->keluhan_awal->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->keluhan_awal->Param, "CustomMsg");
+        $this->Fields['keluhan_awal'] = &$this->keluhan_awal;
     }
 
     // Field Visibility
@@ -152,36 +196,10 @@ class RumahSakit extends DbTable
         }
     }
 
-    // Current detail table name
-    public function getCurrentDetailTable()
-    {
-        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE"));
-    }
-
-    public function setCurrentDetailTable($v)
-    {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
-    }
-
-    // Get detail url
-    public function getDetailUrl()
-    {
-        // Detail url
-        $detailUrl = "";
-        if ($this->getCurrentDetailTable() == "fasilitas_rumah_sakit") {
-            $detailUrl = Container("fasilitas_rumah_sakit")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
-        if ($detailUrl == "") {
-            $detailUrl = "rumahsakitlist";
-        }
-        return $detailUrl;
-    }
-
     // Table level SQL
     public function getSqlFrom() // From
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "`rumah_sakit`";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "antrean_umum";
     }
 
     public function sqlFrom() // For backward compatibility
@@ -196,7 +214,7 @@ class RumahSakit extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("antrean_umum.*");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -212,7 +230,7 @@ class RumahSakit extends DbTable
     public function getSqlWhere() // Where
     {
         $where = ($this->SqlWhere != "") ? $this->SqlWhere : "";
-        $this->DefaultFilter = "`id` = ".CurrentUserInfo("rumah_sakit_id");
+        $this->DefaultFilter = (CurrentUserLevel() == -1) ? "" : "`rumah_sakit_id` =".CurrentUserInfo("rumah_sakit_id");
         AddFilter($where, $this->DefaultFilter);
         return $where;
     }
@@ -468,6 +486,9 @@ class RumahSakit extends DbTable
             // Get insert id if necessary
             $this->id->setDbValue($conn->lastInsertId());
             $rs['id'] = $this->id->DbValue;
+            if ($this->AuditTrailOnAdd) {
+                $this->writeAuditTrailOnAdd($rs);
+            }
         }
         return $success;
     }
@@ -505,36 +526,17 @@ class RumahSakit extends DbTable
     // Update
     public function update(&$rs, $where = "", $rsold = null, $curfilter = true)
     {
-        // Cascade Update detail table 'fasilitas_rumah_sakit'
-        $cascadeUpdate = false;
-        $rscascade = [];
-        if ($rsold && (isset($rs['id']) && $rsold['id'] != $rs['id'])) { // Update detail field 'rumah_sakit_id'
-            $cascadeUpdate = true;
-            $rscascade['rumah_sakit_id'] = $rs['id'];
-        }
-        if ($cascadeUpdate) {
-            $rswrk = Container("fasilitas_rumah_sakit")->loadRs("`rumah_sakit_id` = " . QuotedValue($rsold['id'], DATATYPE_NUMBER, 'DB'))->fetchAll(\PDO::FETCH_ASSOC);
-            foreach ($rswrk as $rsdtlold) {
-                $rskey = [];
-                $fldname = 'id';
-                $rskey[$fldname] = $rsdtlold[$fldname];
-                $rsdtlnew = array_merge($rsdtlold, $rscascade);
-                // Call Row_Updating event
-                $success = Container("fasilitas_rumah_sakit")->rowUpdating($rsdtlold, $rsdtlnew);
-                if ($success) {
-                    $success = Container("fasilitas_rumah_sakit")->update($rscascade, $rskey, $rsdtlold);
-                }
-                if (!$success) {
-                    return false;
-                }
-                // Call Row_Updated event
-                Container("fasilitas_rumah_sakit")->rowUpdated($rsdtlold, $rsdtlnew);
-            }
-        }
-
         // If no field is updated, execute may return 0. Treat as success
         $success = $this->updateSql($rs, $where, $curfilter)->execute();
         $success = ($success > 0) ? $success : true;
+        if ($success && $this->AuditTrailOnEdit && $rsold) {
+            $rsaudit = $rs;
+            $fldname = 'id';
+            if (!array_key_exists($fldname, $rsaudit)) {
+                $rsaudit[$fldname] = $rsold[$fldname];
+            }
+            $this->writeAuditTrailOnEdit($rsold, $rsaudit);
+        }
         return $success;
     }
 
@@ -567,32 +569,11 @@ class RumahSakit extends DbTable
     public function delete(&$rs, $where = "", $curfilter = false)
     {
         $success = true;
-
-        // Cascade delete detail table 'fasilitas_rumah_sakit'
-        $dtlrows = Container("fasilitas_rumah_sakit")->loadRs("`rumah_sakit_id` = " . QuotedValue($rs['id'], DATATYPE_NUMBER, "DB"))->fetchAll(\PDO::FETCH_ASSOC);
-        // Call Row Deleting event
-        foreach ($dtlrows as $dtlrow) {
-            $success = Container("fasilitas_rumah_sakit")->rowDeleting($dtlrow);
-            if (!$success) {
-                break;
-            }
-        }
-        if ($success) {
-            foreach ($dtlrows as $dtlrow) {
-                $success = Container("fasilitas_rumah_sakit")->delete($dtlrow); // Delete
-                if (!$success) {
-                    break;
-                }
-            }
-        }
-        // Call Row Deleted event
-        if ($success) {
-            foreach ($dtlrows as $dtlrow) {
-                Container("fasilitas_rumah_sakit")->rowDeleted($dtlrow);
-            }
-        }
         if ($success) {
             $success = $this->deleteSql($rs, $where, $curfilter)->execute();
+        }
+        if ($success && $this->AuditTrailOnDelete) {
+            $this->writeAuditTrailOnDelete($rs);
         }
         return $success;
     }
@@ -604,10 +585,13 @@ class RumahSakit extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->nama->DbValue = $row['nama'];
-        $this->alamat->DbValue = $row['alamat'];
-        $this->daerah_id->DbValue = $row['daerah_id'];
-        $this->foto_rumah_sakit->DbValue = $row['foto_rumah_sakit'];
+        $this->nomor_antrean->DbValue = $row['nomor_antrean'];
+        $this->waktu->DbValue = $row['waktu'];
+        $this->pasien_id->DbValue = $row['pasien_id'];
+        $this->fasilitas_id->DbValue = $row['fasilitas_id'];
+        $this->rumah_sakit_id->DbValue = $row['rumah_sakit_id'];
+        $this->status->DbValue = $row['status'];
+        $this->keluhan_awal->DbValue = $row['keluhan_awal'];
     }
 
     // Delete uploaded files
@@ -679,7 +663,7 @@ class RumahSakit extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("rumahsakitlist");
+        return $_SESSION[$name] ?? GetUrl("antreanumumrslist");
     }
 
     // Set return page URL
@@ -692,11 +676,11 @@ class RumahSakit extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "rumahsakitview") {
+        if ($pageName == "antreanumumrsview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "rumahsakitedit") {
+        } elseif ($pageName == "antreanumumrsedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "rumahsakitadd") {
+        } elseif ($pageName == "antreanumumrsadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -708,15 +692,15 @@ class RumahSakit extends DbTable
     {
         switch (strtolower($action)) {
             case Config("API_VIEW_ACTION"):
-                return "RumahSakitView";
+                return "AntreanUmumRsView";
             case Config("API_ADD_ACTION"):
-                return "RumahSakitAdd";
+                return "AntreanUmumRsAdd";
             case Config("API_EDIT_ACTION"):
-                return "RumahSakitEdit";
+                return "AntreanUmumRsEdit";
             case Config("API_DELETE_ACTION"):
-                return "RumahSakitDelete";
+                return "AntreanUmumRsDelete";
             case Config("API_LIST_ACTION"):
-                return "RumahSakitList";
+                return "AntreanUmumRsList";
             default:
                 return "";
         }
@@ -725,16 +709,16 @@ class RumahSakit extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "rumahsakitlist";
+        return "antreanumumrslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("rumahsakitview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("antreanumumrsview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("rumahsakitview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("antreanumumrsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -743,9 +727,9 @@ class RumahSakit extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "rumahsakitadd?" . $this->getUrlParm($parm);
+            $url = "antreanumumrsadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "rumahsakitadd";
+            $url = "antreanumumrsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -753,11 +737,7 @@ class RumahSakit extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("rumahsakitedit", $this->getUrlParm($parm));
-        } else {
-            $url = $this->keyUrl("rumahsakitedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
-        }
+        $url = $this->keyUrl("antreanumumrsedit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -771,11 +751,7 @@ class RumahSakit extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("rumahsakitadd", $this->getUrlParm($parm));
-        } else {
-            $url = $this->keyUrl("rumahsakitadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
-        }
+        $url = $this->keyUrl("antreanumumrsadd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -789,7 +765,7 @@ class RumahSakit extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("rumahsakitdelete", $this->getUrlParm());
+        return $this->keyUrl("antreanumumrsdelete", $this->getUrlParm());
     }
 
     // Add master url
@@ -937,10 +913,13 @@ SORTHTML;
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->nama->setDbValue($row['nama']);
-        $this->alamat->setDbValue($row['alamat']);
-        $this->daerah_id->setDbValue($row['daerah_id']);
-        $this->foto_rumah_sakit->setDbValue($row['foto_rumah_sakit']);
+        $this->nomor_antrean->setDbValue($row['nomor_antrean']);
+        $this->waktu->setDbValue($row['waktu']);
+        $this->pasien_id->setDbValue($row['pasien_id']);
+        $this->fasilitas_id->setDbValue($row['fasilitas_id']);
+        $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
+        $this->status->setDbValue($row['status']);
+        $this->keluhan_awal->setDbValue($row['keluhan_awal']);
     }
 
     // Render list row values
@@ -955,83 +934,152 @@ SORTHTML;
 
         // id
 
-        // nama
+        // nomor_antrean
 
-        // alamat
+        // waktu
 
-        // daerah_id
+        // pasien_id
 
-        // foto_rumah_sakit
+        // fasilitas_id
+
+        // rumah_sakit_id
+
+        // status
+
+        // keluhan_awal
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
         $this->id->ViewCustomAttributes = "";
 
-        // nama
-        $this->nama->ViewValue = $this->nama->CurrentValue;
-        $this->nama->ViewCustomAttributes = "";
+        // nomor_antrean
+        $this->nomor_antrean->ViewValue = $this->nomor_antrean->CurrentValue;
+        $this->nomor_antrean->ViewValue = FormatNumber($this->nomor_antrean->ViewValue, 0, -2, -2, -2);
+        $this->nomor_antrean->ViewCustomAttributes = "";
 
-        // alamat
-        $this->alamat->ViewValue = $this->alamat->CurrentValue;
-        $this->alamat->ViewCustomAttributes = "";
+        // waktu
+        $this->waktu->ViewValue = $this->waktu->CurrentValue;
+        $this->waktu->ViewValue = FormatDateTime($this->waktu->ViewValue, 0);
+        $this->waktu->ViewCustomAttributes = "";
 
-        // daerah_id
-        $curVal = trim(strval($this->daerah_id->CurrentValue));
+        // pasien_id
+        $curVal = trim(strval($this->pasien_id->CurrentValue));
         if ($curVal != "") {
-            $this->daerah_id->ViewValue = $this->daerah_id->lookupCacheOption($curVal);
-            if ($this->daerah_id->ViewValue === null) { // Lookup from database
+            $this->pasien_id->ViewValue = $this->pasien_id->lookupCacheOption($curVal);
+            if ($this->pasien_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->daerah_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $sqlWrk = $this->pasien_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->daerah_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->daerah_id->ViewValue = $this->daerah_id->displayValue($arwrk);
+                    $arwrk = $this->pasien_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->pasien_id->ViewValue = $this->pasien_id->displayValue($arwrk);
                 } else {
-                    $this->daerah_id->ViewValue = $this->daerah_id->CurrentValue;
+                    $this->pasien_id->ViewValue = $this->pasien_id->CurrentValue;
                 }
             }
         } else {
-            $this->daerah_id->ViewValue = null;
+            $this->pasien_id->ViewValue = null;
         }
-        $this->daerah_id->ViewCustomAttributes = "";
+        $this->pasien_id->ViewCustomAttributes = "";
 
-        // foto_rumah_sakit
-        $this->foto_rumah_sakit->ViewValue = $this->foto_rumah_sakit->CurrentValue;
-        $this->foto_rumah_sakit->ViewCustomAttributes = "";
+        // fasilitas_id
+        $curVal = trim(strval($this->fasilitas_id->CurrentValue));
+        if ($curVal != "") {
+            $this->fasilitas_id->ViewValue = $this->fasilitas_id->lookupCacheOption($curVal);
+            if ($this->fasilitas_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $lookupFilter = function() {
+                    return (CurrentUserLevel() == -1) ? "" : "`id` IN (SELECT fasilitas_rumah_sakit.fasilitas_id FROM fasilitas_rumah_sakit WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").)";
+                };
+                $lookupFilter = $lookupFilter->bindTo($this);
+                $sqlWrk = $this->fasilitas_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->fasilitas_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->fasilitas_id->ViewValue = $this->fasilitas_id->displayValue($arwrk);
+                } else {
+                    $this->fasilitas_id->ViewValue = $this->fasilitas_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->fasilitas_id->ViewValue = null;
+        }
+        $this->fasilitas_id->ViewCustomAttributes = "";
+
+        // rumah_sakit_id
+        $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
+        if ($curVal != "") {
+            $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
+            if ($this->rumah_sakit_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->displayValue($arwrk);
+                } else {
+                    $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->rumah_sakit_id->ViewValue = null;
+        }
+        $this->rumah_sakit_id->ViewCustomAttributes = "";
+
+        // status
+        if (strval($this->status->CurrentValue) != "") {
+            $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+        } else {
+            $this->status->ViewValue = null;
+        }
+        $this->status->ViewCustomAttributes = "";
+
+        // keluhan_awal
+        $this->keluhan_awal->ViewValue = $this->keluhan_awal->CurrentValue;
+        $this->keluhan_awal->ViewCustomAttributes = "";
 
         // id
         $this->id->LinkCustomAttributes = "";
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // nama
-        $this->nama->LinkCustomAttributes = "";
-        $this->nama->HrefValue = "";
-        $this->nama->TooltipValue = "";
+        // nomor_antrean
+        $this->nomor_antrean->LinkCustomAttributes = "";
+        $this->nomor_antrean->HrefValue = "";
+        $this->nomor_antrean->TooltipValue = "";
 
-        // alamat
-        $this->alamat->LinkCustomAttributes = "";
-        $this->alamat->HrefValue = "";
-        $this->alamat->TooltipValue = "";
+        // waktu
+        $this->waktu->LinkCustomAttributes = "";
+        $this->waktu->HrefValue = "";
+        $this->waktu->TooltipValue = "";
 
-        // daerah_id
-        $this->daerah_id->LinkCustomAttributes = "";
-        $this->daerah_id->HrefValue = "";
-        $this->daerah_id->TooltipValue = "";
+        // pasien_id
+        $this->pasien_id->LinkCustomAttributes = "";
+        $this->pasien_id->HrefValue = "";
+        $this->pasien_id->TooltipValue = "";
 
-        // foto_rumah_sakit
-        $this->foto_rumah_sakit->LinkCustomAttributes = "";
-        if (!EmptyValue($this->foto_rumah_sakit->CurrentValue)) {
-            $this->foto_rumah_sakit->HrefValue = $this->foto_rumah_sakit->CurrentValue; // Add prefix/suffix
-            $this->foto_rumah_sakit->LinkAttrs["target"] = ""; // Add target
-            if ($this->isExport()) {
-                $this->foto_rumah_sakit->HrefValue = FullUrl($this->foto_rumah_sakit->HrefValue, "href");
-            }
-        } else {
-            $this->foto_rumah_sakit->HrefValue = "";
-        }
-        $this->foto_rumah_sakit->TooltipValue = "";
+        // fasilitas_id
+        $this->fasilitas_id->LinkCustomAttributes = "";
+        $this->fasilitas_id->HrefValue = "";
+        $this->fasilitas_id->TooltipValue = "";
+
+        // rumah_sakit_id
+        $this->rumah_sakit_id->LinkCustomAttributes = "";
+        $this->rumah_sakit_id->HrefValue = "";
+        $this->rumah_sakit_id->TooltipValue = "";
+
+        // status
+        $this->status->LinkCustomAttributes = "";
+        $this->status->HrefValue = "";
+        $this->status->TooltipValue = "";
+
+        // keluhan_awal
+        $this->keluhan_awal->LinkCustomAttributes = "";
+        $this->keluhan_awal->HrefValue = "";
+        $this->keluhan_awal->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1054,37 +1102,103 @@ SORTHTML;
         $this->id->EditValue = $this->id->CurrentValue;
         $this->id->ViewCustomAttributes = "";
 
-        // nama
-        $this->nama->EditAttrs["class"] = "form-control";
-        $this->nama->EditCustomAttributes = "";
-        if (!$this->nama->Raw) {
-            $this->nama->CurrentValue = HtmlDecode($this->nama->CurrentValue);
-        }
-        $this->nama->EditValue = $this->nama->CurrentValue;
-        $this->nama->PlaceHolder = RemoveHtml($this->nama->caption());
+        // nomor_antrean
+        $this->nomor_antrean->EditAttrs["class"] = "form-control";
+        $this->nomor_antrean->EditCustomAttributes = "";
+        $this->nomor_antrean->EditValue = $this->nomor_antrean->CurrentValue;
+        $this->nomor_antrean->EditValue = FormatNumber($this->nomor_antrean->EditValue, 0, -2, -2, -2);
+        $this->nomor_antrean->ViewCustomAttributes = "";
 
-        // alamat
-        $this->alamat->EditAttrs["class"] = "form-control";
-        $this->alamat->EditCustomAttributes = "";
-        if (!$this->alamat->Raw) {
-            $this->alamat->CurrentValue = HtmlDecode($this->alamat->CurrentValue);
-        }
-        $this->alamat->EditValue = $this->alamat->CurrentValue;
-        $this->alamat->PlaceHolder = RemoveHtml($this->alamat->caption());
+        // waktu
+        $this->waktu->EditAttrs["class"] = "form-control";
+        $this->waktu->EditCustomAttributes = "";
+        $this->waktu->EditValue = $this->waktu->CurrentValue;
+        $this->waktu->EditValue = FormatDateTime($this->waktu->EditValue, 0);
+        $this->waktu->ViewCustomAttributes = "";
 
-        // daerah_id
-        $this->daerah_id->EditAttrs["class"] = "form-control";
-        $this->daerah_id->EditCustomAttributes = "";
-        $this->daerah_id->PlaceHolder = RemoveHtml($this->daerah_id->caption());
-
-        // foto_rumah_sakit
-        $this->foto_rumah_sakit->EditAttrs["class"] = "form-control";
-        $this->foto_rumah_sakit->EditCustomAttributes = "";
-        if (!$this->foto_rumah_sakit->Raw) {
-            $this->foto_rumah_sakit->CurrentValue = HtmlDecode($this->foto_rumah_sakit->CurrentValue);
+        // pasien_id
+        $this->pasien_id->EditAttrs["class"] = "form-control";
+        $this->pasien_id->EditCustomAttributes = "";
+        $curVal = trim(strval($this->pasien_id->CurrentValue));
+        if ($curVal != "") {
+            $this->pasien_id->EditValue = $this->pasien_id->lookupCacheOption($curVal);
+            if ($this->pasien_id->EditValue === null) { // Lookup from database
+                $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->pasien_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->pasien_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->pasien_id->EditValue = $this->pasien_id->displayValue($arwrk);
+                } else {
+                    $this->pasien_id->EditValue = $this->pasien_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->pasien_id->EditValue = null;
         }
-        $this->foto_rumah_sakit->EditValue = $this->foto_rumah_sakit->CurrentValue;
-        $this->foto_rumah_sakit->PlaceHolder = RemoveHtml($this->foto_rumah_sakit->caption());
+        $this->pasien_id->ViewCustomAttributes = "";
+
+        // fasilitas_id
+        $this->fasilitas_id->EditAttrs["class"] = "form-control";
+        $this->fasilitas_id->EditCustomAttributes = "";
+        $curVal = trim(strval($this->fasilitas_id->CurrentValue));
+        if ($curVal != "") {
+            $this->fasilitas_id->EditValue = $this->fasilitas_id->lookupCacheOption($curVal);
+            if ($this->fasilitas_id->EditValue === null) { // Lookup from database
+                $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $lookupFilter = function() {
+                    return (CurrentUserLevel() == -1) ? "" : "`id` IN (SELECT fasilitas_rumah_sakit.fasilitas_id FROM fasilitas_rumah_sakit WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").)";
+                };
+                $lookupFilter = $lookupFilter->bindTo($this);
+                $sqlWrk = $this->fasilitas_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->fasilitas_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->fasilitas_id->EditValue = $this->fasilitas_id->displayValue($arwrk);
+                } else {
+                    $this->fasilitas_id->EditValue = $this->fasilitas_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->fasilitas_id->EditValue = null;
+        }
+        $this->fasilitas_id->ViewCustomAttributes = "";
+
+        // rumah_sakit_id
+        $this->rumah_sakit_id->EditAttrs["class"] = "form-control";
+        $this->rumah_sakit_id->EditCustomAttributes = "";
+        $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
+        if ($curVal != "") {
+            $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
+            if ($this->rumah_sakit_id->EditValue === null) { // Lookup from database
+                $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->displayValue($arwrk);
+                } else {
+                    $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->rumah_sakit_id->EditValue = null;
+        }
+        $this->rumah_sakit_id->ViewCustomAttributes = "";
+
+        // status
+        $this->status->EditCustomAttributes = "";
+        $this->status->EditValue = $this->status->options(false);
+        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
+        // keluhan_awal
+        $this->keluhan_awal->EditAttrs["class"] = "form-control";
+        $this->keluhan_awal->EditCustomAttributes = "";
+        $this->keluhan_awal->EditValue = $this->keluhan_awal->CurrentValue;
+        $this->keluhan_awal->ViewCustomAttributes = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1115,16 +1229,22 @@ SORTHTML;
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->nama);
-                    $doc->exportCaption($this->alamat);
-                    $doc->exportCaption($this->daerah_id);
-                    $doc->exportCaption($this->foto_rumah_sakit);
+                    $doc->exportCaption($this->nomor_antrean);
+                    $doc->exportCaption($this->waktu);
+                    $doc->exportCaption($this->pasien_id);
+                    $doc->exportCaption($this->fasilitas_id);
+                    $doc->exportCaption($this->rumah_sakit_id);
+                    $doc->exportCaption($this->status);
+                    $doc->exportCaption($this->keluhan_awal);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->nama);
-                    $doc->exportCaption($this->alamat);
-                    $doc->exportCaption($this->daerah_id);
-                    $doc->exportCaption($this->foto_rumah_sakit);
+                    $doc->exportCaption($this->nomor_antrean);
+                    $doc->exportCaption($this->waktu);
+                    $doc->exportCaption($this->pasien_id);
+                    $doc->exportCaption($this->fasilitas_id);
+                    $doc->exportCaption($this->rumah_sakit_id);
+                    $doc->exportCaption($this->status);
+                    $doc->exportCaption($this->keluhan_awal);
                 }
                 $doc->endExportRow();
             }
@@ -1155,16 +1275,22 @@ SORTHTML;
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->nama);
-                        $doc->exportField($this->alamat);
-                        $doc->exportField($this->daerah_id);
-                        $doc->exportField($this->foto_rumah_sakit);
+                        $doc->exportField($this->nomor_antrean);
+                        $doc->exportField($this->waktu);
+                        $doc->exportField($this->pasien_id);
+                        $doc->exportField($this->fasilitas_id);
+                        $doc->exportField($this->rumah_sakit_id);
+                        $doc->exportField($this->status);
+                        $doc->exportField($this->keluhan_awal);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->nama);
-                        $doc->exportField($this->alamat);
-                        $doc->exportField($this->daerah_id);
-                        $doc->exportField($this->foto_rumah_sakit);
+                        $doc->exportField($this->nomor_antrean);
+                        $doc->exportField($this->waktu);
+                        $doc->exportField($this->pasien_id);
+                        $doc->exportField($this->fasilitas_id);
+                        $doc->exportField($this->rumah_sakit_id);
+                        $doc->exportField($this->status);
+                        $doc->exportField($this->keluhan_awal);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1186,6 +1312,140 @@ SORTHTML;
     {
         // No binary fields
         return false;
+    }
+
+    // Write Audit Trail start/end for grid update
+    public function writeAuditTrailDummy($typ)
+    {
+        $table = 'antrean_umum_rs';
+        $usr = CurrentUserID();
+        WriteAuditLog($usr, $typ, $table, "", "", "", "");
+    }
+
+    // Write Audit Trail (add page)
+    public function writeAuditTrailOnAdd(&$rs)
+    {
+        global $Language;
+        if (!$this->AuditTrailOnAdd) {
+            return;
+        }
+        $table = 'antrean_umum_rs';
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rs['id'];
+
+        // Write Audit Trail
+        $usr = CurrentUserID();
+        foreach (array_keys($rs) as $fldname) {
+            if (array_key_exists($fldname, $this->Fields) && $this->Fields[$fldname]->DataType != DATATYPE_BLOB) { // Ignore BLOB fields
+                if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") {
+                    $newvalue = $Language->phrase("PasswordMask"); // Password Field
+                } elseif ($this->Fields[$fldname]->DataType == DATATYPE_MEMO) {
+                    if (Config("AUDIT_TRAIL_TO_DATABASE")) {
+                        $newvalue = $rs[$fldname];
+                    } else {
+                        $newvalue = "[MEMO]"; // Memo Field
+                    }
+                } elseif ($this->Fields[$fldname]->DataType == DATATYPE_XML) {
+                    $newvalue = "[XML]"; // XML Field
+                } else {
+                    $newvalue = $rs[$fldname];
+                }
+                WriteAuditLog($usr, "A", $table, $fldname, $key, "", $newvalue);
+            }
+        }
+    }
+
+    // Write Audit Trail (edit page)
+    public function writeAuditTrailOnEdit(&$rsold, &$rsnew)
+    {
+        global $Language;
+        if (!$this->AuditTrailOnEdit) {
+            return;
+        }
+        $table = 'antrean_umum_rs';
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rsold['id'];
+
+        // Write Audit Trail
+        $usr = CurrentUserID();
+        foreach (array_keys($rsnew) as $fldname) {
+            if (array_key_exists($fldname, $this->Fields) && array_key_exists($fldname, $rsold) && $this->Fields[$fldname]->DataType != DATATYPE_BLOB) { // Ignore BLOB fields
+                if ($this->Fields[$fldname]->DataType == DATATYPE_DATE) { // DateTime field
+                    $modified = (FormatDateTime($rsold[$fldname], 0) != FormatDateTime($rsnew[$fldname], 0));
+                } else {
+                    $modified = !CompareValue($rsold[$fldname], $rsnew[$fldname]);
+                }
+                if ($modified) {
+                    if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") { // Password Field
+                        $oldvalue = $Language->phrase("PasswordMask");
+                        $newvalue = $Language->phrase("PasswordMask");
+                    } elseif ($this->Fields[$fldname]->DataType == DATATYPE_MEMO) { // Memo field
+                        if (Config("AUDIT_TRAIL_TO_DATABASE")) {
+                            $oldvalue = $rsold[$fldname];
+                            $newvalue = $rsnew[$fldname];
+                        } else {
+                            $oldvalue = "[MEMO]";
+                            $newvalue = "[MEMO]";
+                        }
+                    } elseif ($this->Fields[$fldname]->DataType == DATATYPE_XML) { // XML field
+                        $oldvalue = "[XML]";
+                        $newvalue = "[XML]";
+                    } else {
+                        $oldvalue = $rsold[$fldname];
+                        $newvalue = $rsnew[$fldname];
+                    }
+                    WriteAuditLog($usr, "U", $table, $fldname, $key, $oldvalue, $newvalue);
+                }
+            }
+        }
+    }
+
+    // Write Audit Trail (delete page)
+    public function writeAuditTrailOnDelete(&$rs)
+    {
+        global $Language;
+        if (!$this->AuditTrailOnDelete) {
+            return;
+        }
+        $table = 'antrean_umum_rs';
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rs['id'];
+
+        // Write Audit Trail
+        $curUser = CurrentUserID();
+        foreach (array_keys($rs) as $fldname) {
+            if (array_key_exists($fldname, $this->Fields) && $this->Fields[$fldname]->DataType != DATATYPE_BLOB) { // Ignore BLOB fields
+                if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") {
+                    $oldvalue = $Language->phrase("PasswordMask"); // Password Field
+                } elseif ($this->Fields[$fldname]->DataType == DATATYPE_MEMO) {
+                    if (Config("AUDIT_TRAIL_TO_DATABASE")) {
+                        $oldvalue = $rs[$fldname];
+                    } else {
+                        $oldvalue = "[MEMO]"; // Memo field
+                    }
+                } elseif ($this->Fields[$fldname]->DataType == DATATYPE_XML) {
+                    $oldvalue = "[XML]"; // XML field
+                } else {
+                    $oldvalue = $rs[$fldname];
+                }
+                WriteAuditLog($curUser, "D", $table, $fldname, $key, $oldvalue, "");
+            }
+        }
     }
 
     // Table level events

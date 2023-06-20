@@ -264,6 +264,49 @@ return function (App $app) {
         }
     );
 
+    // antrean_bpjs_rs
+    $app->any('/antreanbpjsrslist[/{id}]', AntreanBpjsRsController::class . ':list')->add(PermissionMiddleware::class)->setName('antreanbpjsrslist-antrean_bpjs_rs-list'); // list
+    $app->any('/antreanbpjsrsedit[/{id}]', AntreanBpjsRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('antreanbpjsrsedit-antrean_bpjs_rs-edit'); // edit
+    $app->any('/antreanbpjsrssearch', AntreanBpjsRsController::class . ':search')->add(PermissionMiddleware::class)->setName('antreanbpjsrssearch-antrean_bpjs_rs-search'); // search
+    $app->group(
+        '/antrean_bpjs_rs',
+        function (RouteCollectorProxy $group) {
+            $group->any('/' . Config("LIST_ACTION") . '[/{id}]', AntreanBpjsRsController::class . ':list')->add(PermissionMiddleware::class)->setName('antrean_bpjs_rs/list-antrean_bpjs_rs-list-2'); // list
+            $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', AntreanBpjsRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('antrean_bpjs_rs/edit-antrean_bpjs_rs-edit-2'); // edit
+            $group->any('/' . Config("SEARCH_ACTION") . '', AntreanBpjsRsController::class . ':search')->add(PermissionMiddleware::class)->setName('antrean_bpjs_rs/search-antrean_bpjs_rs-search-2'); // search
+        }
+    );
+
+    // antrean_umum_rs
+    $app->any('/antreanumumrslist[/{id}]', AntreanUmumRsController::class . ':list')->add(PermissionMiddleware::class)->setName('antreanumumrslist-antrean_umum_rs-list'); // list
+    $app->any('/antreanumumrsedit[/{id}]', AntreanUmumRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('antreanumumrsedit-antrean_umum_rs-edit'); // edit
+    $app->any('/antreanumumrssearch', AntreanUmumRsController::class . ':search')->add(PermissionMiddleware::class)->setName('antreanumumrssearch-antrean_umum_rs-search'); // search
+    $app->group(
+        '/antrean_umum_rs',
+        function (RouteCollectorProxy $group) {
+            $group->any('/' . Config("LIST_ACTION") . '[/{id}]', AntreanUmumRsController::class . ':list')->add(PermissionMiddleware::class)->setName('antrean_umum_rs/list-antrean_umum_rs-list-2'); // list
+            $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', AntreanUmumRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('antrean_umum_rs/edit-antrean_umum_rs-edit-2'); // edit
+            $group->any('/' . Config("SEARCH_ACTION") . '', AntreanUmumRsController::class . ':search')->add(PermissionMiddleware::class)->setName('antrean_umum_rs/search-antrean_umum_rs-search-2'); // search
+        }
+    );
+
+    // webusers_rs
+    $app->any('/webusersrslist[/{id}]', WebusersRsController::class . ':list')->add(PermissionMiddleware::class)->setName('webusersrslist-webusers_rs-list'); // list
+    $app->any('/webusersrsadd[/{id}]', WebusersRsController::class . ':add')->add(PermissionMiddleware::class)->setName('webusersrsadd-webusers_rs-add'); // add
+    $app->any('/webusersrsedit[/{id}]', WebusersRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('webusersrsedit-webusers_rs-edit'); // edit
+    $app->any('/webusersrsdelete[/{id}]', WebusersRsController::class . ':delete')->add(PermissionMiddleware::class)->setName('webusersrsdelete-webusers_rs-delete'); // delete
+    $app->any('/webusersrssearch', WebusersRsController::class . ':search')->add(PermissionMiddleware::class)->setName('webusersrssearch-webusers_rs-search'); // search
+    $app->group(
+        '/webusers_rs',
+        function (RouteCollectorProxy $group) {
+            $group->any('/' . Config("LIST_ACTION") . '[/{id}]', WebusersRsController::class . ':list')->add(PermissionMiddleware::class)->setName('webusers_rs/list-webusers_rs-list-2'); // list
+            $group->any('/' . Config("ADD_ACTION") . '[/{id}]', WebusersRsController::class . ':add')->add(PermissionMiddleware::class)->setName('webusers_rs/add-webusers_rs-add-2'); // add
+            $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', WebusersRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('webusers_rs/edit-webusers_rs-edit-2'); // edit
+            $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', WebusersRsController::class . ':delete')->add(PermissionMiddleware::class)->setName('webusers_rs/delete-webusers_rs-delete-2'); // delete
+            $group->any('/' . Config("SEARCH_ACTION") . '', WebusersRsController::class . ':search')->add(PermissionMiddleware::class)->setName('webusers_rs/search-webusers_rs-search-2'); // search
+        }
+    );
+
     // error
     $app->any('/error', OthersController::class . ':error')->add(PermissionMiddleware::class)->setName('error');
 

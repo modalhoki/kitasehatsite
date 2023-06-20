@@ -7,24 +7,32 @@ use Doctrine\DBAL\ParameterType;
 /**
  * Page class
  */
-class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
+class WebusersRsSearch extends WebusersRs
 {
     use MessagesTrait;
 
     // Page ID
-    public $PageID = "addopt";
+    public $PageID = "search";
 
     // Project ID
     public $ProjectID = PROJECT_ID;
 
     // Table name
-    public $TableName = 'fasilitas_rumah_sakit';
+    public $TableName = 'webusers_rs';
 
     // Page object name
-    public $PageObjName = "FasilitasRumahSakitAddopt";
+    public $PageObjName = "WebusersRsSearch";
 
     // Rendering View
     public $RenderingView = false;
+
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
 
     // Page headings
     public $Heading = "";
@@ -127,9 +135,9 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
         // Parent constuctor
         parent::__construct();
 
-        // Table object (fasilitas_rumah_sakit)
-        if (!isset($GLOBALS["fasilitas_rumah_sakit"]) || get_class($GLOBALS["fasilitas_rumah_sakit"]) == PROJECT_NAMESPACE . "fasilitas_rumah_sakit") {
-            $GLOBALS["fasilitas_rumah_sakit"] = &$this;
+        // Table object (webusers_rs)
+        if (!isset($GLOBALS["webusers_rs"]) || get_class($GLOBALS["webusers_rs"]) == PROJECT_NAMESPACE . "webusers_rs") {
+            $GLOBALS["webusers_rs"] = &$this;
         }
 
         // Page URL
@@ -137,7 +145,7 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'fasilitas_rumah_sakit');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'webusers_rs');
         }
 
         // Start timer
@@ -222,7 +230,7 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
             }
             $class = PROJECT_NAMESPACE . Config("EXPORT_CLASSES." . $this->CustomExport);
             if (class_exists($class)) {
-                $doc = new $class(Container("fasilitas_rumah_sakit"));
+                $doc = new $class(Container("webusers_rs"));
                 $doc->Text = @$content;
                 if ($this->isExport("email")) {
                     echo $this->exportEmail($doc->Text);
@@ -259,8 +267,25 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
             if (!Config("DEBUG") && ob_get_length()) {
                 ob_end_clean();
             }
-            SaveDebugMessage();
-            Redirect(GetUrl($url));
+
+            // Handle modal response
+            if ($this->IsModal) { // Show as modal
+                $row = ["url" => GetUrl($url), "modal" => "1"];
+                $pageName = GetPageName($url);
+                if ($pageName != $this->getListUrl()) { // Not List page
+                    $row["caption"] = $this->getModalCaption($pageName);
+                    if ($pageName == "webusersrsview") {
+                        $row["view"] = "1";
+                    }
+                } else { // List page should not be shown as modal => error
+                    $row["error"] = $this->getFailureMessage();
+                    $this->clearFailureMessage();
+                }
+                WriteJson($row);
+            } else {
+                SaveDebugMessage();
+                Redirect(GetUrl($url));
+            }
         }
         return; // Return to controller
     }
@@ -421,7 +446,9 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
         }
         $lookup->toJson($this); // Use settings from current page
     }
+    public $FormClassName = "ew-horizontal ew-form ew-search-form";
     public $IsModal = false;
+    public $IsMobileOrModal = false;
 
     /**
      * Page run
@@ -430,16 +457,21 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
      */
     public function run()
     {
-        global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm;
+        global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm,
+            $SkipHeaderFooter;
+
+        // Is modal
+        $this->IsModal = Param("modal") == "1";
 
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id->Visible = false;
+        $this->id->setVisibility();
+        $this->_username->setVisibility();
+        $this->_password->setVisibility();
+        $this->role->setVisibility();
         $this->rumah_sakit_id->setVisibility();
-        $this->fasilitas_id->setVisibility();
-        $this->hari_buka->setVisibility();
-        $this->jam_buka->setVisibility();
+        $this->administrator_rumah_sakit->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -455,14 +487,43 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
 
         // Set up lookup cache
         $this->setupLookupOptions($this->rumah_sakit_id);
-        $this->setupLookupOptions($this->fasilitas_id);
+        $this->setupLookupOptions($this->administrator_rumah_sakit);
 
         // Set up Breadcrumb
-        //$this->setupBreadcrumb(); // Not used
-        $this->loadRowValues(); // Load default values
+        $this->setupBreadcrumb();
 
-        // Render row
-        $this->RowType = ROWTYPE_ADD; // Render add type
+        // Check modal
+        if ($this->IsModal) {
+            $SkipHeaderFooter = true;
+        }
+        $this->IsMobileOrModal = IsMobile() || $this->IsModal;
+        if ($this->isPageRequest()) {
+            // Get action
+            $this->CurrentAction = Post("action");
+            if ($this->isSearch()) {
+                // Build search string for advanced search, remove blank field
+                $this->loadSearchValues(); // Get search values
+                if ($this->validateSearch()) {
+                    $srchStr = $this->buildAdvancedSearch();
+                } else {
+                    $srchStr = "";
+                }
+                if ($srchStr != "") {
+                    $srchStr = $this->getUrlParm($srchStr);
+                    $srchStr = "webusersrslist" . "?" . $srchStr;
+                    $this->terminate($srchStr); // Go to list page
+                    return;
+                }
+            }
+        }
+
+        // Restore search settings from Session
+        if (!$this->hasInvalidFields()) {
+            $this->loadAdvancedSearch();
+        }
+
+        // Render row for search
+        $this->RowType = ROWTYPE_SEARCH;
         $this->resetAttributes();
         $this->renderRow();
 
@@ -487,136 +548,115 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
         }
     }
 
-    // Get upload files
-    protected function getUploadFiles()
+    // Build advanced search
+    protected function buildAdvancedSearch()
     {
-        global $CurrentForm, $Language;
+        $srchUrl = "";
+        $this->buildSearchUrl($srchUrl, $this->id); // id
+        $this->buildSearchUrl($srchUrl, $this->_username); // username
+        $this->buildSearchUrl($srchUrl, $this->_password); // password
+        $this->buildSearchUrl($srchUrl, $this->role); // role
+        $this->buildSearchUrl($srchUrl, $this->rumah_sakit_id); // rumah_sakit_id
+        $this->buildSearchUrl($srchUrl, $this->administrator_rumah_sakit); // administrator_rumah_sakit
+        if ($srchUrl != "") {
+            $srchUrl .= "&";
+        }
+        $srchUrl .= "cmd=search";
+        return $srchUrl;
     }
 
-    // Load default values
-    protected function loadDefaultValues()
-    {
-        $this->id->CurrentValue = null;
-        $this->id->OldValue = $this->id->CurrentValue;
-        $this->rumah_sakit_id->CurrentValue = null;
-        $this->rumah_sakit_id->OldValue = $this->rumah_sakit_id->CurrentValue;
-        $this->fasilitas_id->CurrentValue = null;
-        $this->fasilitas_id->OldValue = $this->fasilitas_id->CurrentValue;
-        $this->hari_buka->CurrentValue = null;
-        $this->hari_buka->OldValue = $this->hari_buka->CurrentValue;
-        $this->jam_buka->CurrentValue = null;
-        $this->jam_buka->OldValue = $this->jam_buka->CurrentValue;
-    }
-
-    // Load form values
-    protected function loadFormValues()
-    {
-        // Load from form
-        global $CurrentForm;
-
-        // Check field name 'rumah_sakit_id' first before field var 'x_rumah_sakit_id'
-        $val = $CurrentForm->hasValue("rumah_sakit_id") ? $CurrentForm->getValue("rumah_sakit_id") : $CurrentForm->getValue("x_rumah_sakit_id");
-        if (!$this->rumah_sakit_id->IsDetailKey) {
-            $this->rumah_sakit_id->setFormValue(ConvertFromUtf8($val));
-        }
-
-        // Check field name 'fasilitas_id' first before field var 'x_fasilitas_id'
-        $val = $CurrentForm->hasValue("fasilitas_id") ? $CurrentForm->getValue("fasilitas_id") : $CurrentForm->getValue("x_fasilitas_id");
-        if (!$this->fasilitas_id->IsDetailKey) {
-            $this->fasilitas_id->setFormValue(ConvertFromUtf8($val));
-        }
-
-        // Check field name 'hari_buka' first before field var 'x_hari_buka'
-        $val = $CurrentForm->hasValue("hari_buka") ? $CurrentForm->getValue("hari_buka") : $CurrentForm->getValue("x_hari_buka");
-        if (!$this->hari_buka->IsDetailKey) {
-            $this->hari_buka->setFormValue(ConvertFromUtf8($val));
-        }
-
-        // Check field name 'jam_buka' first before field var 'x_jam_buka'
-        $val = $CurrentForm->hasValue("jam_buka") ? $CurrentForm->getValue("jam_buka") : $CurrentForm->getValue("x_jam_buka");
-        if (!$this->jam_buka->IsDetailKey) {
-            $this->jam_buka->setFormValue(ConvertFromUtf8($val));
-        }
-
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-    }
-
-    // Restore form values
-    public function restoreFormValues()
+    // Build search URL
+    protected function buildSearchUrl(&$url, &$fld, $oprOnly = false)
     {
         global $CurrentForm;
-        $this->rumah_sakit_id->CurrentValue = ConvertToUtf8($this->rumah_sakit_id->FormValue);
-        $this->fasilitas_id->CurrentValue = ConvertToUtf8($this->fasilitas_id->FormValue);
-        $this->hari_buka->CurrentValue = ConvertToUtf8($this->hari_buka->FormValue);
-        $this->jam_buka->CurrentValue = ConvertToUtf8($this->jam_buka->FormValue);
-    }
-
-    /**
-     * Load row based on key values
-     *
-     * @return void
-     */
-    public function loadRow()
-    {
-        global $Security, $Language;
-        $filter = $this->getRecordFilter();
-
-        // Call Row Selecting event
-        $this->rowSelecting($filter);
-
-        // Load SQL based on filter
-        $this->CurrentFilter = $filter;
-        $sql = $this->getCurrentSql();
-        $conn = $this->getConnection();
-        $res = false;
-        $row = $conn->fetchAssoc($sql);
-        if ($row) {
-            $res = true;
-            $this->loadRowValues($row); // Load row values
+        $wrk = "";
+        $fldParm = $fld->Param;
+        $fldVal = $CurrentForm->getValue("x_$fldParm");
+        $fldOpr = $CurrentForm->getValue("z_$fldParm");
+        $fldCond = $CurrentForm->getValue("v_$fldParm");
+        $fldVal2 = $CurrentForm->getValue("y_$fldParm");
+        $fldOpr2 = $CurrentForm->getValue("w_$fldParm");
+        if (is_array($fldVal)) {
+            $fldVal = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal);
         }
-        return $res;
-    }
-
-    /**
-     * Load row values from recordset or record
-     *
-     * @param Recordset|array $rs Record
-     * @return void
-     */
-    public function loadRowValues($rs = null)
-    {
-        if (is_array($rs)) {
-            $row = $rs;
-        } elseif ($rs && property_exists($rs, "fields")) { // Recordset
-            $row = $rs->fields;
+        if (is_array($fldVal2)) {
+            $fldVal2 = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal2);
+        }
+        $fldOpr = strtoupper(trim($fldOpr));
+        $fldDataType = ($fld->IsVirtual) ? DATATYPE_STRING : $fld->DataType;
+        if ($fldOpr == "BETWEEN") {
+            $isValidValue = ($fldDataType != DATATYPE_NUMBER) ||
+                ($fldDataType == DATATYPE_NUMBER && $this->searchValueIsNumeric($fld, $fldVal) && $this->searchValueIsNumeric($fld, $fldVal2));
+            if ($fldVal != "" && $fldVal2 != "" && $isValidValue) {
+                $wrk = "x_" . $fldParm . "=" . urlencode($fldVal) .
+                    "&y_" . $fldParm . "=" . urlencode($fldVal2) .
+                    "&z_" . $fldParm . "=" . urlencode($fldOpr);
+            }
         } else {
-            $row = $this->newRow();
+            $isValidValue = ($fldDataType != DATATYPE_NUMBER) ||
+                ($fldDataType == DATATYPE_NUMBER && $this->searchValueIsNumeric($fld, $fldVal));
+            if ($fldVal != "" && $isValidValue && IsValidOperator($fldOpr, $fldDataType)) {
+                $wrk = "x_" . $fldParm . "=" . urlencode($fldVal) .
+                    "&z_" . $fldParm . "=" . urlencode($fldOpr);
+            } elseif ($fldOpr == "IS NULL" || $fldOpr == "IS NOT NULL" || ($fldOpr != "" && $oprOnly && IsValidOperator($fldOpr, $fldDataType))) {
+                $wrk = "z_" . $fldParm . "=" . urlencode($fldOpr);
+            }
+            $isValidValue = ($fldDataType != DATATYPE_NUMBER) ||
+                ($fldDataType == DATATYPE_NUMBER && $this->searchValueIsNumeric($fld, $fldVal2));
+            if ($fldVal2 != "" && $isValidValue && IsValidOperator($fldOpr2, $fldDataType)) {
+                if ($wrk != "") {
+                    $wrk .= "&v_" . $fldParm . "=" . urlencode($fldCond) . "&";
+                }
+                $wrk .= "y_" . $fldParm . "=" . urlencode($fldVal2) .
+                    "&w_" . $fldParm . "=" . urlencode($fldOpr2);
+            } elseif ($fldOpr2 == "IS NULL" || $fldOpr2 == "IS NOT NULL" || ($fldOpr2 != "" && $oprOnly && IsValidOperator($fldOpr2, $fldDataType))) {
+                if ($wrk != "") {
+                    $wrk .= "&v_" . $fldParm . "=" . urlencode($fldCond) . "&";
+                }
+                $wrk .= "w_" . $fldParm . "=" . urlencode($fldOpr2);
+            }
         }
-
-        // Call Row Selected event
-        $this->rowSelected($row);
-        if (!$rs) {
-            return;
+        if ($wrk != "") {
+            if ($url != "") {
+                $url .= "&";
+            }
+            $url .= $wrk;
         }
-        $this->id->setDbValue($row['id']);
-        $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
-        $this->fasilitas_id->setDbValue($row['fasilitas_id']);
-        $this->hari_buka->setDbValue($row['hari_buka']);
-        $this->jam_buka->setDbValue($row['jam_buka']);
     }
 
-    // Return a row with default values
-    protected function newRow()
+    // Check if search value is numeric
+    protected function searchValueIsNumeric($fld, $value)
     {
-        $this->loadDefaultValues();
-        $row = [];
-        $row['id'] = $this->id->CurrentValue;
-        $row['rumah_sakit_id'] = $this->rumah_sakit_id->CurrentValue;
-        $row['fasilitas_id'] = $this->fasilitas_id->CurrentValue;
-        $row['hari_buka'] = $this->hari_buka->CurrentValue;
-        $row['jam_buka'] = $this->jam_buka->CurrentValue;
-        return $row;
+        if (IsFloatFormat($fld->Type)) {
+            $value = ConvertToFloatString($value);
+        }
+        return is_numeric($value);
+    }
+
+    // Load search values for validation
+    protected function loadSearchValues()
+    {
+        // Load search values
+        $hasValue = false;
+        if ($this->id->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        if ($this->_username->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        if ($this->_password->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        if ($this->role->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        if ($this->rumah_sakit_id->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        if ($this->administrator_rumah_sakit->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        return $hasValue;
     }
 
     // Render row values based on field settings
@@ -633,17 +673,31 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
 
         // id
 
+        // username
+
+        // password
+
+        // role
+
         // rumah_sakit_id
 
-        // fasilitas_id
-
-        // hari_buka
-
-        // jam_buka
+        // administrator_rumah_sakit
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
             $this->id->ViewCustomAttributes = "";
+
+            // username
+            $this->_username->ViewValue = $this->_username->CurrentValue;
+            $this->_username->ViewCustomAttributes = "";
+
+            // password
+            $this->_password->ViewValue = $Language->phrase("PasswordMask");
+            $this->_password->ViewCustomAttributes = "";
+
+            // role
+            $this->role->ViewValue = FormatNumber($this->role->ViewValue, 0, -2, -2, -2);
+            $this->role->ViewCustomAttributes = "";
 
             // rumah_sakit_id
             $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
@@ -666,158 +720,147 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
             }
             $this->rumah_sakit_id->ViewCustomAttributes = "";
 
-            // fasilitas_id
-            $curVal = trim(strval($this->fasilitas_id->CurrentValue));
+            // administrator_rumah_sakit
+            $curVal = trim(strval($this->administrator_rumah_sakit->CurrentValue));
             if ($curVal != "") {
-                $this->fasilitas_id->ViewValue = $this->fasilitas_id->lookupCacheOption($curVal);
-                if ($this->fasilitas_id->ViewValue === null) { // Lookup from database
+                $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->lookupCacheOption($curVal);
+                if ($this->administrator_rumah_sakit->ViewValue === null) { // Lookup from database
                     $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->fasilitas_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $sqlWrk = $this->administrator_rumah_sakit->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->fasilitas_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->fasilitas_id->ViewValue = $this->fasilitas_id->displayValue($arwrk);
+                        $arwrk = $this->administrator_rumah_sakit->Lookup->renderViewRow($rswrk[0]);
+                        $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->displayValue($arwrk);
                     } else {
-                        $this->fasilitas_id->ViewValue = $this->fasilitas_id->CurrentValue;
+                        $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->CurrentValue;
                     }
                 }
             } else {
-                $this->fasilitas_id->ViewValue = null;
+                $this->administrator_rumah_sakit->ViewValue = null;
             }
-            $this->fasilitas_id->ViewCustomAttributes = "";
+            $this->administrator_rumah_sakit->ViewCustomAttributes = "";
 
-            // hari_buka
-            $this->hari_buka->ViewValue = $this->hari_buka->CurrentValue;
-            $this->hari_buka->ViewCustomAttributes = "";
+            // id
+            $this->id->LinkCustomAttributes = "";
+            $this->id->HrefValue = "";
+            $this->id->TooltipValue = "";
 
-            // jam_buka
-            $this->jam_buka->ViewValue = $this->jam_buka->CurrentValue;
-            $this->jam_buka->ViewCustomAttributes = "";
+            // username
+            $this->_username->LinkCustomAttributes = "";
+            $this->_username->HrefValue = "";
+            $this->_username->TooltipValue = "";
+
+            // password
+            $this->_password->LinkCustomAttributes = "";
+            $this->_password->HrefValue = "";
+            $this->_password->TooltipValue = "";
+
+            // role
+            $this->role->LinkCustomAttributes = "";
+            $this->role->HrefValue = "";
+            $this->role->TooltipValue = "";
 
             // rumah_sakit_id
             $this->rumah_sakit_id->LinkCustomAttributes = "";
             $this->rumah_sakit_id->HrefValue = "";
             $this->rumah_sakit_id->TooltipValue = "";
 
-            // fasilitas_id
-            $this->fasilitas_id->LinkCustomAttributes = "";
-            $this->fasilitas_id->HrefValue = "";
-            $this->fasilitas_id->TooltipValue = "";
+            // administrator_rumah_sakit
+            $this->administrator_rumah_sakit->LinkCustomAttributes = "";
+            $this->administrator_rumah_sakit->HrefValue = "";
+            $this->administrator_rumah_sakit->TooltipValue = "";
+        } elseif ($this->RowType == ROWTYPE_SEARCH) {
+            // id
+            $this->id->EditAttrs["class"] = "form-control";
+            $this->id->EditCustomAttributes = "";
+            $this->id->EditValue = HtmlEncode($this->id->AdvancedSearch->SearchValue);
+            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
 
-            // hari_buka
-            $this->hari_buka->LinkCustomAttributes = "";
-            $this->hari_buka->HrefValue = "";
-            $this->hari_buka->TooltipValue = "";
+            // username
+            $this->_username->EditAttrs["class"] = "form-control";
+            $this->_username->EditCustomAttributes = "";
+            if (!$this->_username->Raw) {
+                $this->_username->AdvancedSearch->SearchValue = HtmlDecode($this->_username->AdvancedSearch->SearchValue);
+            }
+            $this->_username->EditValue = HtmlEncode($this->_username->AdvancedSearch->SearchValue);
+            $this->_username->PlaceHolder = RemoveHtml($this->_username->caption());
 
-            // jam_buka
-            $this->jam_buka->LinkCustomAttributes = "";
-            $this->jam_buka->HrefValue = "";
-            $this->jam_buka->TooltipValue = "";
-        } elseif ($this->RowType == ROWTYPE_ADD) {
+            // password
+            $this->_password->EditAttrs["class"] = "form-control";
+            $this->_password->EditCustomAttributes = "";
+            $this->_password->PlaceHolder = RemoveHtml($this->_password->caption());
+
+            // role
+            $this->role->EditAttrs["class"] = "form-control";
+            $this->role->EditCustomAttributes = "";
+            $this->role->PlaceHolder = RemoveHtml($this->role->caption());
+
             // rumah_sakit_id
             $this->rumah_sakit_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
+            $curVal = trim(strval($this->rumah_sakit_id->AdvancedSearch->SearchValue));
             if ($curVal != "") {
-                $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
+                $this->rumah_sakit_id->AdvancedSearch->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
             } else {
-                $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->Lookup !== null && is_array($this->rumah_sakit_id->Lookup->Options) ? $curVal : null;
+                $this->rumah_sakit_id->AdvancedSearch->ViewValue = $this->rumah_sakit_id->Lookup !== null && is_array($this->rumah_sakit_id->Lookup->Options) ? $curVal : null;
             }
-            if ($this->rumah_sakit_id->ViewValue !== null) { // Load from cache
+            if ($this->rumah_sakit_id->AdvancedSearch->ViewValue !== null) { // Load from cache
                 $this->rumah_sakit_id->EditValue = array_values($this->rumah_sakit_id->Lookup->Options);
-                if ($this->rumah_sakit_id->ViewValue == "") {
-                    $this->rumah_sakit_id->ViewValue = $Language->phrase("PleaseSelect");
+                if ($this->rumah_sakit_id->AdvancedSearch->ViewValue == "") {
+                    $this->rumah_sakit_id->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
                 }
             } else { // Lookup from database
                 if ($curVal == "") {
                     $filterWrk = "0=1";
                 } else {
-                    $filterWrk = "`id`" . SearchString("=", $this->rumah_sakit_id->CurrentValue, DATATYPE_NUMBER, "");
+                    $filterWrk = "`id`" . SearchString("=", $this->rumah_sakit_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
                 $sqlWrk = $this->rumah_sakit_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
                     $arwrk = $this->rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->displayValue($arwrk);
+                    $this->rumah_sakit_id->AdvancedSearch->ViewValue = $this->rumah_sakit_id->displayValue($arwrk);
                 } else {
-                    $this->rumah_sakit_id->ViewValue = $Language->phrase("PleaseSelect");
+                    $this->rumah_sakit_id->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
                 }
                 $arwrk = $rswrk;
-                foreach ($arwrk as &$row)
-                    $row = $this->rumah_sakit_id->Lookup->renderViewRow($row);
                 $this->rumah_sakit_id->EditValue = $arwrk;
             }
             $this->rumah_sakit_id->PlaceHolder = RemoveHtml($this->rumah_sakit_id->caption());
 
-            // fasilitas_id
-            $this->fasilitas_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->fasilitas_id->CurrentValue));
+            // administrator_rumah_sakit
+            $this->administrator_rumah_sakit->EditCustomAttributes = "";
+            $curVal = trim(strval($this->administrator_rumah_sakit->AdvancedSearch->SearchValue));
             if ($curVal != "") {
-                $this->fasilitas_id->ViewValue = $this->fasilitas_id->lookupCacheOption($curVal);
+                $this->administrator_rumah_sakit->AdvancedSearch->ViewValue = $this->administrator_rumah_sakit->lookupCacheOption($curVal);
             } else {
-                $this->fasilitas_id->ViewValue = $this->fasilitas_id->Lookup !== null && is_array($this->fasilitas_id->Lookup->Options) ? $curVal : null;
+                $this->administrator_rumah_sakit->AdvancedSearch->ViewValue = $this->administrator_rumah_sakit->Lookup !== null && is_array($this->administrator_rumah_sakit->Lookup->Options) ? $curVal : null;
             }
-            if ($this->fasilitas_id->ViewValue !== null) { // Load from cache
-                $this->fasilitas_id->EditValue = array_values($this->fasilitas_id->Lookup->Options);
-                if ($this->fasilitas_id->ViewValue == "") {
-                    $this->fasilitas_id->ViewValue = $Language->phrase("PleaseSelect");
+            if ($this->administrator_rumah_sakit->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->administrator_rumah_sakit->EditValue = array_values($this->administrator_rumah_sakit->Lookup->Options);
+                if ($this->administrator_rumah_sakit->AdvancedSearch->ViewValue == "") {
+                    $this->administrator_rumah_sakit->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
                 }
             } else { // Lookup from database
                 if ($curVal == "") {
                     $filterWrk = "0=1";
                 } else {
-                    $filterWrk = "`id`" . SearchString("=", $this->fasilitas_id->CurrentValue, DATATYPE_NUMBER, "");
+                    $filterWrk = "`id`" . SearchString("=", $this->administrator_rumah_sakit->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->fasilitas_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $sqlWrk = $this->administrator_rumah_sakit->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->fasilitas_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->fasilitas_id->ViewValue = $this->fasilitas_id->displayValue($arwrk);
+                    $arwrk = $this->administrator_rumah_sakit->Lookup->renderViewRow($rswrk[0]);
+                    $this->administrator_rumah_sakit->AdvancedSearch->ViewValue = $this->administrator_rumah_sakit->displayValue($arwrk);
                 } else {
-                    $this->fasilitas_id->ViewValue = $Language->phrase("PleaseSelect");
+                    $this->administrator_rumah_sakit->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
                 }
                 $arwrk = $rswrk;
-                $this->fasilitas_id->EditValue = $arwrk;
+                $this->administrator_rumah_sakit->EditValue = $arwrk;
             }
-            $this->fasilitas_id->PlaceHolder = RemoveHtml($this->fasilitas_id->caption());
-
-            // hari_buka
-            $this->hari_buka->EditAttrs["class"] = "form-control";
-            $this->hari_buka->EditCustomAttributes = "";
-            if (!$this->hari_buka->Raw) {
-                $this->hari_buka->CurrentValue = HtmlDecode($this->hari_buka->CurrentValue);
-            }
-            $this->hari_buka->EditValue = HtmlEncode($this->hari_buka->CurrentValue);
-            $this->hari_buka->PlaceHolder = RemoveHtml($this->hari_buka->caption());
-
-            // jam_buka
-            $this->jam_buka->EditAttrs["class"] = "form-control";
-            $this->jam_buka->EditCustomAttributes = "";
-            if (!$this->jam_buka->Raw) {
-                $this->jam_buka->CurrentValue = HtmlDecode($this->jam_buka->CurrentValue);
-            }
-            $this->jam_buka->EditValue = HtmlEncode($this->jam_buka->CurrentValue);
-            $this->jam_buka->PlaceHolder = RemoveHtml($this->jam_buka->caption());
-
-            // Add refer script
-
-            // rumah_sakit_id
-            $this->rumah_sakit_id->LinkCustomAttributes = "";
-            $this->rumah_sakit_id->HrefValue = "";
-
-            // fasilitas_id
-            $this->fasilitas_id->LinkCustomAttributes = "";
-            $this->fasilitas_id->HrefValue = "";
-
-            // hari_buka
-            $this->hari_buka->LinkCustomAttributes = "";
-            $this->hari_buka->HrefValue = "";
-
-            // jam_buka
-            $this->jam_buka->LinkCustomAttributes = "";
-            $this->jam_buka->HrefValue = "";
+            $this->administrator_rumah_sakit->PlaceHolder = RemoveHtml($this->administrator_rumah_sakit->caption());
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -829,46 +872,38 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
         }
     }
 
-    // Validate form
-    protected function validateForm()
+    // Validate search
+    protected function validateSearch()
     {
-        global $Language;
-
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
         }
-        if ($this->rumah_sakit_id->Required) {
-            if (!$this->rumah_sakit_id->IsDetailKey && EmptyValue($this->rumah_sakit_id->FormValue)) {
-                $this->rumah_sakit_id->addErrorMessage(str_replace("%s", $this->rumah_sakit_id->caption(), $this->rumah_sakit_id->RequiredErrorMessage));
-            }
-        }
-        if ($this->fasilitas_id->Required) {
-            if (!$this->fasilitas_id->IsDetailKey && EmptyValue($this->fasilitas_id->FormValue)) {
-                $this->fasilitas_id->addErrorMessage(str_replace("%s", $this->fasilitas_id->caption(), $this->fasilitas_id->RequiredErrorMessage));
-            }
-        }
-        if ($this->hari_buka->Required) {
-            if (!$this->hari_buka->IsDetailKey && EmptyValue($this->hari_buka->FormValue)) {
-                $this->hari_buka->addErrorMessage(str_replace("%s", $this->hari_buka->caption(), $this->hari_buka->RequiredErrorMessage));
-            }
-        }
-        if ($this->jam_buka->Required) {
-            if (!$this->jam_buka->IsDetailKey && EmptyValue($this->jam_buka->FormValue)) {
-                $this->jam_buka->addErrorMessage(str_replace("%s", $this->jam_buka->caption(), $this->jam_buka->RequiredErrorMessage));
-            }
+        if (!CheckInteger($this->id->AdvancedSearch->SearchValue)) {
+            $this->id->addErrorMessage($this->id->getErrorMessage(false));
         }
 
         // Return validate result
-        $validateForm = !$this->hasInvalidFields();
+        $validateSearch = !$this->hasInvalidFields();
 
         // Call Form_CustomValidate event
         $formCustomError = "";
-        $validateForm = $validateForm && $this->formCustomValidate($formCustomError);
+        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
         if ($formCustomError != "") {
             $this->setFailureMessage($formCustomError);
         }
-        return $validateForm;
+        return $validateSearch;
+    }
+
+    // Load advanced search
+    public function loadAdvancedSearch()
+    {
+        $this->id->AdvancedSearch->load();
+        $this->_username->AdvancedSearch->load();
+        $this->_password->AdvancedSearch->load();
+        $this->role->AdvancedSearch->load();
+        $this->rumah_sakit_id->AdvancedSearch->load();
+        $this->administrator_rumah_sakit->AdvancedSearch->load();
     }
 
     // Set up Breadcrumb
@@ -877,9 +912,9 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("fasilitasrumahsakitlist"), "", $this->TableVar, true);
-        $pageId = "addopt";
-        $Breadcrumb->add("addopt", $pageId, $url);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("webusersrslist"), "", $this->TableVar, true);
+        $pageId = "search";
+        $Breadcrumb->add("search", $pageId, $url);
     }
 
     // Setup lookup options
@@ -897,7 +932,7 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
             switch ($fld->FieldVar) {
                 case "x_rumah_sakit_id":
                     break;
-                case "x_fasilitas_id":
+                case "x_administrator_rumah_sakit":
                     break;
                 default:
                     $lookupFilter = "";
@@ -976,5 +1011,12 @@ class FasilitasRumahSakitAddopt extends FasilitasRumahSakit
     {
         // Example:
         //$footer = "your footer";
+    }
+
+    // Form Custom Validate event
+    public function formCustomValidate(&$customError)
+    {
+        // Return error message in CustomError
+        return true;
     }
 }

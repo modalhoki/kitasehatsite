@@ -5,9 +5,9 @@ namespace PHPMaker2021\Kitasehat;
 use Doctrine\DBAL\ParameterType;
 
 /**
- * Table class for rumah_sakit
+ * Table class for webusers_rs
  */
-class RumahSakit extends DbTable
+class WebusersRs extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -24,15 +24,24 @@ class RumahSakit extends DbTable
     public $OffsetColumnClass = "col-sm-10 offset-sm-2";
     public $TableLeftColumnClass = "w-col-2";
 
+    // Audit trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Export
     public $ExportDoc;
 
     // Fields
     public $id;
-    public $nama;
-    public $alamat;
-    public $daerah_id;
-    public $foto_rumah_sakit;
+    public $_username;
+    public $_password;
+    public $role;
+    public $rumah_sakit_id;
+    public $administrator_rumah_sakit;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -45,12 +54,12 @@ class RumahSakit extends DbTable
 
         // Language object
         $Language = Container("language");
-        $this->TableVar = 'rumah_sakit';
-        $this->TableName = 'rumah_sakit';
-        $this->TableType = 'TABLE';
+        $this->TableVar = 'webusers_rs';
+        $this->TableName = 'webusers_rs';
+        $this->TableType = 'CUSTOMVIEW';
 
         // Update Table
-        $this->UpdateTable = "`rumah_sakit`";
+        $this->UpdateTable = "webusers";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -71,48 +80,60 @@ class RumahSakit extends DbTable
         $this->BasicSearch->TypeDefault = "OR";
 
         // id
-        $this->id = new DbField('rumah_sakit', 'rumah_sakit', 'x_id', 'id', '`id`', '`id`', 20, 20, -1, false, '`id`', false, false, false, 'FORMATTED TEXT', 'NO');
+        $this->id = new DbField('webusers_rs', 'webusers_rs', 'x_id', 'id', '`id`', '`id`', 20, 20, -1, false, '`id`', false, false, false, 'FORMATTED TEXT', 'NO');
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
-        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
-        // nama
-        $this->nama = new DbField('rumah_sakit', 'rumah_sakit', 'x_nama', 'nama', '`nama`', '`nama`', 200, 255, -1, false, '`nama`', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->nama->Nullable = false; // NOT NULL field
-        $this->nama->Required = true; // Required field
-        $this->nama->Sortable = true; // Allow sort
-        $this->nama->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->nama->Param, "CustomMsg");
-        $this->Fields['nama'] = &$this->nama;
+        // username
+        $this->_username = new DbField('webusers_rs', 'webusers_rs', 'x__username', 'username', '`username`', '`username`', 200, 255, -1, false, '`username`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->_username->Nullable = false; // NOT NULL field
+        $this->_username->Required = true; // Required field
+        $this->_username->Sortable = true; // Allow sort
+        $this->_username->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->_username->Param, "CustomMsg");
+        $this->Fields['username'] = &$this->_username;
 
-        // alamat
-        $this->alamat = new DbField('rumah_sakit', 'rumah_sakit', 'x_alamat', 'alamat', '`alamat`', '`alamat`', 200, 255, -1, false, '`alamat`', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->alamat->Nullable = false; // NOT NULL field
-        $this->alamat->Required = true; // Required field
-        $this->alamat->Sortable = true; // Allow sort
-        $this->alamat->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->alamat->Param, "CustomMsg");
-        $this->Fields['alamat'] = &$this->alamat;
+        // password
+        $this->_password = new DbField('webusers_rs', 'webusers_rs', 'x__password', 'password', '`password`', '`password`', 200, 255, -1, false, '`password`', false, false, false, 'FORMATTED TEXT', 'PASSWORD');
+        $this->_password->Nullable = false; // NOT NULL field
+        $this->_password->Required = true; // Required field
+        $this->_password->Sortable = true; // Allow sort
+        $this->_password->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->_password->Param, "CustomMsg");
+        $this->Fields['password'] = &$this->_password;
 
-        // daerah_id
-        $this->daerah_id = new DbField('rumah_sakit', 'rumah_sakit', 'x_daerah_id', 'daerah_id', '`daerah_id`', '`daerah_id`', 3, 11, -1, false, '`daerah_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->daerah_id->Nullable = false; // NOT NULL field
-        $this->daerah_id->Required = true; // Required field
-        $this->daerah_id->Sortable = true; // Allow sort
-        $this->daerah_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->daerah_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->daerah_id->Lookup = new Lookup('daerah_id', 'daerah', false, 'id', ["jenis","nama_daerah","",""], [], [], [], [], [], [], '', '');
-        $this->daerah_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->daerah_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->daerah_id->Param, "CustomMsg");
-        $this->Fields['daerah_id'] = &$this->daerah_id;
+        // role
+        $this->role = new DbField('webusers_rs', 'webusers_rs', 'x_role', 'role', '`role`', '`role`', 3, 11, -1, false, '`role`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->role->Nullable = false; // NOT NULL field
+        $this->role->Required = true; // Required field
+        $this->role->Sortable = true; // Allow sort
+        $this->role->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->role->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->role->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->role->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->role->Param, "CustomMsg");
+        $this->Fields['role'] = &$this->role;
 
-        // foto_rumah_sakit
-        $this->foto_rumah_sakit = new DbField('rumah_sakit', 'rumah_sakit', 'x_foto_rumah_sakit', 'foto_rumah_sakit', '`foto_rumah_sakit`', '`foto_rumah_sakit`', 200, 255, -1, false, '`foto_rumah_sakit`', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->foto_rumah_sakit->Sortable = true; // Allow sort
-        $this->foto_rumah_sakit->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->foto_rumah_sakit->Param, "CustomMsg");
-        $this->Fields['foto_rumah_sakit'] = &$this->foto_rumah_sakit;
+        // rumah_sakit_id
+        $this->rumah_sakit_id = new DbField('webusers_rs', 'webusers_rs', 'x_rumah_sakit_id', 'rumah_sakit_id', '`rumah_sakit_id`', '`rumah_sakit_id`', 20, 20, -1, false, '`rumah_sakit_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->rumah_sakit_id->Sortable = true; // Allow sort
+        $this->rumah_sakit_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->rumah_sakit_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->rumah_sakit_id->Lookup = new Lookup('rumah_sakit_id', 'rumah_sakit', false, 'id', ["nama","","",""], [], [], [], [], [], [], '', '');
+        $this->rumah_sakit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->rumah_sakit_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->rumah_sakit_id->Param, "CustomMsg");
+        $this->Fields['rumah_sakit_id'] = &$this->rumah_sakit_id;
+
+        // administrator_rumah_sakit
+        $this->administrator_rumah_sakit = new DbField('webusers_rs', 'webusers_rs', 'x_administrator_rumah_sakit', 'administrator_rumah_sakit', '`administrator_rumah_sakit`', '`administrator_rumah_sakit`', 20, 20, -1, false, '`administrator_rumah_sakit`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->administrator_rumah_sakit->Sortable = true; // Allow sort
+        $this->administrator_rumah_sakit->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->administrator_rumah_sakit->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->administrator_rumah_sakit->Lookup = new Lookup('administrator_rumah_sakit', 'webusers_rs', false, 'id', ["username","","",""], [], [], [], [], [], [], '', '');
+        $this->administrator_rumah_sakit->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->administrator_rumah_sakit->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->administrator_rumah_sakit->Param, "CustomMsg");
+        $this->Fields['administrator_rumah_sakit'] = &$this->administrator_rumah_sakit;
     }
 
     // Field Visibility
@@ -152,36 +173,10 @@ class RumahSakit extends DbTable
         }
     }
 
-    // Current detail table name
-    public function getCurrentDetailTable()
-    {
-        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE"));
-    }
-
-    public function setCurrentDetailTable($v)
-    {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
-    }
-
-    // Get detail url
-    public function getDetailUrl()
-    {
-        // Detail url
-        $detailUrl = "";
-        if ($this->getCurrentDetailTable() == "fasilitas_rumah_sakit") {
-            $detailUrl = Container("fasilitas_rumah_sakit")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
-        if ($detailUrl == "") {
-            $detailUrl = "rumahsakitlist";
-        }
-        return $detailUrl;
-    }
-
     // Table level SQL
     public function getSqlFrom() // From
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "`rumah_sakit`";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "webusers";
     }
 
     public function sqlFrom() // For backward compatibility
@@ -196,7 +191,7 @@ class RumahSakit extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("webusers.*");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -212,7 +207,7 @@ class RumahSakit extends DbTable
     public function getSqlWhere() // Where
     {
         $where = ($this->SqlWhere != "") ? $this->SqlWhere : "";
-        $this->DefaultFilter = "`id` = ".CurrentUserInfo("rumah_sakit_id");
+        $this->DefaultFilter = "`rumah_sakit_id` = ".CurrentUserInfo("rumah_sakit_id");
         AddFilter($where, $this->DefaultFilter);
         return $where;
     }
@@ -468,6 +463,9 @@ class RumahSakit extends DbTable
             // Get insert id if necessary
             $this->id->setDbValue($conn->lastInsertId());
             $rs['id'] = $this->id->DbValue;
+            if ($this->AuditTrailOnAdd) {
+                $this->writeAuditTrailOnAdd($rs);
+            }
         }
         return $success;
     }
@@ -505,36 +503,17 @@ class RumahSakit extends DbTable
     // Update
     public function update(&$rs, $where = "", $rsold = null, $curfilter = true)
     {
-        // Cascade Update detail table 'fasilitas_rumah_sakit'
-        $cascadeUpdate = false;
-        $rscascade = [];
-        if ($rsold && (isset($rs['id']) && $rsold['id'] != $rs['id'])) { // Update detail field 'rumah_sakit_id'
-            $cascadeUpdate = true;
-            $rscascade['rumah_sakit_id'] = $rs['id'];
-        }
-        if ($cascadeUpdate) {
-            $rswrk = Container("fasilitas_rumah_sakit")->loadRs("`rumah_sakit_id` = " . QuotedValue($rsold['id'], DATATYPE_NUMBER, 'DB'))->fetchAll(\PDO::FETCH_ASSOC);
-            foreach ($rswrk as $rsdtlold) {
-                $rskey = [];
-                $fldname = 'id';
-                $rskey[$fldname] = $rsdtlold[$fldname];
-                $rsdtlnew = array_merge($rsdtlold, $rscascade);
-                // Call Row_Updating event
-                $success = Container("fasilitas_rumah_sakit")->rowUpdating($rsdtlold, $rsdtlnew);
-                if ($success) {
-                    $success = Container("fasilitas_rumah_sakit")->update($rscascade, $rskey, $rsdtlold);
-                }
-                if (!$success) {
-                    return false;
-                }
-                // Call Row_Updated event
-                Container("fasilitas_rumah_sakit")->rowUpdated($rsdtlold, $rsdtlnew);
-            }
-        }
-
         // If no field is updated, execute may return 0. Treat as success
         $success = $this->updateSql($rs, $where, $curfilter)->execute();
         $success = ($success > 0) ? $success : true;
+        if ($success && $this->AuditTrailOnEdit && $rsold) {
+            $rsaudit = $rs;
+            $fldname = 'id';
+            if (!array_key_exists($fldname, $rsaudit)) {
+                $rsaudit[$fldname] = $rsold[$fldname];
+            }
+            $this->writeAuditTrailOnEdit($rsold, $rsaudit);
+        }
         return $success;
     }
 
@@ -567,32 +546,11 @@ class RumahSakit extends DbTable
     public function delete(&$rs, $where = "", $curfilter = false)
     {
         $success = true;
-
-        // Cascade delete detail table 'fasilitas_rumah_sakit'
-        $dtlrows = Container("fasilitas_rumah_sakit")->loadRs("`rumah_sakit_id` = " . QuotedValue($rs['id'], DATATYPE_NUMBER, "DB"))->fetchAll(\PDO::FETCH_ASSOC);
-        // Call Row Deleting event
-        foreach ($dtlrows as $dtlrow) {
-            $success = Container("fasilitas_rumah_sakit")->rowDeleting($dtlrow);
-            if (!$success) {
-                break;
-            }
-        }
-        if ($success) {
-            foreach ($dtlrows as $dtlrow) {
-                $success = Container("fasilitas_rumah_sakit")->delete($dtlrow); // Delete
-                if (!$success) {
-                    break;
-                }
-            }
-        }
-        // Call Row Deleted event
-        if ($success) {
-            foreach ($dtlrows as $dtlrow) {
-                Container("fasilitas_rumah_sakit")->rowDeleted($dtlrow);
-            }
-        }
         if ($success) {
             $success = $this->deleteSql($rs, $where, $curfilter)->execute();
+        }
+        if ($success && $this->AuditTrailOnDelete) {
+            $this->writeAuditTrailOnDelete($rs);
         }
         return $success;
     }
@@ -604,10 +562,11 @@ class RumahSakit extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->nama->DbValue = $row['nama'];
-        $this->alamat->DbValue = $row['alamat'];
-        $this->daerah_id->DbValue = $row['daerah_id'];
-        $this->foto_rumah_sakit->DbValue = $row['foto_rumah_sakit'];
+        $this->_username->DbValue = $row['username'];
+        $this->_password->DbValue = $row['password'];
+        $this->role->DbValue = $row['role'];
+        $this->rumah_sakit_id->DbValue = $row['rumah_sakit_id'];
+        $this->administrator_rumah_sakit->DbValue = $row['administrator_rumah_sakit'];
     }
 
     // Delete uploaded files
@@ -679,7 +638,7 @@ class RumahSakit extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("rumahsakitlist");
+        return $_SESSION[$name] ?? GetUrl("webusersrslist");
     }
 
     // Set return page URL
@@ -692,11 +651,11 @@ class RumahSakit extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "rumahsakitview") {
+        if ($pageName == "webusersrsview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "rumahsakitedit") {
+        } elseif ($pageName == "webusersrsedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "rumahsakitadd") {
+        } elseif ($pageName == "webusersrsadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -708,15 +667,15 @@ class RumahSakit extends DbTable
     {
         switch (strtolower($action)) {
             case Config("API_VIEW_ACTION"):
-                return "RumahSakitView";
+                return "WebusersRsView";
             case Config("API_ADD_ACTION"):
-                return "RumahSakitAdd";
+                return "WebusersRsAdd";
             case Config("API_EDIT_ACTION"):
-                return "RumahSakitEdit";
+                return "WebusersRsEdit";
             case Config("API_DELETE_ACTION"):
-                return "RumahSakitDelete";
+                return "WebusersRsDelete";
             case Config("API_LIST_ACTION"):
-                return "RumahSakitList";
+                return "WebusersRsList";
             default:
                 return "";
         }
@@ -725,16 +684,16 @@ class RumahSakit extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "rumahsakitlist";
+        return "webusersrslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("rumahsakitview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("webusersrsview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("rumahsakitview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("webusersrsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -743,9 +702,9 @@ class RumahSakit extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "rumahsakitadd?" . $this->getUrlParm($parm);
+            $url = "webusersrsadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "rumahsakitadd";
+            $url = "webusersrsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -753,11 +712,7 @@ class RumahSakit extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("rumahsakitedit", $this->getUrlParm($parm));
-        } else {
-            $url = $this->keyUrl("rumahsakitedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
-        }
+        $url = $this->keyUrl("webusersrsedit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -771,11 +726,7 @@ class RumahSakit extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("rumahsakitadd", $this->getUrlParm($parm));
-        } else {
-            $url = $this->keyUrl("rumahsakitadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
-        }
+        $url = $this->keyUrl("webusersrsadd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -789,7 +740,7 @@ class RumahSakit extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("rumahsakitdelete", $this->getUrlParm());
+        return $this->keyUrl("webusersrsdelete", $this->getUrlParm());
     }
 
     // Add master url
@@ -937,10 +888,11 @@ SORTHTML;
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->nama->setDbValue($row['nama']);
-        $this->alamat->setDbValue($row['alamat']);
-        $this->daerah_id->setDbValue($row['daerah_id']);
-        $this->foto_rumah_sakit->setDbValue($row['foto_rumah_sakit']);
+        $this->_username->setDbValue($row['username']);
+        $this->_password->setDbValue($row['password']);
+        $this->role->setDbValue($row['role']);
+        $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
+        $this->administrator_rumah_sakit->setDbValue($row['administrator_rumah_sakit']);
     }
 
     // Render list row values
@@ -955,83 +907,103 @@ SORTHTML;
 
         // id
 
-        // nama
+        // username
 
-        // alamat
+        // password
 
-        // daerah_id
+        // role
 
-        // foto_rumah_sakit
+        // rumah_sakit_id
+
+        // administrator_rumah_sakit
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
         $this->id->ViewCustomAttributes = "";
 
-        // nama
-        $this->nama->ViewValue = $this->nama->CurrentValue;
-        $this->nama->ViewCustomAttributes = "";
+        // username
+        $this->_username->ViewValue = $this->_username->CurrentValue;
+        $this->_username->ViewCustomAttributes = "";
 
-        // alamat
-        $this->alamat->ViewValue = $this->alamat->CurrentValue;
-        $this->alamat->ViewCustomAttributes = "";
+        // password
+        $this->_password->ViewValue = $Language->phrase("PasswordMask");
+        $this->_password->ViewCustomAttributes = "";
 
-        // daerah_id
-        $curVal = trim(strval($this->daerah_id->CurrentValue));
+        // role
+        $this->role->ViewValue = FormatNumber($this->role->ViewValue, 0, -2, -2, -2);
+        $this->role->ViewCustomAttributes = "";
+
+        // rumah_sakit_id
+        $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
         if ($curVal != "") {
-            $this->daerah_id->ViewValue = $this->daerah_id->lookupCacheOption($curVal);
-            if ($this->daerah_id->ViewValue === null) { // Lookup from database
+            $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
+            if ($this->rumah_sakit_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->daerah_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $sqlWrk = $this->rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->daerah_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->daerah_id->ViewValue = $this->daerah_id->displayValue($arwrk);
+                    $arwrk = $this->rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->displayValue($arwrk);
                 } else {
-                    $this->daerah_id->ViewValue = $this->daerah_id->CurrentValue;
+                    $this->rumah_sakit_id->ViewValue = $this->rumah_sakit_id->CurrentValue;
                 }
             }
         } else {
-            $this->daerah_id->ViewValue = null;
+            $this->rumah_sakit_id->ViewValue = null;
         }
-        $this->daerah_id->ViewCustomAttributes = "";
+        $this->rumah_sakit_id->ViewCustomAttributes = "";
 
-        // foto_rumah_sakit
-        $this->foto_rumah_sakit->ViewValue = $this->foto_rumah_sakit->CurrentValue;
-        $this->foto_rumah_sakit->ViewCustomAttributes = "";
+        // administrator_rumah_sakit
+        $curVal = trim(strval($this->administrator_rumah_sakit->CurrentValue));
+        if ($curVal != "") {
+            $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->lookupCacheOption($curVal);
+            if ($this->administrator_rumah_sakit->ViewValue === null) { // Lookup from database
+                $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->administrator_rumah_sakit->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->administrator_rumah_sakit->Lookup->renderViewRow($rswrk[0]);
+                    $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->displayValue($arwrk);
+                } else {
+                    $this->administrator_rumah_sakit->ViewValue = $this->administrator_rumah_sakit->CurrentValue;
+                }
+            }
+        } else {
+            $this->administrator_rumah_sakit->ViewValue = null;
+        }
+        $this->administrator_rumah_sakit->ViewCustomAttributes = "";
 
         // id
         $this->id->LinkCustomAttributes = "";
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // nama
-        $this->nama->LinkCustomAttributes = "";
-        $this->nama->HrefValue = "";
-        $this->nama->TooltipValue = "";
+        // username
+        $this->_username->LinkCustomAttributes = "";
+        $this->_username->HrefValue = "";
+        $this->_username->TooltipValue = "";
 
-        // alamat
-        $this->alamat->LinkCustomAttributes = "";
-        $this->alamat->HrefValue = "";
-        $this->alamat->TooltipValue = "";
+        // password
+        $this->_password->LinkCustomAttributes = "";
+        $this->_password->HrefValue = "";
+        $this->_password->TooltipValue = "";
 
-        // daerah_id
-        $this->daerah_id->LinkCustomAttributes = "";
-        $this->daerah_id->HrefValue = "";
-        $this->daerah_id->TooltipValue = "";
+        // role
+        $this->role->LinkCustomAttributes = "";
+        $this->role->HrefValue = "";
+        $this->role->TooltipValue = "";
 
-        // foto_rumah_sakit
-        $this->foto_rumah_sakit->LinkCustomAttributes = "";
-        if (!EmptyValue($this->foto_rumah_sakit->CurrentValue)) {
-            $this->foto_rumah_sakit->HrefValue = $this->foto_rumah_sakit->CurrentValue; // Add prefix/suffix
-            $this->foto_rumah_sakit->LinkAttrs["target"] = ""; // Add target
-            if ($this->isExport()) {
-                $this->foto_rumah_sakit->HrefValue = FullUrl($this->foto_rumah_sakit->HrefValue, "href");
-            }
-        } else {
-            $this->foto_rumah_sakit->HrefValue = "";
-        }
-        $this->foto_rumah_sakit->TooltipValue = "";
+        // rumah_sakit_id
+        $this->rumah_sakit_id->LinkCustomAttributes = "";
+        $this->rumah_sakit_id->HrefValue = "";
+        $this->rumah_sakit_id->TooltipValue = "";
+
+        // administrator_rumah_sakit
+        $this->administrator_rumah_sakit->LinkCustomAttributes = "";
+        $this->administrator_rumah_sakit->HrefValue = "";
+        $this->administrator_rumah_sakit->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1054,37 +1026,53 @@ SORTHTML;
         $this->id->EditValue = $this->id->CurrentValue;
         $this->id->ViewCustomAttributes = "";
 
-        // nama
-        $this->nama->EditAttrs["class"] = "form-control";
-        $this->nama->EditCustomAttributes = "";
-        if (!$this->nama->Raw) {
-            $this->nama->CurrentValue = HtmlDecode($this->nama->CurrentValue);
+        // username
+        $this->_username->EditAttrs["class"] = "form-control";
+        $this->_username->EditCustomAttributes = "";
+        if (!$this->_username->Raw) {
+            $this->_username->CurrentValue = HtmlDecode($this->_username->CurrentValue);
         }
-        $this->nama->EditValue = $this->nama->CurrentValue;
-        $this->nama->PlaceHolder = RemoveHtml($this->nama->caption());
+        $this->_username->EditValue = $this->_username->CurrentValue;
+        $this->_username->PlaceHolder = RemoveHtml($this->_username->caption());
 
-        // alamat
-        $this->alamat->EditAttrs["class"] = "form-control";
-        $this->alamat->EditCustomAttributes = "";
-        if (!$this->alamat->Raw) {
-            $this->alamat->CurrentValue = HtmlDecode($this->alamat->CurrentValue);
+        // password
+        $this->_password->EditAttrs["class"] = "form-control";
+        $this->_password->EditCustomAttributes = "";
+        $this->_password->EditValue = $Language->phrase("PasswordMask"); // Show as masked password
+        $this->_password->PlaceHolder = RemoveHtml($this->_password->caption());
+
+        // role
+        $this->role->EditAttrs["class"] = "form-control";
+        $this->role->EditCustomAttributes = "";
+        $this->role->PlaceHolder = RemoveHtml($this->role->caption());
+
+        // rumah_sakit_id
+        $this->rumah_sakit_id->EditAttrs["class"] = "form-control";
+        $this->rumah_sakit_id->EditCustomAttributes = "";
+        $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
+        if ($curVal != "") {
+            $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
+            if ($this->rumah_sakit_id->EditValue === null) { // Lookup from database
+                $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->displayValue($arwrk);
+                } else {
+                    $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->rumah_sakit_id->EditValue = null;
         }
-        $this->alamat->EditValue = $this->alamat->CurrentValue;
-        $this->alamat->PlaceHolder = RemoveHtml($this->alamat->caption());
+        $this->rumah_sakit_id->ViewCustomAttributes = "";
 
-        // daerah_id
-        $this->daerah_id->EditAttrs["class"] = "form-control";
-        $this->daerah_id->EditCustomAttributes = "";
-        $this->daerah_id->PlaceHolder = RemoveHtml($this->daerah_id->caption());
-
-        // foto_rumah_sakit
-        $this->foto_rumah_sakit->EditAttrs["class"] = "form-control";
-        $this->foto_rumah_sakit->EditCustomAttributes = "";
-        if (!$this->foto_rumah_sakit->Raw) {
-            $this->foto_rumah_sakit->CurrentValue = HtmlDecode($this->foto_rumah_sakit->CurrentValue);
-        }
-        $this->foto_rumah_sakit->EditValue = $this->foto_rumah_sakit->CurrentValue;
-        $this->foto_rumah_sakit->PlaceHolder = RemoveHtml($this->foto_rumah_sakit->caption());
+        // administrator_rumah_sakit
+        $this->administrator_rumah_sakit->EditAttrs["class"] = "form-control";
+        $this->administrator_rumah_sakit->EditCustomAttributes = "";
+        $this->administrator_rumah_sakit->PlaceHolder = RemoveHtml($this->administrator_rumah_sakit->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1115,16 +1103,18 @@ SORTHTML;
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->nama);
-                    $doc->exportCaption($this->alamat);
-                    $doc->exportCaption($this->daerah_id);
-                    $doc->exportCaption($this->foto_rumah_sakit);
+                    $doc->exportCaption($this->_username);
+                    $doc->exportCaption($this->_password);
+                    $doc->exportCaption($this->role);
+                    $doc->exportCaption($this->rumah_sakit_id);
+                    $doc->exportCaption($this->administrator_rumah_sakit);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->nama);
-                    $doc->exportCaption($this->alamat);
-                    $doc->exportCaption($this->daerah_id);
-                    $doc->exportCaption($this->foto_rumah_sakit);
+                    $doc->exportCaption($this->_username);
+                    $doc->exportCaption($this->_password);
+                    $doc->exportCaption($this->role);
+                    $doc->exportCaption($this->rumah_sakit_id);
+                    $doc->exportCaption($this->administrator_rumah_sakit);
                 }
                 $doc->endExportRow();
             }
@@ -1155,16 +1145,18 @@ SORTHTML;
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->nama);
-                        $doc->exportField($this->alamat);
-                        $doc->exportField($this->daerah_id);
-                        $doc->exportField($this->foto_rumah_sakit);
+                        $doc->exportField($this->_username);
+                        $doc->exportField($this->_password);
+                        $doc->exportField($this->role);
+                        $doc->exportField($this->rumah_sakit_id);
+                        $doc->exportField($this->administrator_rumah_sakit);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->nama);
-                        $doc->exportField($this->alamat);
-                        $doc->exportField($this->daerah_id);
-                        $doc->exportField($this->foto_rumah_sakit);
+                        $doc->exportField($this->_username);
+                        $doc->exportField($this->_password);
+                        $doc->exportField($this->role);
+                        $doc->exportField($this->rumah_sakit_id);
+                        $doc->exportField($this->administrator_rumah_sakit);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1186,6 +1178,140 @@ SORTHTML;
     {
         // No binary fields
         return false;
+    }
+
+    // Write Audit Trail start/end for grid update
+    public function writeAuditTrailDummy($typ)
+    {
+        $table = 'webusers_rs';
+        $usr = CurrentUserID();
+        WriteAuditLog($usr, $typ, $table, "", "", "", "");
+    }
+
+    // Write Audit Trail (add page)
+    public function writeAuditTrailOnAdd(&$rs)
+    {
+        global $Language;
+        if (!$this->AuditTrailOnAdd) {
+            return;
+        }
+        $table = 'webusers_rs';
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rs['id'];
+
+        // Write Audit Trail
+        $usr = CurrentUserID();
+        foreach (array_keys($rs) as $fldname) {
+            if (array_key_exists($fldname, $this->Fields) && $this->Fields[$fldname]->DataType != DATATYPE_BLOB) { // Ignore BLOB fields
+                if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") {
+                    $newvalue = $Language->phrase("PasswordMask"); // Password Field
+                } elseif ($this->Fields[$fldname]->DataType == DATATYPE_MEMO) {
+                    if (Config("AUDIT_TRAIL_TO_DATABASE")) {
+                        $newvalue = $rs[$fldname];
+                    } else {
+                        $newvalue = "[MEMO]"; // Memo Field
+                    }
+                } elseif ($this->Fields[$fldname]->DataType == DATATYPE_XML) {
+                    $newvalue = "[XML]"; // XML Field
+                } else {
+                    $newvalue = $rs[$fldname];
+                }
+                WriteAuditLog($usr, "A", $table, $fldname, $key, "", $newvalue);
+            }
+        }
+    }
+
+    // Write Audit Trail (edit page)
+    public function writeAuditTrailOnEdit(&$rsold, &$rsnew)
+    {
+        global $Language;
+        if (!$this->AuditTrailOnEdit) {
+            return;
+        }
+        $table = 'webusers_rs';
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rsold['id'];
+
+        // Write Audit Trail
+        $usr = CurrentUserID();
+        foreach (array_keys($rsnew) as $fldname) {
+            if (array_key_exists($fldname, $this->Fields) && array_key_exists($fldname, $rsold) && $this->Fields[$fldname]->DataType != DATATYPE_BLOB) { // Ignore BLOB fields
+                if ($this->Fields[$fldname]->DataType == DATATYPE_DATE) { // DateTime field
+                    $modified = (FormatDateTime($rsold[$fldname], 0) != FormatDateTime($rsnew[$fldname], 0));
+                } else {
+                    $modified = !CompareValue($rsold[$fldname], $rsnew[$fldname]);
+                }
+                if ($modified) {
+                    if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") { // Password Field
+                        $oldvalue = $Language->phrase("PasswordMask");
+                        $newvalue = $Language->phrase("PasswordMask");
+                    } elseif ($this->Fields[$fldname]->DataType == DATATYPE_MEMO) { // Memo field
+                        if (Config("AUDIT_TRAIL_TO_DATABASE")) {
+                            $oldvalue = $rsold[$fldname];
+                            $newvalue = $rsnew[$fldname];
+                        } else {
+                            $oldvalue = "[MEMO]";
+                            $newvalue = "[MEMO]";
+                        }
+                    } elseif ($this->Fields[$fldname]->DataType == DATATYPE_XML) { // XML field
+                        $oldvalue = "[XML]";
+                        $newvalue = "[XML]";
+                    } else {
+                        $oldvalue = $rsold[$fldname];
+                        $newvalue = $rsnew[$fldname];
+                    }
+                    WriteAuditLog($usr, "U", $table, $fldname, $key, $oldvalue, $newvalue);
+                }
+            }
+        }
+    }
+
+    // Write Audit Trail (delete page)
+    public function writeAuditTrailOnDelete(&$rs)
+    {
+        global $Language;
+        if (!$this->AuditTrailOnDelete) {
+            return;
+        }
+        $table = 'webusers_rs';
+
+        // Get key value
+        $key = "";
+        if ($key != "") {
+            $key .= Config("COMPOSITE_KEY_SEPARATOR");
+        }
+        $key .= $rs['id'];
+
+        // Write Audit Trail
+        $curUser = CurrentUserID();
+        foreach (array_keys($rs) as $fldname) {
+            if (array_key_exists($fldname, $this->Fields) && $this->Fields[$fldname]->DataType != DATATYPE_BLOB) { // Ignore BLOB fields
+                if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") {
+                    $oldvalue = $Language->phrase("PasswordMask"); // Password Field
+                } elseif ($this->Fields[$fldname]->DataType == DATATYPE_MEMO) {
+                    if (Config("AUDIT_TRAIL_TO_DATABASE")) {
+                        $oldvalue = $rs[$fldname];
+                    } else {
+                        $oldvalue = "[MEMO]"; // Memo field
+                    }
+                } elseif ($this->Fields[$fldname]->DataType == DATATYPE_XML) {
+                    $oldvalue = "[XML]"; // XML field
+                } else {
+                    $oldvalue = $rs[$fldname];
+                }
+                WriteAuditLog($curUser, "D", $table, $fldname, $key, $oldvalue, "");
+            }
+        }
     }
 
     // Table level events
