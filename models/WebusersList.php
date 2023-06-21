@@ -64,6 +64,14 @@ class WebusersList extends Webusers
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -763,6 +771,13 @@ class WebusersList extends Webusers
                 } else {
                     $this->setWarningMessage($Language->phrase("NoRecord"));
                 }
+            }
+
+            // Audit trail on search
+            if ($this->AuditTrailOnSearch && $this->Command == "search" && !$this->RestoreSearch) {
+                $searchParm = ServerVar("QUERY_STRING");
+                $searchSql = $this->getSessionWhere();
+                $this->writeAuditTrailOnSearch($searchParm, $searchSql);
             }
         }
 
@@ -1969,6 +1984,7 @@ class WebusersList extends Webusers
     public function pageRender()
     {
         //Log("Page Render");
+        if (CurrentUserLevel() != -1) $this->rumah_sakit_id->Visible = FALSE;
     }
 
     // Page Data Rendering event

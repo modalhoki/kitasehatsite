@@ -26,6 +26,14 @@ class DokterDelete extends Dokter
     // Rendering View
     public $RenderingView = false;
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -636,6 +644,9 @@ class DokterDelete extends Dokter
             return false;
         }
         $conn->beginTransaction();
+        if ($this->AuditTrailOnDelete) {
+            $this->writeAuditTrailDummy($Language->phrase("BatchDeleteBegin")); // Batch delete begin
+        }
 
         // Clone old rows
         $rsold = $rows;
@@ -683,8 +694,14 @@ class DokterDelete extends Dokter
         }
         if ($deleteRows) {
             $conn->commit(); // Commit the changes
+            if ($this->AuditTrailOnDelete) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchDeleteSuccess")); // Batch delete success
+            }
         } else {
             $conn->rollback(); // Rollback changes
+            if ($this->AuditTrailOnDelete) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchDeleteRollback")); // Batch delete rollback
+            }
         }
 
         // Call Row Deleted event

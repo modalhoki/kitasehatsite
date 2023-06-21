@@ -64,6 +64,14 @@ class PraktikPoliList extends PraktikPoli
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -872,6 +880,13 @@ class PraktikPoliList extends PraktikPoli
                     $this->setWarningMessage($Language->phrase("NoRecord"));
                 }
             }
+
+            // Audit trail on search
+            if ($this->AuditTrailOnSearch && $this->Command == "search" && !$this->RestoreSearch) {
+                $searchParm = ServerVar("QUERY_STRING");
+                $searchSql = $this->getSessionWhere();
+                $this->writeAuditTrailOnSearch($searchParm, $searchSql);
+            }
         }
 
         // Search options
@@ -988,6 +1003,9 @@ class PraktikPoliList extends PraktikPoli
 
         // Begin transaction
         $conn->beginTransaction();
+        if ($this->AuditTrailOnEdit) {
+            $this->writeAuditTrailDummy($Language->phrase("BatchUpdateBegin")); // Batch update begin
+        }
         $key = "";
 
         // Update row index and get row key
@@ -1050,12 +1068,18 @@ class PraktikPoliList extends PraktikPoli
 
             // Call Grid_Updated event
             $this->gridUpdated($rsold, $rsnew);
+            if ($this->AuditTrailOnEdit) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchUpdateSuccess")); // Batch update success
+            }
             if ($this->getSuccessMessage() == "") {
                 $this->setSuccessMessage($Language->phrase("UpdateSuccess")); // Set up update success message
             }
             $this->clearInlineMode(); // Clear inline edit mode
         } else {
             $conn->rollback(); // Rollback transaction
+            if ($this->AuditTrailOnEdit) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchUpdateRollback")); // Batch update rollback
+            }
             if ($this->getFailureMessage() == "") {
                 $this->setFailureMessage($Language->phrase("UpdateFailed")); // Set update failed message
             }
@@ -1116,6 +1140,9 @@ class PraktikPoliList extends PraktikPoli
         // Init key filter
         $wrkfilter = "";
         $addcnt = 0;
+        if ($this->AuditTrailOnAdd) {
+            $this->writeAuditTrailDummy($Language->phrase("BatchInsertBegin")); // Batch insert begin
+        }
         $key = "";
 
         // Get row count
@@ -1179,12 +1206,18 @@ class PraktikPoliList extends PraktikPoli
 
             // Call Grid_Inserted event
             $this->gridInserted($rsnew);
+            if ($this->AuditTrailOnAdd) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchInsertSuccess")); // Batch insert success
+            }
             if ($this->getSuccessMessage() == "") {
                 $this->setSuccessMessage($Language->phrase("InsertSuccess")); // Set up insert success message
             }
             $this->clearInlineMode(); // Clear grid add mode
         } else {
             $conn->rollback(); // Rollback transaction
+            if ($this->AuditTrailOnAdd) {
+                $this->writeAuditTrailDummy($Language->phrase("BatchInsertRollback")); // Batch insert rollback
+            }
             if ($this->getFailureMessage() == "") {
                 $this->setFailureMessage($Language->phrase("InsertFailed")); // Set insert failed message
             }
@@ -2549,6 +2582,9 @@ class PraktikPoliList extends PraktikPoli
         if (count($rows) == 0) {
             $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
             return false;
+        }
+        if ($this->AuditTrailOnDelete) {
+            $this->writeAuditTrailDummy($Language->phrase("BatchDeleteBegin")); // Batch delete begin
         }
 
         // Clone old rows

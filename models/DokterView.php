@@ -58,6 +58,14 @@ class DokterView extends Dokter
     public $MultiDeleteUrl;
     public $MultiUpdateUrl;
 
+    // Audit Trail
+    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnEdit = true;
+    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnView = false;
+    public $AuditTrailOnViewData = false;
+    public $AuditTrailOnSearch = false;
+
     // Page headings
     public $Heading = "";
     public $Subheading = "";
@@ -803,6 +811,9 @@ class DokterView extends Dokter
         $this->rowSelected($row);
         if (!$rs) {
             return;
+        }
+        if ($this->AuditTrailOnView) {
+            $this->writeAuditTrailOnView($row);
         }
         $this->id->setDbValue($row['id']);
         $this->nama_dokter->setDbValue($row['nama_dokter']);

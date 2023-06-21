@@ -934,12 +934,6 @@
     <menu id="37">
       <phrase id="menutext" value="image slider" />
     </menu>
-    <menu id="1">
-      <phrase id="menutext" value="Antrean BPJS superuser View" />
-    </menu>
-    <menu id="2">
-      <phrase id="menutext" value="Antrean Umum superuser View" />
-    </menu>
     <menu id="10">
       <phrase id="menutext" value="Master" />
     </menu>
@@ -990,6 +984,12 @@
     </menu>
     <menu id="39">
       <phrase id="menutext" value="Durasi" />
+    </menu>
+    <menu id="1">
+      <phrase id="menutext" value="Antrean BPJS superuser View" />
+    </menu>
+    <menu id="2">
+      <phrase id="menutext" value="Antrean Umum superuser View" />
     </menu>
     <table id="antrean_bpjs">
       <phrase id="tblcaption" value="Antrean BPJS superuser View" />

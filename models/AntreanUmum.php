@@ -27,7 +27,7 @@ class AntreanUmum extends DbTable
     // Audit trail
     public $AuditTrailOnAdd = false;
     public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnDelete = false;
     public $AuditTrailOnView = false;
     public $AuditTrailOnViewData = false;
     public $AuditTrailOnSearch = false;
@@ -566,9 +566,6 @@ class AntreanUmum extends DbTable
         $success = true;
         if ($success) {
             $success = $this->deleteSql($rs, $where, $curfilter)->execute();
-        }
-        if ($success && $this->AuditTrailOnDelete) {
-            $this->writeAuditTrailOnDelete($rs);
         }
         return $success;
     }
@@ -1357,44 +1354,6 @@ SORTHTML;
                     }
                     WriteAuditLog($usr, "U", $table, $fldname, $key, $oldvalue, $newvalue);
                 }
-            }
-        }
-    }
-
-    // Write Audit Trail (delete page)
-    public function writeAuditTrailOnDelete(&$rs)
-    {
-        global $Language;
-        if (!$this->AuditTrailOnDelete) {
-            return;
-        }
-        $table = 'antrean_umum';
-
-        // Get key value
-        $key = "";
-        if ($key != "") {
-            $key .= Config("COMPOSITE_KEY_SEPARATOR");
-        }
-        $key .= $rs['id'];
-
-        // Write Audit Trail
-        $curUser = CurrentUserID();
-        foreach (array_keys($rs) as $fldname) {
-            if (array_key_exists($fldname, $this->Fields) && $this->Fields[$fldname]->DataType != DATATYPE_BLOB) { // Ignore BLOB fields
-                if ($this->Fields[$fldname]->HtmlTag == "PASSWORD") {
-                    $oldvalue = $Language->phrase("PasswordMask"); // Password Field
-                } elseif ($this->Fields[$fldname]->DataType == DATATYPE_MEMO) {
-                    if (Config("AUDIT_TRAIL_TO_DATABASE")) {
-                        $oldvalue = $rs[$fldname];
-                    } else {
-                        $oldvalue = "[MEMO]"; // Memo field
-                    }
-                } elseif ($this->Fields[$fldname]->DataType == DATATYPE_XML) {
-                    $oldvalue = "[XML]"; // XML field
-                } else {
-                    $oldvalue = $rs[$fldname];
-                }
-                WriteAuditLog($curUser, "D", $table, $fldname, $key, $oldvalue, "");
             }
         }
     }

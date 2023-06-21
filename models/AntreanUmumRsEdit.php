@@ -27,9 +27,9 @@ class AntreanUmumRsEdit extends AntreanUmumRs
     public $RenderingView = false;
 
     // Audit Trail
-    public $AuditTrailOnAdd = true;
+    public $AuditTrailOnAdd = false;
     public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnDelete = false;
     public $AuditTrailOnView = false;
     public $AuditTrailOnViewData = false;
     public $AuditTrailOnSearch = false;

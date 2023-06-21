@@ -29,7 +29,7 @@ class AntreanBpjsEdit extends AntreanBpjs
     // Audit Trail
     public $AuditTrailOnAdd = false;
     public $AuditTrailOnEdit = true;
-    public $AuditTrailOnDelete = true;
+    public $AuditTrailOnDelete = false;
     public $AuditTrailOnView = false;
     public $AuditTrailOnViewData = false;
     public $AuditTrailOnSearch = false;
