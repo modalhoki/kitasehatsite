@@ -1514,10 +1514,10 @@ SORTHTML;
     public function rowUpdated($rsold, &$rsnew)
     {
         //Log("Row Updated");
-        $waktu = $rsold['waktu']);
+        $waktu = $rsold['waktu'];
         $insert_data_durasi = ExecuteQuery("
         	Insert into data_durasi (waktu_daftar, jalur)
-        	values (".$waktu.", \"UMUM\");
+        	values (\"".$waktu."\", \"UMUM\");
         ");
     }
 
