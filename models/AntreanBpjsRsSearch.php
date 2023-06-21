@@ -806,11 +806,7 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
                 $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
                 if ($this->webusers_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $lookupFilter = function() {
-                        return "`id` = ".CurrentUserID();
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                    $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -999,7 +995,6 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
             $this->keluhan_awal->PlaceHolder = RemoveHtml($this->keluhan_awal->caption());
 
             // webusers_id
-            $this->webusers_id->EditAttrs["class"] = "form-control";
             $this->webusers_id->EditCustomAttributes = "";
             $curVal = trim(strval($this->webusers_id->AdvancedSearch->SearchValue));
             if ($curVal != "") {
@@ -1009,19 +1004,24 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
             }
             if ($this->webusers_id->AdvancedSearch->ViewValue !== null) { // Load from cache
                 $this->webusers_id->EditValue = array_values($this->webusers_id->Lookup->Options);
+                if ($this->webusers_id->AdvancedSearch->ViewValue == "") {
+                    $this->webusers_id->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
+                }
             } else { // Lookup from database
                 if ($curVal == "") {
                     $filterWrk = "0=1";
                 } else {
                     $filterWrk = "`id`" . SearchString("=", $this->webusers_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $lookupFilter = function() {
-                    return "`id` = ".CurrentUserID();
-                };
-                $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->webusers_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
+                $sqlWrk = $this->webusers_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->webusers_id->AdvancedSearch->ViewValue = $this->webusers_id->displayValue($arwrk);
+                } else {
+                    $this->webusers_id->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
+                }
                 $arwrk = $rswrk;
                 $this->webusers_id->EditValue = $arwrk;
             }
@@ -1120,10 +1120,6 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
                 case "x_status":
                     break;
                 case "x_webusers_id":
-                    $lookupFilter = function () {
-                        return "`id` = ".CurrentUserID();
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 default:
                     $lookupFilter = "";

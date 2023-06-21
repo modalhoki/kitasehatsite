@@ -756,15 +756,6 @@ class WebusersEdit extends Webusers
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
-
-        // Check if valid User ID
-        if ($res) {
-            $res = $this->showOptionLink("edit");
-            if (!$res) {
-                $userIdMsg = DeniedMessage();
-                $this->setFailureMessage($userIdMsg);
-            }
-        }
         return $res;
     }
 
@@ -1035,7 +1026,7 @@ class WebusersEdit extends Webusers
             $this->administrator_rumah_sakit->EditAttrs["class"] = "form-control";
             $this->administrator_rumah_sakit->EditCustomAttributes = "";
             if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
-                if (SameString($this->id->CurrentValue, CurrentUserID())) {
+                if (SameString($this->->CurrentValue, CurrentUserID())) {
                     $curVal = trim(strval($this->administrator_rumah_sakit->CurrentValue));
                     if ($curVal != "") {
                         $this->administrator_rumah_sakit->EditValue = $this->administrator_rumah_sakit->lookupCacheOption($curVal);
@@ -1061,7 +1052,6 @@ class WebusersEdit extends Webusers
                 } else {
                     $filterWrk = "`id`" . SearchString("=", $this->administrator_rumah_sakit->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                AddFilter($filterWrk, Container("webusers")->addParentUserIDFilter($this->id->CurrentValue));
                 $sqlWrk = $this->administrator_rumah_sakit->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $arwrk = $rswrk;
@@ -1256,16 +1246,6 @@ class WebusersEdit extends Webusers
             WriteJson(["success" => true, $this->TableVar => $row]);
         }
         return $editRow;
-    }
-
-    // Show link optionally based on User ID
-    protected function showOptionLink($id = "")
-    {
-        global $Security;
-        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
-            return $Security->isValidUserID($this->id->CurrentValue);
-        }
-        return true;
     }
 
     // Set up Breadcrumb

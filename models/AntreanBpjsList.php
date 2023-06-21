@@ -1872,11 +1872,7 @@ class AntreanBpjsList extends AntreanBpjs
                 $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
                 if ($this->webusers_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $lookupFilter = function() {
-                        return "`id` = ".CurrentUserID();
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                    $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2151,10 +2147,6 @@ class AntreanBpjsList extends AntreanBpjs
                 case "x_status":
                     break;
                 case "x_webusers_id":
-                    $lookupFilter = function () {
-                        return "`id` = ".CurrentUserID();
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 default:
                     $lookupFilter = "";

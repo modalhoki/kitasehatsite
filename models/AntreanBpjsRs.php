@@ -1056,11 +1056,7 @@ SORTHTML;
             $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
             if ($this->webusers_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $lookupFilter = function() {
-                    return "`id` = ".CurrentUserID();
-                };
-                $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1555,6 +1551,9 @@ SORTHTML;
     {
         //var_dump($fld->Name, $fld->Lookup, $filter); // Uncomment to view the filter
         // Enter your code here
+        if ($fld->Name == "webusers_id" && CurrentUserLevel() != -1) {
+        	$fld->Lookup->UserFilter = "id = ".CurrentUserID();
+        }
     }
 
     // Row Rendering event
