@@ -79,14 +79,14 @@ class DataDurasi extends DbTable
         $this->Fields['id'] = &$this->id;
 
         // waktu_daftar
-        $this->waktu_daftar = new DbField('data_durasi', 'data_durasi', 'x_waktu_daftar', 'waktu_daftar', '`waktu_daftar`', CastDateFieldForLike("`waktu_daftar`", 0, "DB"), 135, 19, 0, false, '`waktu_daftar`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->waktu_daftar = new DbField('data_durasi', 'data_durasi', 'x_waktu_daftar', 'waktu_daftar', '`waktu_daftar`', CastDateFieldForLike("`waktu_daftar`", 1, "DB"), 135, 19, 1, false, '`waktu_daftar`', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->waktu_daftar->Sortable = true; // Allow sort
         $this->waktu_daftar->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->waktu_daftar->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->waktu_daftar->Param, "CustomMsg");
         $this->Fields['waktu_daftar'] = &$this->waktu_daftar;
 
         // waktu_edit
-        $this->waktu_edit = new DbField('data_durasi', 'data_durasi', 'x_waktu_edit', 'waktu_edit', '`waktu_edit`', CastDateFieldForLike("`waktu_edit`", 0, "DB"), 135, 19, 0, false, '`waktu_edit`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->waktu_edit = new DbField('data_durasi', 'data_durasi', 'x_waktu_edit', 'waktu_edit', '`waktu_edit`', CastDateFieldForLike("`waktu_edit`", 1, "DB"), 135, 19, 1, false, '`waktu_edit`', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->waktu_edit->Sortable = true; // Allow sort
         $this->waktu_edit->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->waktu_edit->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->waktu_edit->Param, "CustomMsg");
@@ -879,12 +879,12 @@ SORTHTML;
 
         // waktu_daftar
         $this->waktu_daftar->ViewValue = $this->waktu_daftar->CurrentValue;
-        $this->waktu_daftar->ViewValue = FormatDateTime($this->waktu_daftar->ViewValue, 0);
+        $this->waktu_daftar->ViewValue = FormatDateTime($this->waktu_daftar->ViewValue, 1);
         $this->waktu_daftar->ViewCustomAttributes = "";
 
         // waktu_edit
         $this->waktu_edit->ViewValue = $this->waktu_edit->CurrentValue;
-        $this->waktu_edit->ViewValue = FormatDateTime($this->waktu_edit->ViewValue, 0);
+        $this->waktu_edit->ViewValue = FormatDateTime($this->waktu_edit->ViewValue, 1);
         $this->waktu_edit->ViewCustomAttributes = "";
 
         // durasi

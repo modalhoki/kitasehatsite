@@ -20,7 +20,7 @@ loadjs.ready("head", function () {
     if (!ew.vars.tables.data_durasi)
         ew.vars.tables.data_durasi = currentTable;
     fdata_durasiadd.addFields([
-        ["waktu_daftar", [fields.waktu_daftar.visible && fields.waktu_daftar.required ? ew.Validators.required(fields.waktu_daftar.caption) : null, ew.Validators.datetime(0)], fields.waktu_daftar.isInvalid],
+        ["waktu_daftar", [fields.waktu_daftar.visible && fields.waktu_daftar.required ? ew.Validators.required(fields.waktu_daftar.caption) : null, ew.Validators.datetime(1)], fields.waktu_daftar.isInvalid],
         ["jalur", [fields.jalur.visible && fields.jalur.required ? ew.Validators.required(fields.jalur.caption) : null], fields.jalur.isInvalid]
     ]);
 
@@ -116,13 +116,13 @@ $Page->showMessage();
         <label id="elh_data_durasi_waktu_daftar" for="x_waktu_daftar" class="<?= $Page->LeftColumnClass ?>"><?= $Page->waktu_daftar->caption() ?><?= $Page->waktu_daftar->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->waktu_daftar->cellAttributes() ?>>
 <span id="el_data_durasi_waktu_daftar">
-<input type="<?= $Page->waktu_daftar->getInputTextType() ?>" data-table="data_durasi" data-field="x_waktu_daftar" name="x_waktu_daftar" id="x_waktu_daftar" maxlength="19" placeholder="<?= HtmlEncode($Page->waktu_daftar->getPlaceHolder()) ?>" value="<?= $Page->waktu_daftar->EditValue ?>"<?= $Page->waktu_daftar->editAttributes() ?> aria-describedby="x_waktu_daftar_help">
+<input type="<?= $Page->waktu_daftar->getInputTextType() ?>" data-table="data_durasi" data-field="x_waktu_daftar" data-format="1" name="x_waktu_daftar" id="x_waktu_daftar" maxlength="19" placeholder="<?= HtmlEncode($Page->waktu_daftar->getPlaceHolder()) ?>" value="<?= $Page->waktu_daftar->EditValue ?>"<?= $Page->waktu_daftar->editAttributes() ?> aria-describedby="x_waktu_daftar_help">
 <?= $Page->waktu_daftar->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->waktu_daftar->getErrorMessage() ?></div>
 <?php if (!$Page->waktu_daftar->ReadOnly && !$Page->waktu_daftar->Disabled && !isset($Page->waktu_daftar->EditAttrs["readonly"]) && !isset($Page->waktu_daftar->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fdata_durasiadd", "datetimepicker"], function() {
-    ew.createDateTimePicker("fdata_durasiadd", "x_waktu_daftar", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+    ew.createDateTimePicker("fdata_durasiadd", "x_waktu_daftar", {"ignoreReadonly":true,"useCurrent":false,"format":1});
 });
 </script>
 <?php } ?>

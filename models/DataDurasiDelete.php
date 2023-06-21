@@ -588,12 +588,12 @@ class DataDurasiDelete extends DataDurasi
 
             // waktu_daftar
             $this->waktu_daftar->ViewValue = $this->waktu_daftar->CurrentValue;
-            $this->waktu_daftar->ViewValue = FormatDateTime($this->waktu_daftar->ViewValue, 0);
+            $this->waktu_daftar->ViewValue = FormatDateTime($this->waktu_daftar->ViewValue, 1);
             $this->waktu_daftar->ViewCustomAttributes = "";
 
             // waktu_edit
             $this->waktu_edit->ViewValue = $this->waktu_edit->CurrentValue;
-            $this->waktu_edit->ViewValue = FormatDateTime($this->waktu_edit->ViewValue, 0);
+            $this->waktu_edit->ViewValue = FormatDateTime($this->waktu_edit->ViewValue, 1);
             $this->waktu_edit->ViewCustomAttributes = "";
 
             // durasi

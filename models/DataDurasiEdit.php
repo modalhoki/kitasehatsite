@@ -666,7 +666,7 @@ class DataDurasiEdit extends DataDurasi
             } else {
                 $this->waktu_daftar->setFormValue($val);
             }
-            $this->waktu_daftar->CurrentValue = UnFormatDateTime($this->waktu_daftar->CurrentValue, 0);
+            $this->waktu_daftar->CurrentValue = UnFormatDateTime($this->waktu_daftar->CurrentValue, 1);
         }
 
         // Check field name 'waktu_edit' first before field var 'x_waktu_edit'
@@ -677,7 +677,7 @@ class DataDurasiEdit extends DataDurasi
             } else {
                 $this->waktu_edit->setFormValue($val);
             }
-            $this->waktu_edit->CurrentValue = UnFormatDateTime($this->waktu_edit->CurrentValue, 0);
+            $this->waktu_edit->CurrentValue = UnFormatDateTime($this->waktu_edit->CurrentValue, 1);
         }
 
         // Check field name 'durasi' first before field var 'x_durasi'
@@ -707,9 +707,9 @@ class DataDurasiEdit extends DataDurasi
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
         $this->waktu_daftar->CurrentValue = $this->waktu_daftar->FormValue;
-        $this->waktu_daftar->CurrentValue = UnFormatDateTime($this->waktu_daftar->CurrentValue, 0);
+        $this->waktu_daftar->CurrentValue = UnFormatDateTime($this->waktu_daftar->CurrentValue, 1);
         $this->waktu_edit->CurrentValue = $this->waktu_edit->FormValue;
-        $this->waktu_edit->CurrentValue = UnFormatDateTime($this->waktu_edit->CurrentValue, 0);
+        $this->waktu_edit->CurrentValue = UnFormatDateTime($this->waktu_edit->CurrentValue, 1);
         $this->durasi->CurrentValue = $this->durasi->FormValue;
         $this->jalur->CurrentValue = $this->jalur->FormValue;
     }
@@ -824,12 +824,12 @@ class DataDurasiEdit extends DataDurasi
 
             // waktu_daftar
             $this->waktu_daftar->ViewValue = $this->waktu_daftar->CurrentValue;
-            $this->waktu_daftar->ViewValue = FormatDateTime($this->waktu_daftar->ViewValue, 0);
+            $this->waktu_daftar->ViewValue = FormatDateTime($this->waktu_daftar->ViewValue, 1);
             $this->waktu_daftar->ViewCustomAttributes = "";
 
             // waktu_edit
             $this->waktu_edit->ViewValue = $this->waktu_edit->CurrentValue;
-            $this->waktu_edit->ViewValue = FormatDateTime($this->waktu_edit->ViewValue, 0);
+            $this->waktu_edit->ViewValue = FormatDateTime($this->waktu_edit->ViewValue, 1);
             $this->waktu_edit->ViewCustomAttributes = "";
 
             // durasi
@@ -1007,10 +1007,10 @@ class DataDurasiEdit extends DataDurasi
             $rsnew = [];
 
             // waktu_daftar
-            $this->waktu_daftar->setDbValueDef($rsnew, UnFormatDateTime($this->waktu_daftar->CurrentValue, 0), null, $this->waktu_daftar->ReadOnly);
+            $this->waktu_daftar->setDbValueDef($rsnew, UnFormatDateTime($this->waktu_daftar->CurrentValue, 1), null, $this->waktu_daftar->ReadOnly);
 
             // waktu_edit
-            $this->waktu_edit->setDbValueDef($rsnew, UnFormatDateTime($this->waktu_edit->CurrentValue, 0), null, $this->waktu_edit->ReadOnly);
+            $this->waktu_edit->setDbValueDef($rsnew, UnFormatDateTime($this->waktu_edit->CurrentValue, 1), null, $this->waktu_edit->ReadOnly);
 
             // durasi
             $this->durasi->setDbValueDef($rsnew, $this->durasi->CurrentValue, null, $this->durasi->ReadOnly);

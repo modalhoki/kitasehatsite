@@ -21,8 +21,8 @@ loadjs.ready("head", function () {
         ew.vars.tables.data_durasi = currentTable;
     fdata_durasiedit.addFields([
         ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["waktu_daftar", [fields.waktu_daftar.visible && fields.waktu_daftar.required ? ew.Validators.required(fields.waktu_daftar.caption) : null, ew.Validators.datetime(0)], fields.waktu_daftar.isInvalid],
-        ["waktu_edit", [fields.waktu_edit.visible && fields.waktu_edit.required ? ew.Validators.required(fields.waktu_edit.caption) : null, ew.Validators.datetime(0)], fields.waktu_edit.isInvalid],
+        ["waktu_daftar", [fields.waktu_daftar.visible && fields.waktu_daftar.required ? ew.Validators.required(fields.waktu_daftar.caption) : null, ew.Validators.datetime(1)], fields.waktu_daftar.isInvalid],
+        ["waktu_edit", [fields.waktu_edit.visible && fields.waktu_edit.required ? ew.Validators.required(fields.waktu_edit.caption) : null, ew.Validators.datetime(1)], fields.waktu_edit.isInvalid],
         ["durasi", [fields.durasi.visible && fields.durasi.required ? ew.Validators.required(fields.durasi.caption) : null, ew.Validators.integer], fields.durasi.isInvalid],
         ["jalur", [fields.jalur.visible && fields.jalur.required ? ew.Validators.required(fields.jalur.caption) : null], fields.jalur.isInvalid]
     ]);
@@ -131,13 +131,13 @@ $Page->showMessage();
         <label id="elh_data_durasi_waktu_daftar" for="x_waktu_daftar" class="<?= $Page->LeftColumnClass ?>"><?= $Page->waktu_daftar->caption() ?><?= $Page->waktu_daftar->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->waktu_daftar->cellAttributes() ?>>
 <span id="el_data_durasi_waktu_daftar">
-<input type="<?= $Page->waktu_daftar->getInputTextType() ?>" data-table="data_durasi" data-field="x_waktu_daftar" name="x_waktu_daftar" id="x_waktu_daftar" maxlength="19" placeholder="<?= HtmlEncode($Page->waktu_daftar->getPlaceHolder()) ?>" value="<?= $Page->waktu_daftar->EditValue ?>"<?= $Page->waktu_daftar->editAttributes() ?> aria-describedby="x_waktu_daftar_help">
+<input type="<?= $Page->waktu_daftar->getInputTextType() ?>" data-table="data_durasi" data-field="x_waktu_daftar" data-format="1" name="x_waktu_daftar" id="x_waktu_daftar" maxlength="19" placeholder="<?= HtmlEncode($Page->waktu_daftar->getPlaceHolder()) ?>" value="<?= $Page->waktu_daftar->EditValue ?>"<?= $Page->waktu_daftar->editAttributes() ?> aria-describedby="x_waktu_daftar_help">
 <?= $Page->waktu_daftar->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->waktu_daftar->getErrorMessage() ?></div>
 <?php if (!$Page->waktu_daftar->ReadOnly && !$Page->waktu_daftar->Disabled && !isset($Page->waktu_daftar->EditAttrs["readonly"]) && !isset($Page->waktu_daftar->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fdata_durasiedit", "datetimepicker"], function() {
-    ew.createDateTimePicker("fdata_durasiedit", "x_waktu_daftar", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+    ew.createDateTimePicker("fdata_durasiedit", "x_waktu_daftar", {"ignoreReadonly":true,"useCurrent":false,"format":1});
 });
 </script>
 <?php } ?>
@@ -150,13 +150,13 @@ loadjs.ready(["fdata_durasiedit", "datetimepicker"], function() {
         <label id="elh_data_durasi_waktu_edit" for="x_waktu_edit" class="<?= $Page->LeftColumnClass ?>"><?= $Page->waktu_edit->caption() ?><?= $Page->waktu_edit->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->waktu_edit->cellAttributes() ?>>
 <span id="el_data_durasi_waktu_edit">
-<input type="<?= $Page->waktu_edit->getInputTextType() ?>" data-table="data_durasi" data-field="x_waktu_edit" name="x_waktu_edit" id="x_waktu_edit" maxlength="19" placeholder="<?= HtmlEncode($Page->waktu_edit->getPlaceHolder()) ?>" value="<?= $Page->waktu_edit->EditValue ?>"<?= $Page->waktu_edit->editAttributes() ?> aria-describedby="x_waktu_edit_help">
+<input type="<?= $Page->waktu_edit->getInputTextType() ?>" data-table="data_durasi" data-field="x_waktu_edit" data-format="1" name="x_waktu_edit" id="x_waktu_edit" maxlength="19" placeholder="<?= HtmlEncode($Page->waktu_edit->getPlaceHolder()) ?>" value="<?= $Page->waktu_edit->EditValue ?>"<?= $Page->waktu_edit->editAttributes() ?> aria-describedby="x_waktu_edit_help">
 <?= $Page->waktu_edit->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->waktu_edit->getErrorMessage() ?></div>
 <?php if (!$Page->waktu_edit->ReadOnly && !$Page->waktu_edit->Disabled && !isset($Page->waktu_edit->EditAttrs["readonly"]) && !isset($Page->waktu_edit->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fdata_durasiedit", "datetimepicker"], function() {
-    ew.createDateTimePicker("fdata_durasiedit", "x_waktu_edit", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+    ew.createDateTimePicker("fdata_durasiedit", "x_waktu_edit", {"ignoreReadonly":true,"useCurrent":false,"format":1});
 });
 </script>
 <?php } ?>

@@ -641,7 +641,7 @@ class DataDurasiAdd extends DataDurasi
             } else {
                 $this->waktu_daftar->setFormValue($val);
             }
-            $this->waktu_daftar->CurrentValue = UnFormatDateTime($this->waktu_daftar->CurrentValue, 0);
+            $this->waktu_daftar->CurrentValue = UnFormatDateTime($this->waktu_daftar->CurrentValue, 1);
         }
 
         // Check field name 'jalur' first before field var 'x_jalur'
@@ -663,7 +663,7 @@ class DataDurasiAdd extends DataDurasi
     {
         global $CurrentForm;
         $this->waktu_daftar->CurrentValue = $this->waktu_daftar->FormValue;
-        $this->waktu_daftar->CurrentValue = UnFormatDateTime($this->waktu_daftar->CurrentValue, 0);
+        $this->waktu_daftar->CurrentValue = UnFormatDateTime($this->waktu_daftar->CurrentValue, 1);
         $this->jalur->CurrentValue = $this->jalur->FormValue;
     }
 
@@ -778,12 +778,12 @@ class DataDurasiAdd extends DataDurasi
 
             // waktu_daftar
             $this->waktu_daftar->ViewValue = $this->waktu_daftar->CurrentValue;
-            $this->waktu_daftar->ViewValue = FormatDateTime($this->waktu_daftar->ViewValue, 0);
+            $this->waktu_daftar->ViewValue = FormatDateTime($this->waktu_daftar->ViewValue, 1);
             $this->waktu_daftar->ViewCustomAttributes = "";
 
             // waktu_edit
             $this->waktu_edit->ViewValue = $this->waktu_edit->CurrentValue;
-            $this->waktu_edit->ViewValue = FormatDateTime($this->waktu_edit->ViewValue, 0);
+            $this->waktu_edit->ViewValue = FormatDateTime($this->waktu_edit->ViewValue, 1);
             $this->waktu_edit->ViewCustomAttributes = "";
 
             // durasi
@@ -888,7 +888,7 @@ class DataDurasiAdd extends DataDurasi
         $rsnew = [];
 
         // waktu_daftar
-        $this->waktu_daftar->setDbValueDef($rsnew, UnFormatDateTime($this->waktu_daftar->CurrentValue, 0), null, false);
+        $this->waktu_daftar->setDbValueDef($rsnew, UnFormatDateTime($this->waktu_daftar->CurrentValue, 1), null, false);
 
         // jalur
         $this->jalur->setDbValueDef($rsnew, $this->jalur->CurrentValue, "", false);
