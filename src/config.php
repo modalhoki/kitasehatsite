@@ -171,7 +171,7 @@ $CONFIG = [
 
     // General
     "UNFORMAT_YEAR" => 50, // Unformat year
-    "RANDOM_KEY" => 'XGj7hLHuTck3KCwK', // Random key for encryption
+    "RANDOM_KEY" => 'I4Ey0790FD9GSN8U', // Random key for encryption
     "ENCRYPTION_KEY" => '', // Encryption key for data protection
     "PROJECT_STYLESHEET_FILENAME" => "css/kitasehat.css", // Project stylesheet file name
     "PROJECT_CHARSET" => "utf-8", // Project charset
@@ -359,7 +359,7 @@ $CONFIG = [
     "USER_TABLE_NAME" => "webusers",
     "LOGIN_USERNAME_FIELD_NAME" => "username",
     "LOGIN_PASSWORD_FIELD_NAME" => "password",
-    "USER_ID_FIELD_NAME" => "role",
+    "USER_ID_FIELD_NAME" => "id",
     "PARENT_USER_ID_FIELD_NAME" => "administrator_rumah_sakit",
     "USER_LEVEL_FIELD_NAME" => "role",
     "USER_PROFILE_FIELD_NAME" => "",
@@ -370,7 +370,7 @@ $CONFIG = [
     "USER_TABLE_DBID" => "DB",
     "USER_TABLE" => "`webusers`",
     "USER_NAME_FILTER" => "(`username` = '%u')",
-    "USER_ID_FILTER" => "(`role` = %u)",
+    "USER_ID_FILTER" => "(`id` = %u)",
     "USER_EMAIL_FILTER" => "",
     "USER_ACTIVATE_FILTER" => "",
 

@@ -240,16 +240,30 @@ $Page->showMessage();
         <label id="elh_antrean_bpjs_rs_webusers_id" for="x_webusers_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->webusers_id->caption() ?><?= $Page->webusers_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->webusers_id->cellAttributes() ?>>
 <span id="el_antrean_bpjs_rs_webusers_id">
-<div class="input-group ew-lookup-list" aria-describedby="x_webusers_id_help">
-    <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x_webusers_id"><?= EmptyValue(strval($Page->webusers_id->ViewValue)) ? $Language->phrase("PleaseSelect") : $Page->webusers_id->ViewValue ?></div>
-    <div class="input-group-append">
-        <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Page->webusers_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Page->webusers_id->ReadOnly || $Page->webusers_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x_webusers_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
-    </div>
-</div>
-<div class="invalid-feedback"><?= $Page->webusers_id->getErrorMessage() ?></div>
-<?= $Page->webusers_id->getCustomMessage() ?>
+    <select
+        id="x_webusers_id"
+        name="x_webusers_id"
+        class="form-control ew-select<?= $Page->webusers_id->isInvalidClass() ?>"
+        data-select2-id="antrean_bpjs_rs_x_webusers_id"
+        data-table="antrean_bpjs_rs"
+        data-field="x_webusers_id"
+        data-value-separator="<?= $Page->webusers_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->webusers_id->getPlaceHolder()) ?>"
+        <?= $Page->webusers_id->editAttributes() ?>>
+        <?= $Page->webusers_id->selectOptionListHtml("x_webusers_id") ?>
+    </select>
+    <?= $Page->webusers_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->webusers_id->getErrorMessage() ?></div>
 <?= $Page->webusers_id->Lookup->getParamTag($Page, "p_x_webusers_id") ?>
-<input type="hidden" is="selection-list" data-table="antrean_bpjs_rs" data-field="x_webusers_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->webusers_id->displayValueSeparatorAttribute() ?>" name="x_webusers_id" id="x_webusers_id" value="<?= $Page->webusers_id->CurrentValue ?>"<?= $Page->webusers_id->editAttributes() ?>>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='antrean_bpjs_rs_x_webusers_id']"),
+        options = { name: "x_webusers_id", selectId: "antrean_bpjs_rs_x_webusers_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.antrean_bpjs_rs.fields.webusers_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 </span>
 </div></div>
     </div>

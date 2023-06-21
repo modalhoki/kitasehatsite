@@ -1224,8 +1224,8 @@ SORTHTML;
     // User ID filter
     public function getUserIDFilter($userId)
     {
-        $userIdFilter = '`role` = ' . QuotedValue($userId, DATATYPE_NUMBER, Config("USER_TABLE_DBID"));
-        $parentUserIdFilter = '`role` IN (SELECT `role` FROM ' . "`webusers`" . ' WHERE `administrator_rumah_sakit` = ' . QuotedValue($userId, DATATYPE_NUMBER, Config("USER_TABLE_DBID")) . ')';
+        $userIdFilter = '`id` = ' . QuotedValue($userId, DATATYPE_NUMBER, Config("USER_TABLE_DBID"));
+        $parentUserIdFilter = '`id` IN (SELECT `id` FROM ' . "`webusers`" . ' WHERE `administrator_rumah_sakit` = ' . QuotedValue($userId, DATATYPE_NUMBER, Config("USER_TABLE_DBID")) . ')';
         $userIdFilter = "($userIdFilter) OR ($parentUserIdFilter)";
         return $userIdFilter;
     }
@@ -1239,7 +1239,7 @@ SORTHTML;
         if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
             $filterWrk = $Security->userIdList();
             if ($filterWrk != "") {
-                $filterWrk = '`role` IN (' . $filterWrk . ')';
+                $filterWrk = '`id` IN (' . $filterWrk . ')';
             }
         }
 
@@ -1256,7 +1256,7 @@ SORTHTML;
         if (!$Security->isAdmin()) {
             $result = $Security->parentUserIDList($userId);
             if ($result != "") {
-                $result = '`role` IN (' . $result . ')';
+                $result = '`id` IN (' . $result . ')';
             }
             return $result;
         }

@@ -1168,7 +1168,7 @@ class AdvancedSecurity
                 $sql = $UserTable->getSql($filter);
                 $rows = Conn($UserTable->Dbid)->fetchAll($sql);
                 foreach ($rows as $row) {
-                    $this->addUserID($row['role']);
+                    $this->addUserID($row['id']);
                 }
                 $userIDList = $curUserIDList;
                 $curUserIDList = $this->userIDList();
