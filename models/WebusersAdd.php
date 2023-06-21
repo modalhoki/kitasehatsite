@@ -735,6 +735,15 @@ class WebusersAdd extends Webusers
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
+
+        // Check if valid User ID
+        if ($res) {
+            $res = $this->showOptionLink("add");
+            if (!$res) {
+                $userIdMsg = DeniedMessage();
+                $this->setFailureMessage($userIdMsg);
+            }
+        }
         return $res;
     }
 
@@ -1010,6 +1019,7 @@ class WebusersAdd extends Webusers
                 } else {
                     $filterWrk = "`id`" . SearchString("=", $this->administrator_rumah_sakit->CurrentValue, DATATYPE_NUMBER, "");
                 }
+                AddFilter($filterWrk, Container("webusers")->addParentUserIDFilter(""));
                 $sqlWrk = $this->administrator_rumah_sakit->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $arwrk = $rswrk;
@@ -1128,6 +1138,18 @@ class WebusersAdd extends Webusers
     {
         global $Language, $Security;
 
+        // Check if valid User ID
+        $validUser = false;
+        if ($Security->currentUserID() != "" && !EmptyValue($this->id->CurrentValue) && !$Security->isAdmin()) { // Non system admin
+            $validUser = $Security->isValidUserID($this->id->CurrentValue);
+            if (!$validUser) {
+                $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
+                $userIdMsg = str_replace("%u", $this->id->CurrentValue, $userIdMsg);
+                $this->setFailureMessage($userIdMsg);
+                return false;
+            }
+        }
+
         // Check if valid Parent User ID
         $validParentUser = false;
         if ($Security->currentUserID() != "" && !EmptyValue($this->administrator_rumah_sakit->CurrentValue) && !$Security->isAdmin()) { // Non system admin
@@ -1166,6 +1188,8 @@ class WebusersAdd extends Webusers
         // administrator_rumah_sakit
         $this->administrator_rumah_sakit->setDbValueDef($rsnew, $this->administrator_rumah_sakit->CurrentValue, null, false);
 
+        // id
+
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
         $addRow = false;
@@ -1203,6 +1227,16 @@ class WebusersAdd extends Webusers
             WriteJson(["success" => true, $this->TableVar => $row]);
         }
         return $addRow;
+    }
+
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->id->CurrentValue);
+        }
+        return true;
     }
 
     // Set up Breadcrumb

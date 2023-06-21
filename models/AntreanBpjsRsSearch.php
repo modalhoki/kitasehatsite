@@ -995,6 +995,7 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
             $this->keluhan_awal->PlaceHolder = RemoveHtml($this->keluhan_awal->caption());
 
             // webusers_id
+            $this->webusers_id->EditAttrs["class"] = "form-control";
             $this->webusers_id->EditCustomAttributes = "";
             $curVal = trim(strval($this->webusers_id->AdvancedSearch->SearchValue));
             if ($curVal != "") {
@@ -1004,9 +1005,6 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
             }
             if ($this->webusers_id->AdvancedSearch->ViewValue !== null) { // Load from cache
                 $this->webusers_id->EditValue = array_values($this->webusers_id->Lookup->Options);
-                if ($this->webusers_id->AdvancedSearch->ViewValue == "") {
-                    $this->webusers_id->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
-                }
             } else { // Lookup from database
                 if ($curVal == "") {
                     $filterWrk = "0=1";
@@ -1016,12 +1014,6 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
                 $sqlWrk = $this->webusers_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->webusers_id->AdvancedSearch->ViewValue = $this->webusers_id->displayValue($arwrk);
-                } else {
-                    $this->webusers_id->AdvancedSearch->ViewValue = $Language->phrase("PleaseSelect");
-                }
                 $arwrk = $rswrk;
                 $this->webusers_id->EditValue = $arwrk;
             }

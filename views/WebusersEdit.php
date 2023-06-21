@@ -205,6 +205,14 @@ loadjs.ready("head", function() {
     <div id="r_administrator_rumah_sakit" class="form-group row">
         <label id="elh_webusers_administrator_rumah_sakit" for="x_administrator_rumah_sakit" class="<?= $Page->LeftColumnClass ?>"><?= $Page->administrator_rumah_sakit->caption() ?><?= $Page->administrator_rumah_sakit->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->administrator_rumah_sakit->cellAttributes() ?>>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin ?>
+<?php if (SameString($Page->id->CurrentValue, CurrentUserID())) { ?>
+    <span id="el_webusers_administrator_rumah_sakit">
+    <span<?= $Page->administrator_rumah_sakit->viewAttributes() ?>>
+    <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->administrator_rumah_sakit->getDisplayValue($Page->administrator_rumah_sakit->EditValue))) ?>"></span>
+    </span>
+    <input type="hidden" data-table="webusers" data-field="x_administrator_rumah_sakit" data-hidden="1" name="x_administrator_rumah_sakit" id="x_administrator_rumah_sakit" value="<?= HtmlEncode($Page->administrator_rumah_sakit->CurrentValue) ?>">
+<?php } else { ?>
 <span id="el_webusers_administrator_rumah_sakit">
     <select
         id="x_administrator_rumah_sakit"
@@ -231,6 +239,35 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
+<?php } else { ?>
+<span id="el_webusers_administrator_rumah_sakit">
+    <select
+        id="x_administrator_rumah_sakit"
+        name="x_administrator_rumah_sakit"
+        class="form-control ew-select<?= $Page->administrator_rumah_sakit->isInvalidClass() ?>"
+        data-select2-id="webusers_x_administrator_rumah_sakit"
+        data-table="webusers"
+        data-field="x_administrator_rumah_sakit"
+        data-value-separator="<?= $Page->administrator_rumah_sakit->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->administrator_rumah_sakit->getPlaceHolder()) ?>"
+        <?= $Page->administrator_rumah_sakit->editAttributes() ?>>
+        <?= $Page->administrator_rumah_sakit->selectOptionListHtml("x_administrator_rumah_sakit") ?>
+    </select>
+    <?= $Page->administrator_rumah_sakit->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->administrator_rumah_sakit->getErrorMessage() ?></div>
+<?= $Page->administrator_rumah_sakit->Lookup->getParamTag($Page, "p_x_administrator_rumah_sakit") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='webusers_x_administrator_rumah_sakit']"),
+        options = { name: "x_administrator_rumah_sakit", selectId: "webusers_x_administrator_rumah_sakit", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.webusers.fields.administrator_rumah_sakit.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

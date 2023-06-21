@@ -1543,9 +1543,6 @@ SORTHTML;
     {
         //var_dump($fld->Name, $fld->Lookup, $filter); // Uncomment to view the filter
         // Enter your code here
-        if ($fld->Name == "webusers_id" && CurrentUserLevel() != -1) {
-        	$fld->Lookup->UserFilter = "id = ".CurrentUserID();
-        }
     }
 
     // Row Rendering event

@@ -27,8 +27,7 @@ loadjs.ready("head", function () {
         ["fasilitas_id", [fields.fasilitas_id.visible && fields.fasilitas_id.required ? ew.Validators.required(fields.fasilitas_id.caption) : null], fields.fasilitas_id.isInvalid],
         ["rumah_sakit_id", [fields.rumah_sakit_id.visible && fields.rumah_sakit_id.required ? ew.Validators.required(fields.rumah_sakit_id.caption) : null], fields.rumah_sakit_id.isInvalid],
         ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
-        ["keluhan_awal", [fields.keluhan_awal.visible && fields.keluhan_awal.required ? ew.Validators.required(fields.keluhan_awal.caption) : null], fields.keluhan_awal.isInvalid],
-        ["webusers_id", [fields.webusers_id.visible && fields.webusers_id.required ? ew.Validators.required(fields.webusers_id.caption) : null], fields.webusers_id.isInvalid]
+        ["keluhan_awal", [fields.keluhan_awal.visible && fields.keluhan_awal.required ? ew.Validators.required(fields.keluhan_awal.caption) : null], fields.keluhan_awal.isInvalid]
     ]);
 
     // Set invalid fields
@@ -96,7 +95,6 @@ loadjs.ready("head", function () {
 
     // Dynamic selection lists
     fantrean_umum_rsedit.lists.status = <?= $Page->status->toClientList($Page) ?>;
-    fantrean_umum_rsedit.lists.webusers_id = <?= $Page->webusers_id->toClientList($Page) ?>;
     loadjs.done("fantrean_umum_rsedit");
 });
 </script>
@@ -232,25 +230,6 @@ $Page->showMessage();
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->keluhan_awal->getDisplayValue($Page->keluhan_awal->EditValue))) ?>"></span>
 </span>
 <input type="hidden" data-table="antrean_umum_rs" data-field="x_keluhan_awal" data-hidden="1" name="x_keluhan_awal" id="x_keluhan_awal" value="<?= HtmlEncode($Page->keluhan_awal->CurrentValue) ?>">
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->webusers_id->Visible) { // webusers_id ?>
-    <div id="r_webusers_id" class="form-group row">
-        <label id="elh_antrean_umum_rs_webusers_id" for="x_webusers_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->webusers_id->caption() ?><?= $Page->webusers_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->webusers_id->cellAttributes() ?>>
-<span id="el_antrean_umum_rs_webusers_id">
-<div class="input-group ew-lookup-list" aria-describedby="x_webusers_id_help">
-    <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x_webusers_id"><?= EmptyValue(strval($Page->webusers_id->ViewValue)) ? $Language->phrase("PleaseSelect") : $Page->webusers_id->ViewValue ?></div>
-    <div class="input-group-append">
-        <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Page->webusers_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Page->webusers_id->ReadOnly || $Page->webusers_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x_webusers_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
-    </div>
-</div>
-<div class="invalid-feedback"><?= $Page->webusers_id->getErrorMessage() ?></div>
-<?= $Page->webusers_id->getCustomMessage() ?>
-<?= $Page->webusers_id->Lookup->getParamTag($Page, "p_x_webusers_id") ?>
-<input type="hidden" is="selection-list" data-table="antrean_umum_rs" data-field="x_webusers_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->webusers_id->displayValueSeparatorAttribute() ?>" name="x_webusers_id" id="x_webusers_id" value="<?= $Page->webusers_id->CurrentValue ?>"<?= $Page->webusers_id->editAttributes() ?>>
-</span>
 </div></div>
     </div>
 <?php } ?>

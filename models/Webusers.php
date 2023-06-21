@@ -75,7 +75,6 @@ class Webusers extends DbTable
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
-        $this->UserIDAllowSecurity = Config("DEFAULT_USER_ID_ALLOW_SECURITY"); // Default User ID allowed permissions
         $this->BasicSearch = new BasicSearch($this->TableVar);
 
         // id
@@ -273,6 +272,11 @@ class Webusers extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter)
     {
+        global $Security;
+        // Add User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            $filter = $this->addUserIDFilter($filter);
+        }
         return $filter;
     }
 
@@ -1092,7 +1096,7 @@ SORTHTML;
         $this->administrator_rumah_sakit->EditAttrs["class"] = "form-control";
         $this->administrator_rumah_sakit->EditCustomAttributes = "";
         if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
-            if (SameString($this->->CurrentValue, CurrentUserID())) {
+            if (SameString($this->id->CurrentValue, CurrentUserID())) {
                 $curVal = trim(strval($this->administrator_rumah_sakit->CurrentValue));
                 if ($curVal != "") {
                     $this->administrator_rumah_sakit->EditValue = $this->administrator_rumah_sakit->lookupCacheOption($curVal);
@@ -1215,6 +1219,76 @@ SORTHTML;
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
+    }
+
+    // User ID filter
+    public function getUserIDFilter($userId)
+    {
+        $userIdFilter = '`id` = ' . QuotedValue($userId, DATATYPE_NUMBER, Config("USER_TABLE_DBID"));
+        $parentUserIdFilter = '`id` IN (SELECT `id` FROM ' . "`webusers`" . ' WHERE `administrator_rumah_sakit` = ' . QuotedValue($userId, DATATYPE_NUMBER, Config("USER_TABLE_DBID")) . ')';
+        $userIdFilter = "($userIdFilter) OR ($parentUserIdFilter)";
+        return $userIdFilter;
+    }
+
+    // Add User ID filter
+    public function addUserIDFilter($filter = "")
+    {
+        global $Security;
+        $filterWrk = "";
+        $id = (CurrentPageID() == "list") ? $this->CurrentAction : CurrentPageID();
+        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
+            $filterWrk = $Security->userIdList();
+            if ($filterWrk != "") {
+                $filterWrk = '`id` IN (' . $filterWrk . ')';
+            }
+        }
+
+        // Call User ID Filtering event
+        $this->userIdFiltering($filterWrk);
+        AddFilter($filter, $filterWrk);
+        return $filter;
+    }
+
+    // Add Parent User ID filter
+    public function addParentUserIDFilter($userId)
+    {
+        global $Security;
+        if (!$Security->isAdmin()) {
+            $result = $Security->parentUserIDList($userId);
+            if ($result != "") {
+                $result = '`id` IN (' . $result . ')';
+            }
+            return $result;
+        }
+        return "";
+    }
+
+    // User ID subquery
+    public function getUserIDSubquery(&$fld, &$masterfld)
+    {
+        global $UserTable;
+        $wrk = "";
+        $sql = "SELECT " . $masterfld->Expression . " FROM `webusers`";
+        $filter = $this->addUserIDFilter("");
+        if ($filter != "") {
+            $sql .= " WHERE " . $filter;
+        }
+
+        // List all values
+        if ($rs = Conn($UserTable->Dbid)->executeQuery($sql)->fetchAll(\PDO::FETCH_NUM)) {
+            foreach ($rs as $row) {
+                if ($wrk != "") {
+                    $wrk .= ",";
+                }
+                $wrk .= QuotedValue($row[0], $masterfld->DataType, Config("USER_TABLE_DBID"));
+            }
+        }
+        if ($wrk != "") {
+            $wrk = $fld->Expression . " IN (" . $wrk . ")";
+        } else { // No User ID value found
+            $wrk = "0=1";
+        }
+        return $wrk;
     }
 
     // Get file data
