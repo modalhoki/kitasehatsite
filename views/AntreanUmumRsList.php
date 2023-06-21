@@ -32,7 +32,7 @@ loadjs.ready("head", function () {
         ["pasien_id", [], fields.pasien_id.isInvalid],
         ["fasilitas_id", [], fields.fasilitas_id.isInvalid],
         ["status", [], fields.status.isInvalid],
-        ["webusers_id", [], fields.webusers_id.isInvalid]
+        ["Petugas", [], fields.Petugas.isInvalid]
     ]);
 
     // Set invalid fields
@@ -256,7 +256,20 @@ $Page->renderRow();
 </div>
     <?php } ?>
 <div id="xsr_<?= $Page->SearchRowCount + 1 ?>" class="ew-row d-sm-flex">
-    <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+    <div class="ew-quick-search input-group">
+        <input type="text" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>">
+        <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
+        <div class="input-group-append">
+            <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+            <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span></button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this);"><?= $Language->phrase("QuickSearchAuto") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "=") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, '=');"><?= $Language->phrase("QuickSearchExact") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "AND") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'AND');"><?= $Language->phrase("QuickSearchAll") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "OR") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'OR');"><?= $Language->phrase("QuickSearchAny") ?></a>
+            </div>
+        </div>
+    </div>
 </div>
     </div><!-- /.ew-extended-search -->
 </div><!-- /.ew-search-panel -->
@@ -305,8 +318,8 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->status->Visible) { // status ?>
         <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_antrean_umum_rs_status" class="antrean_umum_rs_status"><?= $Page->renderSort($Page->status) ?></div></th>
 <?php } ?>
-<?php if ($Page->webusers_id->Visible) { // webusers_id ?>
-        <th data-name="webusers_id" class="<?= $Page->webusers_id->headerCellClass() ?>"><div id="elh_antrean_umum_rs_webusers_id" class="antrean_umum_rs_webusers_id"><?= $Page->renderSort($Page->webusers_id) ?></div></th>
+<?php if ($Page->Petugas->Visible) { // Petugas ?>
+        <th data-name="Petugas" class="<?= $Page->Petugas->headerCellClass() ?>"><div id="elh_antrean_umum_rs_Petugas" class="antrean_umum_rs_Petugas"><?= $Page->renderSort($Page->Petugas) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -415,11 +428,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->webusers_id->Visible) { // webusers_id ?>
-        <td data-name="webusers_id" <?= $Page->webusers_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_antrean_umum_rs_webusers_id">
-<span<?= $Page->webusers_id->viewAttributes() ?>>
-<?= $Page->webusers_id->getViewValue() ?></span>
+    <?php if ($Page->Petugas->Visible) { // Petugas ?>
+        <td data-name="Petugas" <?= $Page->Petugas->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_antrean_umum_rs_Petugas">
+<span<?= $Page->Petugas->viewAttributes() ?>>
+<?= $Page->Petugas->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

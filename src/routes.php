@@ -268,12 +268,14 @@ return function (App $app) {
 
     // antrean_bpjs_rs
     $app->any('/antreanbpjsrslist[/{id}]', AntreanBpjsRsController::class . ':list')->add(PermissionMiddleware::class)->setName('antreanbpjsrslist-antrean_bpjs_rs-list'); // list
+    $app->any('/antreanbpjsrsview[/{id}]', AntreanBpjsRsController::class . ':view')->add(PermissionMiddleware::class)->setName('antreanbpjsrsview-antrean_bpjs_rs-view'); // view
     $app->any('/antreanbpjsrsedit[/{id}]', AntreanBpjsRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('antreanbpjsrsedit-antrean_bpjs_rs-edit'); // edit
     $app->any('/antreanbpjsrssearch', AntreanBpjsRsController::class . ':search')->add(PermissionMiddleware::class)->setName('antreanbpjsrssearch-antrean_bpjs_rs-search'); // search
     $app->group(
         '/antrean_bpjs_rs',
         function (RouteCollectorProxy $group) {
             $group->any('/' . Config("LIST_ACTION") . '[/{id}]', AntreanBpjsRsController::class . ':list')->add(PermissionMiddleware::class)->setName('antrean_bpjs_rs/list-antrean_bpjs_rs-list-2'); // list
+            $group->any('/' . Config("VIEW_ACTION") . '[/{id}]', AntreanBpjsRsController::class . ':view')->add(PermissionMiddleware::class)->setName('antrean_bpjs_rs/view-antrean_bpjs_rs-view-2'); // view
             $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', AntreanBpjsRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('antrean_bpjs_rs/edit-antrean_bpjs_rs-edit-2'); // edit
             $group->any('/' . Config("SEARCH_ACTION") . '', AntreanBpjsRsController::class . ':search')->add(PermissionMiddleware::class)->setName('antrean_bpjs_rs/search-antrean_bpjs_rs-search-2'); // search
         }
@@ -281,12 +283,14 @@ return function (App $app) {
 
     // antrean_umum_rs
     $app->any('/antreanumumrslist[/{id}]', AntreanUmumRsController::class . ':list')->add(PermissionMiddleware::class)->setName('antreanumumrslist-antrean_umum_rs-list'); // list
+    $app->any('/antreanumumrsview[/{id}]', AntreanUmumRsController::class . ':view')->add(PermissionMiddleware::class)->setName('antreanumumrsview-antrean_umum_rs-view'); // view
     $app->any('/antreanumumrsedit[/{id}]', AntreanUmumRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('antreanumumrsedit-antrean_umum_rs-edit'); // edit
     $app->any('/antreanumumrssearch', AntreanUmumRsController::class . ':search')->add(PermissionMiddleware::class)->setName('antreanumumrssearch-antrean_umum_rs-search'); // search
     $app->group(
         '/antrean_umum_rs',
         function (RouteCollectorProxy $group) {
             $group->any('/' . Config("LIST_ACTION") . '[/{id}]', AntreanUmumRsController::class . ':list')->add(PermissionMiddleware::class)->setName('antrean_umum_rs/list-antrean_umum_rs-list-2'); // list
+            $group->any('/' . Config("VIEW_ACTION") . '[/{id}]', AntreanUmumRsController::class . ':view')->add(PermissionMiddleware::class)->setName('antrean_umum_rs/view-antrean_umum_rs-view-2'); // view
             $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', AntreanUmumRsController::class . ':edit')->add(PermissionMiddleware::class)->setName('antrean_umum_rs/edit-antrean_umum_rs-edit-2'); // edit
             $group->any('/' . Config("SEARCH_ACTION") . '', AntreanUmumRsController::class . ':search')->add(PermissionMiddleware::class)->setName('antrean_umum_rs/search-antrean_umum_rs-search-2'); // search
         }

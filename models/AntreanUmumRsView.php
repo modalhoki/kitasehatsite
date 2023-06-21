@@ -7,12 +7,12 @@ use Doctrine\DBAL\ParameterType;
 /**
  * Page class
  */
-class AntreanUmumRsEdit extends AntreanUmumRs
+class AntreanUmumRsView extends AntreanUmumRs
 {
     use MessagesTrait;
 
     // Page ID
-    public $PageID = "edit";
+    public $PageID = "view";
 
     // Project ID
     public $ProjectID = PROJECT_ID;
@@ -21,10 +21,42 @@ class AntreanUmumRsEdit extends AntreanUmumRs
     public $TableName = 'antrean_umum_rs';
 
     // Page object name
-    public $PageObjName = "AntreanUmumRsEdit";
+    public $PageObjName = "AntreanUmumRsView";
 
     // Rendering View
     public $RenderingView = false;
+
+    // Page URLs
+    public $AddUrl;
+    public $EditUrl;
+    public $CopyUrl;
+    public $DeleteUrl;
+    public $ViewUrl;
+    public $ListUrl;
+
+    // Export URLs
+    public $ExportPrintUrl;
+    public $ExportHtmlUrl;
+    public $ExportExcelUrl;
+    public $ExportWordUrl;
+    public $ExportXmlUrl;
+    public $ExportCsvUrl;
+    public $ExportPdfUrl;
+
+    // Custom export
+    public $ExportExcelCustom = false;
+    public $ExportWordCustom = false;
+    public $ExportPdfCustom = false;
+    public $ExportEmailCustom = false;
+
+    // Update URLs
+    public $InlineAddUrl;
+    public $InlineCopyUrl;
+    public $InlineEditUrl;
+    public $GridAddUrl;
+    public $GridEditUrl;
+    public $MultiDeleteUrl;
+    public $MultiUpdateUrl;
 
     // Audit Trail
     public $AuditTrailOnAdd = false;
@@ -142,6 +174,16 @@ class AntreanUmumRsEdit extends AntreanUmumRs
 
         // Page URL
         $pageUrl = $this->pageUrl();
+        if (($keyValue = Get("id") ?? Route("id")) !== null) {
+            $this->RecKey["id"] = $keyValue;
+        }
+        $this->ExportPrintUrl = $pageUrl . "export=print";
+        $this->ExportHtmlUrl = $pageUrl . "export=html";
+        $this->ExportExcelUrl = $pageUrl . "export=excel";
+        $this->ExportWordUrl = $pageUrl . "export=word";
+        $this->ExportXmlUrl = $pageUrl . "export=xml";
+        $this->ExportCsvUrl = $pageUrl . "export=csv";
+        $this->ExportPdfUrl = $pageUrl . "export=pdf";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -159,6 +201,19 @@ class AntreanUmumRsEdit extends AntreanUmumRs
 
         // User table object
         $UserTable = Container("usertable");
+
+        // Export options
+        $this->ExportOptions = new ListOptions("div");
+        $this->ExportOptions->TagClassName = "ew-export-option";
+
+        // Other options
+        if (!$this->OtherOptions) {
+            $this->OtherOptions = new ListOptionsArray();
+        }
+        $this->OtherOptions["action"] = new ListOptions("div");
+        $this->OtherOptions["action"]->TagClassName = "ew-action-option";
+        $this->OtherOptions["detail"] = new ListOptions("div");
+        $this->OtherOptions["detail"]->TagClassName = "ew-detail-option";
     }
 
     // Get content from stream
@@ -446,18 +501,17 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         }
         $lookup->toJson($this); // Use settings from current page
     }
-    public $FormClassName = "ew-horizontal ew-form ew-edit-form";
-    public $IsModal = false;
-    public $IsMobileOrModal = false;
+    public $ExportOptions; // Export options
+    public $OtherOptions; // Other options
+    public $DisplayRecords = 1;
     public $DbMasterFilter;
     public $DbDetailFilter;
-    public $HashValue; // Hash Value
-    public $DisplayRecords = 1;
     public $StartRecord;
     public $StopRecord;
     public $TotalRecords = 0;
     public $RecordRange = 10;
-    public $RecordCount;
+    public $RecKey = [];
+    public $IsModal = false;
 
     /**
      * Page run
@@ -471,9 +525,6 @@ class AntreanUmumRsEdit extends AntreanUmumRs
 
         // Is modal
         $this->IsModal = Param("modal") == "1";
-
-        // Create form object
-        $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
         $this->id->setVisibility();
         $this->nomor_antrean->setVisibility();
@@ -484,12 +535,8 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         $this->status->setVisibility();
         $this->keluhan_awal->setVisibility();
         $this->webusers_id->setVisibility();
-        $this->Petugas->Visible = false;
+        $this->Petugas->setVisibility();
         $this->hideFieldsForAddEdit();
-        $this->pasien_id->Required = false;
-        $this->fasilitas_id->Required = false;
-        $this->rumah_sakit_id->Required = false;
-        $this->keluhan_awal->Required = false;
 
         // Do not use lookup cache
         $this->setUseLookupCache(false);
@@ -512,133 +559,75 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
         }
-        $this->IsMobileOrModal = IsMobile() || $this->IsModal;
-        $this->FormClassName = "ew-form ew-edit-form ew-horizontal";
-        $loaded = false;
-        $postBack = false;
 
-        // Set up current action and primary key
-        if (IsApi()) {
-            // Load key values
-            $loaded = true;
-            if (($keyValue = Get("id") ?? Key(0) ?? Route(2)) !== null) {
+        // Load current record
+        $loadCurrentRecord = false;
+        $returnUrl = "";
+        $matchRecord = false;
+        if ($this->isPageRequest()) { // Validate request
+            if (($keyValue = Get("id") ?? Route("id")) !== null) {
                 $this->id->setQueryStringValue($keyValue);
-                $this->id->setOldValue($this->id->QueryStringValue);
+                $this->RecKey["id"] = $this->id->QueryStringValue;
             } elseif (Post("id") !== null) {
                 $this->id->setFormValue(Post("id"));
-                $this->id->setOldValue($this->id->FormValue);
+                $this->RecKey["id"] = $this->id->FormValue;
+            } elseif (IsApi() && ($keyValue = Key(0) ?? Route(2)) !== null) {
+                $this->id->setQueryStringValue($keyValue);
+                $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $loaded = false; // Unable to load key
+                $returnUrl = "antreanumumrslist"; // Return to list
             }
 
-            // Load record
-            if ($loaded) {
-                $loaded = $this->loadRow();
-            }
-            if (!$loaded) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
-                $this->terminate();
-                return;
-            }
-            $this->CurrentAction = "update"; // Update record directly
-            $this->OldKey = $this->getKey(true); // Get from CurrentValue
-            $postBack = true;
-        } else {
-            if (Post("action") !== null) {
-                $this->CurrentAction = Post("action"); // Get action code
-                if (!$this->isShow()) { // Not reload record, handle as postback
-                    $postBack = true;
-                }
+            // Get action
+            $this->CurrentAction = "show"; // Display
+            switch ($this->CurrentAction) {
+                case "show": // Get a record to display
 
-                // Get key from Form
-                $this->setKey(Post($this->OldKeyName), $this->isShow());
-            } else {
-                $this->CurrentAction = "show"; // Default action is display
-
-                // Load key from QueryString
-                $loadByQuery = false;
-                if (($keyValue = Get("id") ?? Route("id")) !== null) {
-                    $this->id->setQueryStringValue($keyValue);
-                    $loadByQuery = true;
-                } else {
-                    $this->id->CurrentValue = null;
-                }
-            }
-
-            // Load recordset
-            if ($this->isShow()) {
-                // Load current record
-                $loaded = $this->loadRow();
-                $this->OldKey = $loaded ? $this->getKey(true) : ""; // Get from CurrentValue
-            }
-        }
-
-        // Process form if post back
-        if ($postBack) {
-            $this->loadFormValues(); // Get form values
-        }
-
-        // Validate form if post back
-        if ($postBack) {
-            if (!$this->validateForm()) {
-                $this->EventCancelled = true; // Event cancelled
-                $this->restoreFormValues();
-                if (IsApi()) {
-                    $this->terminate();
-                    return;
-                } else {
-                    $this->CurrentAction = ""; // Form error, reset action
-                }
-            }
-        }
-
-        // Perform current action
-        switch ($this->CurrentAction) {
-            case "show": // Get a record to display
-                if (!$loaded) { // Load record based on key
-                    if ($this->getFailureMessage() == "") {
-                        $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
-                    }
-                    $this->terminate("antreanumumrslist"); // No matching record, return to list
-                    return;
-                }
-                break;
-            case "update": // Update
-                $returnUrl = "antreanumumrslist";
-                if (GetPageName($returnUrl) == "antreanumumrslist") {
-                    $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                }
-                $this->SendEmail = true; // Send email on update success
-                if ($this->editRow()) { // Update record based on key
-                    if ($this->getSuccessMessage() == "") {
-                        $this->setSuccessMessage($Language->phrase("UpdateSuccess")); // Update success
-                    }
+                    // Load record based on key
                     if (IsApi()) {
-                        $this->terminate(true);
-                        return;
+                        $filter = $this->getRecordFilter();
+                        $this->CurrentFilter = $filter;
+                        $sql = $this->getCurrentSql();
+                        $conn = $this->getConnection();
+                        $this->Recordset = LoadRecordset($sql, $conn);
+                        $res = $this->Recordset && !$this->Recordset->EOF;
                     } else {
-                        $this->terminate($returnUrl); // Return to caller
-                        return;
+                        $res = $this->loadRow();
                     }
-                } elseif (IsApi()) { // API request, return
-                    $this->terminate();
-                    return;
-                } elseif ($this->getFailureMessage() == $Language->phrase("NoRecord")) {
-                    $this->terminate($returnUrl); // Return to caller
-                    return;
-                } else {
-                    $this->EventCancelled = true; // Event cancelled
-                    $this->restoreFormValues(); // Restore form values if update failed
-                }
+                    if (!$res) { // Load record based on key
+                        if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
+                            $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
+                        }
+                        $returnUrl = "antreanumumrslist"; // No matching record, return to list
+                    }
+                    break;
+            }
+        } else {
+            $returnUrl = "antreanumumrslist"; // Not page request, return to list
+        }
+        if ($returnUrl != "") {
+            $this->terminate($returnUrl);
+            return;
         }
 
         // Set up Breadcrumb
-        $this->setupBreadcrumb();
+        if (!$this->isExport()) {
+            $this->setupBreadcrumb();
+        }
 
-        // Render the record
-        $this->RowType = ROWTYPE_EDIT; // Render as Edit
+        // Render row
+        $this->RowType = ROWTYPE_VIEW;
         $this->resetAttributes();
         $this->renderRow();
+
+        // Normal return
+        if (IsApi()) {
+            $rows = $this->getRecordsFromRecordset($this->Recordset, true); // Get current record only
+            $this->Recordset->close();
+            WriteJson(["success" => true, $this->TableVar => $rows]);
+            $this->terminate(true);
+            return;
+        }
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
@@ -661,120 +650,31 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         }
     }
 
-    // Get upload files
-    protected function getUploadFiles()
+    // Set up other options
+    protected function setupOtherOptions()
     {
-        global $CurrentForm, $Language;
-    }
+        global $Language, $Security;
+        $options = &$this->OtherOptions;
+        $option = $options["action"];
 
-    // Load form values
-    protected function loadFormValues()
-    {
-        // Load from form
-        global $CurrentForm;
-
-        // Check field name 'id' first before field var 'x_id'
-        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
-        if (!$this->id->IsDetailKey) {
-            $this->id->setFormValue($val);
+        // Edit
+        $item = &$option->add("edit");
+        $editcaption = HtmlTitle($Language->phrase("ViewPageEditLink"));
+        if ($this->IsModal) {
+            $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,url:'" . HtmlEncode(GetUrl($this->EditUrl)) . "'});\">" . $Language->phrase("ViewPageEditLink") . "</a>";
+        } else {
+            $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
         }
+        $item->Visible = ($this->EditUrl != "" && $Security->canEdit());
 
-        // Check field name 'nomor_antrean' first before field var 'x_nomor_antrean'
-        $val = $CurrentForm->hasValue("nomor_antrean") ? $CurrentForm->getValue("nomor_antrean") : $CurrentForm->getValue("x_nomor_antrean");
-        if (!$this->nomor_antrean->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->nomor_antrean->Visible = false; // Disable update for API request
-            } else {
-                $this->nomor_antrean->setFormValue($val);
-            }
-        }
-
-        // Check field name 'waktu' first before field var 'x_waktu'
-        $val = $CurrentForm->hasValue("waktu") ? $CurrentForm->getValue("waktu") : $CurrentForm->getValue("x_waktu");
-        if (!$this->waktu->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->waktu->Visible = false; // Disable update for API request
-            } else {
-                $this->waktu->setFormValue($val);
-            }
-            $this->waktu->CurrentValue = UnFormatDateTime($this->waktu->CurrentValue, 0);
-        }
-
-        // Check field name 'pasien_id' first before field var 'x_pasien_id'
-        $val = $CurrentForm->hasValue("pasien_id") ? $CurrentForm->getValue("pasien_id") : $CurrentForm->getValue("x_pasien_id");
-        if (!$this->pasien_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->pasien_id->Visible = false; // Disable update for API request
-            } else {
-                $this->pasien_id->setFormValue($val);
-            }
-        }
-
-        // Check field name 'fasilitas_id' first before field var 'x_fasilitas_id'
-        $val = $CurrentForm->hasValue("fasilitas_id") ? $CurrentForm->getValue("fasilitas_id") : $CurrentForm->getValue("x_fasilitas_id");
-        if (!$this->fasilitas_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->fasilitas_id->Visible = false; // Disable update for API request
-            } else {
-                $this->fasilitas_id->setFormValue($val);
-            }
-        }
-
-        // Check field name 'rumah_sakit_id' first before field var 'x_rumah_sakit_id'
-        $val = $CurrentForm->hasValue("rumah_sakit_id") ? $CurrentForm->getValue("rumah_sakit_id") : $CurrentForm->getValue("x_rumah_sakit_id");
-        if (!$this->rumah_sakit_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->rumah_sakit_id->Visible = false; // Disable update for API request
-            } else {
-                $this->rumah_sakit_id->setFormValue($val);
-            }
-        }
-
-        // Check field name 'status' first before field var 'x_status'
-        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
-        if (!$this->status->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->status->Visible = false; // Disable update for API request
-            } else {
-                $this->status->setFormValue($val);
-            }
-        }
-
-        // Check field name 'keluhan_awal' first before field var 'x_keluhan_awal'
-        $val = $CurrentForm->hasValue("keluhan_awal") ? $CurrentForm->getValue("keluhan_awal") : $CurrentForm->getValue("x_keluhan_awal");
-        if (!$this->keluhan_awal->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->keluhan_awal->Visible = false; // Disable update for API request
-            } else {
-                $this->keluhan_awal->setFormValue($val);
-            }
-        }
-
-        // Check field name 'webusers_id' first before field var 'x_webusers_id'
-        $val = $CurrentForm->hasValue("webusers_id") ? $CurrentForm->getValue("webusers_id") : $CurrentForm->getValue("x_webusers_id");
-        if (!$this->webusers_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->webusers_id->Visible = false; // Disable update for API request
-            } else {
-                $this->webusers_id->setFormValue($val);
-            }
-        }
-    }
-
-    // Restore form values
-    public function restoreFormValues()
-    {
-        global $CurrentForm;
-        $this->id->CurrentValue = $this->id->FormValue;
-        $this->nomor_antrean->CurrentValue = $this->nomor_antrean->FormValue;
-        $this->waktu->CurrentValue = $this->waktu->FormValue;
-        $this->waktu->CurrentValue = UnFormatDateTime($this->waktu->CurrentValue, 0);
-        $this->pasien_id->CurrentValue = $this->pasien_id->FormValue;
-        $this->fasilitas_id->CurrentValue = $this->fasilitas_id->FormValue;
-        $this->rumah_sakit_id->CurrentValue = $this->rumah_sakit_id->FormValue;
-        $this->status->CurrentValue = $this->status->FormValue;
-        $this->keluhan_awal->CurrentValue = $this->keluhan_awal->FormValue;
-        $this->webusers_id->CurrentValue = $this->webusers_id->FormValue;
+        // Set up action default
+        $option = $options["action"];
+        $option->DropDownButtonPhrase = $Language->phrase("ButtonActions");
+        $option->UseDropDownButton = false;
+        $option->UseButtonGroup = true;
+        $item = &$option->add($option->GroupOptionName);
+        $item->Body = "";
+        $item->Visible = false;
     }
 
     /**
@@ -824,6 +724,9 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         if (!$rs) {
             return;
         }
+        if ($this->AuditTrailOnView) {
+            $this->writeAuditTrailOnView($row);
+        }
         $this->id->setDbValue($row['id']);
         $this->nomor_antrean->setDbValue($row['nomor_antrean']);
         $this->waktu->setDbValue($row['waktu']);
@@ -853,28 +756,18 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         return $row;
     }
 
-    // Load old record
-    protected function loadOldRecord()
-    {
-        // Load old record
-        $this->OldRecordset = null;
-        $validKey = $this->OldKey != "";
-        if ($validKey) {
-            $this->CurrentFilter = $this->getRecordFilter();
-            $sql = $this->getCurrentSql();
-            $conn = $this->getConnection();
-            $this->OldRecordset = LoadRecordset($sql, $conn);
-        }
-        $this->loadRowValues($this->OldRecordset); // Load row values
-        return $validKey;
-    }
-
     // Render row values based on field settings
     public function renderRow()
     {
         global $Security, $Language, $CurrentLanguage;
 
         // Initialize URLs
+        $this->AddUrl = $this->getAddUrl();
+        $this->EditUrl = $this->getEditUrl();
+        $this->CopyUrl = $this->getCopyUrl();
+        $this->DeleteUrl = $this->getDeleteUrl();
+        $this->ListUrl = $this->getListUrl();
+        $this->setupOtherOptions();
 
         // Call Row_Rendering event
         $this->rowRendering();
@@ -1059,329 +952,16 @@ class AntreanUmumRsEdit extends AntreanUmumRs
             $this->keluhan_awal->HrefValue = "";
             $this->keluhan_awal->TooltipValue = "";
 
-            // webusers_id
-            $this->webusers_id->LinkCustomAttributes = "";
-            $this->webusers_id->HrefValue = "";
-            $this->webusers_id->TooltipValue = "";
-        } elseif ($this->RowType == ROWTYPE_EDIT) {
-            // id
-            $this->id->EditAttrs["class"] = "form-control";
-            $this->id->EditCustomAttributes = "";
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->ViewCustomAttributes = "";
-
-            // nomor_antrean
-            $this->nomor_antrean->EditAttrs["class"] = "form-control";
-            $this->nomor_antrean->EditCustomAttributes = "";
-            $this->nomor_antrean->EditValue = $this->nomor_antrean->CurrentValue;
-            $this->nomor_antrean->EditValue = FormatNumber($this->nomor_antrean->EditValue, 0, -2, -2, -2);
-            $this->nomor_antrean->ViewCustomAttributes = "";
-
-            // waktu
-            $this->waktu->EditAttrs["class"] = "form-control";
-            $this->waktu->EditCustomAttributes = "";
-            $this->waktu->EditValue = $this->waktu->CurrentValue;
-            $this->waktu->EditValue = FormatDateTime($this->waktu->EditValue, 0);
-            $this->waktu->ViewCustomAttributes = "";
-
-            // pasien_id
-            $this->pasien_id->EditAttrs["class"] = "form-control";
-            $this->pasien_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->pasien_id->CurrentValue));
-            if ($curVal != "") {
-                $this->pasien_id->EditValue = $this->pasien_id->lookupCacheOption($curVal);
-                if ($this->pasien_id->EditValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->pasien_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->pasien_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->pasien_id->EditValue = $this->pasien_id->displayValue($arwrk);
-                    } else {
-                        $this->pasien_id->EditValue = $this->pasien_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->pasien_id->EditValue = null;
-            }
-            $this->pasien_id->ViewCustomAttributes = "";
-
-            // fasilitas_id
-            $this->fasilitas_id->EditAttrs["class"] = "form-control";
-            $this->fasilitas_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->fasilitas_id->CurrentValue));
-            if ($curVal != "") {
-                $this->fasilitas_id->EditValue = $this->fasilitas_id->lookupCacheOption($curVal);
-                if ($this->fasilitas_id->EditValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $lookupFilter = function() {
-                        return (CurrentUserLevel() == -1) ? "" : "`id` IN (SELECT fasilitas_rumah_sakit.fasilitas_id FROM fasilitas_rumah_sakit WHERE rumah_sakit_id = ".CurrentUserInfo("rumah_sakit_id").")";
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->fasilitas_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->fasilitas_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->fasilitas_id->EditValue = $this->fasilitas_id->displayValue($arwrk);
-                    } else {
-                        $this->fasilitas_id->EditValue = $this->fasilitas_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->fasilitas_id->EditValue = null;
-            }
-            $this->fasilitas_id->ViewCustomAttributes = "";
-
-            // rumah_sakit_id
-            $this->rumah_sakit_id->EditAttrs["class"] = "form-control";
-            $this->rumah_sakit_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->rumah_sakit_id->CurrentValue));
-            if ($curVal != "") {
-                $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->lookupCacheOption($curVal);
-                if ($this->rumah_sakit_id->EditValue === null) { // Lookup from database
-                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->rumah_sakit_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->rumah_sakit_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->displayValue($arwrk);
-                    } else {
-                        $this->rumah_sakit_id->EditValue = $this->rumah_sakit_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->rumah_sakit_id->EditValue = null;
-            }
-            $this->rumah_sakit_id->ViewCustomAttributes = "";
-
-            // status
-            $this->status->EditCustomAttributes = "";
-            $this->status->EditValue = $this->status->options(false);
-            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
-
-            // keluhan_awal
-            $this->keluhan_awal->EditAttrs["class"] = "form-control";
-            $this->keluhan_awal->EditCustomAttributes = "";
-            $this->keluhan_awal->EditValue = $this->keluhan_awal->CurrentValue;
-            $this->keluhan_awal->ViewCustomAttributes = "";
-
-            // webusers_id
-            $this->webusers_id->EditAttrs["class"] = "form-control";
-            $this->webusers_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->webusers_id->CurrentValue));
-            if ($curVal != "") {
-                $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
-            } else {
-                $this->webusers_id->ViewValue = $this->webusers_id->Lookup !== null && is_array($this->webusers_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->webusers_id->ViewValue !== null) { // Load from cache
-                $this->webusers_id->EditValue = array_values($this->webusers_id->Lookup->Options);
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = "`id`" . SearchString("=", $this->webusers_id->CurrentValue, DATATYPE_NUMBER, "");
-                }
-                $sqlWrk = $this->webusers_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->webusers_id->EditValue = $arwrk;
-            }
-            $this->webusers_id->PlaceHolder = RemoveHtml($this->webusers_id->caption());
-
-            // Edit refer script
-
-            // id
-            $this->id->LinkCustomAttributes = "";
-            $this->id->HrefValue = "";
-            $this->id->TooltipValue = "";
-
-            // nomor_antrean
-            $this->nomor_antrean->LinkCustomAttributes = "";
-            $this->nomor_antrean->HrefValue = "";
-            $this->nomor_antrean->TooltipValue = "";
-
-            // waktu
-            $this->waktu->LinkCustomAttributes = "";
-            $this->waktu->HrefValue = "";
-            $this->waktu->TooltipValue = "";
-
-            // pasien_id
-            $this->pasien_id->LinkCustomAttributes = "";
-            $this->pasien_id->HrefValue = "";
-            $this->pasien_id->TooltipValue = "";
-
-            // fasilitas_id
-            $this->fasilitas_id->LinkCustomAttributes = "";
-            $this->fasilitas_id->HrefValue = "";
-            $this->fasilitas_id->TooltipValue = "";
-
-            // rumah_sakit_id
-            $this->rumah_sakit_id->LinkCustomAttributes = "";
-            $this->rumah_sakit_id->HrefValue = "";
-            $this->rumah_sakit_id->TooltipValue = "";
-
-            // status
-            $this->status->LinkCustomAttributes = "";
-            $this->status->HrefValue = "";
-
-            // keluhan_awal
-            $this->keluhan_awal->LinkCustomAttributes = "";
-            $this->keluhan_awal->HrefValue = "";
-            $this->keluhan_awal->TooltipValue = "";
-
-            // webusers_id
-            $this->webusers_id->LinkCustomAttributes = "";
-            $this->webusers_id->HrefValue = "";
-        }
-        if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
-            $this->setupFieldTitles();
+            // Petugas
+            $this->Petugas->LinkCustomAttributes = "";
+            $this->Petugas->HrefValue = "";
+            $this->Petugas->TooltipValue = "";
         }
 
         // Call Row Rendered event
         if ($this->RowType != ROWTYPE_AGGREGATEINIT) {
             $this->rowRendered();
         }
-    }
-
-    // Validate form
-    protected function validateForm()
-    {
-        global $Language;
-
-        // Check if validation required
-        if (!Config("SERVER_VALIDATE")) {
-            return true;
-        }
-        if ($this->id->Required) {
-            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
-                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-            }
-        }
-        if ($this->nomor_antrean->Required) {
-            if (!$this->nomor_antrean->IsDetailKey && EmptyValue($this->nomor_antrean->FormValue)) {
-                $this->nomor_antrean->addErrorMessage(str_replace("%s", $this->nomor_antrean->caption(), $this->nomor_antrean->RequiredErrorMessage));
-            }
-        }
-        if ($this->waktu->Required) {
-            if (!$this->waktu->IsDetailKey && EmptyValue($this->waktu->FormValue)) {
-                $this->waktu->addErrorMessage(str_replace("%s", $this->waktu->caption(), $this->waktu->RequiredErrorMessage));
-            }
-        }
-        if ($this->pasien_id->Required) {
-            if (!$this->pasien_id->IsDetailKey && EmptyValue($this->pasien_id->FormValue)) {
-                $this->pasien_id->addErrorMessage(str_replace("%s", $this->pasien_id->caption(), $this->pasien_id->RequiredErrorMessage));
-            }
-        }
-        if ($this->fasilitas_id->Required) {
-            if (!$this->fasilitas_id->IsDetailKey && EmptyValue($this->fasilitas_id->FormValue)) {
-                $this->fasilitas_id->addErrorMessage(str_replace("%s", $this->fasilitas_id->caption(), $this->fasilitas_id->RequiredErrorMessage));
-            }
-        }
-        if ($this->rumah_sakit_id->Required) {
-            if (!$this->rumah_sakit_id->IsDetailKey && EmptyValue($this->rumah_sakit_id->FormValue)) {
-                $this->rumah_sakit_id->addErrorMessage(str_replace("%s", $this->rumah_sakit_id->caption(), $this->rumah_sakit_id->RequiredErrorMessage));
-            }
-        }
-        if ($this->status->Required) {
-            if ($this->status->FormValue == "") {
-                $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
-            }
-        }
-        if ($this->keluhan_awal->Required) {
-            if (!$this->keluhan_awal->IsDetailKey && EmptyValue($this->keluhan_awal->FormValue)) {
-                $this->keluhan_awal->addErrorMessage(str_replace("%s", $this->keluhan_awal->caption(), $this->keluhan_awal->RequiredErrorMessage));
-            }
-        }
-        if ($this->webusers_id->Required) {
-            if (!$this->webusers_id->IsDetailKey && EmptyValue($this->webusers_id->FormValue)) {
-                $this->webusers_id->addErrorMessage(str_replace("%s", $this->webusers_id->caption(), $this->webusers_id->RequiredErrorMessage));
-            }
-        }
-
-        // Return validate result
-        $validateForm = !$this->hasInvalidFields();
-
-        // Call Form_CustomValidate event
-        $formCustomError = "";
-        $validateForm = $validateForm && $this->formCustomValidate($formCustomError);
-        if ($formCustomError != "") {
-            $this->setFailureMessage($formCustomError);
-        }
-        return $validateForm;
-    }
-
-    // Update record based on key values
-    protected function editRow()
-    {
-        global $Security, $Language;
-        $oldKeyFilter = $this->getRecordFilter();
-        $filter = $this->applyUserIDFilters($oldKeyFilter);
-        $conn = $this->getConnection();
-        $this->CurrentFilter = $filter;
-        $sql = $this->getCurrentSql();
-        $rsold = $conn->fetchAssoc($sql);
-        $editRow = false;
-        if (!$rsold) {
-            $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
-            $editRow = false; // Update Failed
-        } else {
-            // Save old values
-            $this->loadDbValues($rsold);
-            $rsnew = [];
-
-            // status
-            $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, "", $this->status->ReadOnly);
-
-            // webusers_id
-            $this->webusers_id->setDbValueDef($rsnew, $this->webusers_id->CurrentValue, null, $this->webusers_id->ReadOnly);
-
-            // Call Row Updating event
-            $updateRow = $this->rowUpdating($rsold, $rsnew);
-            if ($updateRow) {
-                if (count($rsnew) > 0) {
-                    try {
-                        $editRow = $this->update($rsnew, "", $rsold);
-                    } catch (\Exception $e) {
-                        $this->setFailureMessage($e->getMessage());
-                    }
-                } else {
-                    $editRow = true; // No field to update
-                }
-                if ($editRow) {
-                }
-            } else {
-                if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
-                    // Use the message, do nothing
-                } elseif ($this->CancelMessage != "") {
-                    $this->setFailureMessage($this->CancelMessage);
-                    $this->CancelMessage = "";
-                } else {
-                    $this->setFailureMessage($Language->phrase("UpdateCancelled"));
-                }
-                $editRow = false;
-            }
-        }
-
-        // Call Row_Updated event
-        if ($editRow) {
-            $this->rowUpdated($rsold, $rsnew);
-        }
-
-        // Clean upload path if any
-        if ($editRow) {
-        }
-
-        // Write JSON for API request
-        if (IsApi() && $editRow) {
-            $row = $this->getRecordsFromRecordset([$rsnew], true);
-            WriteJson(["success" => true, $this->TableVar => $row]);
-        }
-        return $editRow;
     }
 
     // Set up Breadcrumb
@@ -1391,8 +971,8 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
         $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("antreanumumrslist"), "", $this->TableVar, true);
-        $pageId = "edit";
-        $Breadcrumb->add("edit", $pageId, $url);
+        $pageId = "view";
+        $Breadcrumb->add("view", $pageId, $url);
     }
 
     // Setup lookup options
@@ -1540,10 +1120,27 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         //$footer = "your footer";
     }
 
-    // Form Custom Validate event
-    public function formCustomValidate(&$customError)
+    // Page Exporting event
+    // $this->ExportDoc = export document object
+    public function pageExporting()
     {
-        // Return error message in CustomError
-        return true;
+        //$this->ExportDoc->Text = "my header"; // Export header
+        //return false; // Return false to skip default export and use Row_Export event
+        return true; // Return true to use default export and skip Row_Export event
+    }
+
+    // Row Export event
+    // $this->ExportDoc = export document object
+    public function rowExport($rs)
+    {
+        //$this->ExportDoc->Text .= "my content"; // Build HTML with field value: $rs["MyField"] or $this->MyField->ViewValue
+    }
+
+    // Page Exported event
+    // $this->ExportDoc = export document object
+    public function pageExported()
+    {
+        //$this->ExportDoc->Text .= "my footer"; // Export footer
+        //Log($this->ExportDoc->Text);
     }
 }

@@ -45,6 +45,7 @@ class AntreanUmumRs extends DbTable
     public $status;
     public $keluhan_awal;
     public $webusers_id;
+    public $Petugas;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -169,6 +170,13 @@ class AntreanUmumRs extends DbTable
         $this->webusers_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->webusers_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->webusers_id->Param, "CustomMsg");
         $this->Fields['webusers_id'] = &$this->webusers_id;
+
+        // Petugas
+        $this->Petugas = new DbField('antrean_umum_rs', 'antrean_umum_rs', 'x_Petugas', 'Petugas', '(SELECT webusers.username FROM webusers WHERE webusers.id = webusers_id)', '(SELECT webusers.username FROM webusers WHERE webusers.id = webusers_id)', 200, 255, -1, false, '(SELECT webusers.username FROM webusers WHERE webusers.id = webusers_id)', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->Petugas->IsCustom = true; // Custom field
+        $this->Petugas->Sortable = true; // Allow sort
+        $this->Petugas->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->Petugas->Param, "CustomMsg");
+        $this->Fields['Petugas'] = &$this->Petugas;
     }
 
     // Field Visibility
@@ -226,7 +234,7 @@ class AntreanUmumRs extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("antrean_umum.*");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("antrean_umum.*, (SELECT webusers.username FROM webusers WHERE webusers.id = webusers_id) AS `Petugas`");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -599,6 +607,7 @@ class AntreanUmumRs extends DbTable
         $this->status->DbValue = $row['status'];
         $this->keluhan_awal->DbValue = $row['keluhan_awal'];
         $this->webusers_id->DbValue = $row['webusers_id'];
+        $this->Petugas->DbValue = $row['Petugas'];
     }
 
     // Delete uploaded files
@@ -928,6 +937,7 @@ SORTHTML;
         $this->status->setDbValue($row['status']);
         $this->keluhan_awal->setDbValue($row['keluhan_awal']);
         $this->webusers_id->setDbValue($row['webusers_id']);
+        $this->Petugas->setDbValue($row['Petugas']);
     }
 
     // Render list row values
@@ -957,6 +967,8 @@ SORTHTML;
         // keluhan_awal
 
         // webusers_id
+
+        // Petugas
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1072,6 +1084,10 @@ SORTHTML;
         }
         $this->webusers_id->ViewCustomAttributes = "";
 
+        // Petugas
+        $this->Petugas->ViewValue = $this->Petugas->CurrentValue;
+        $this->Petugas->ViewCustomAttributes = "";
+
         // id
         $this->id->LinkCustomAttributes = "";
         $this->id->HrefValue = "";
@@ -1116,6 +1132,11 @@ SORTHTML;
         $this->webusers_id->LinkCustomAttributes = "";
         $this->webusers_id->HrefValue = "";
         $this->webusers_id->TooltipValue = "";
+
+        // Petugas
+        $this->Petugas->LinkCustomAttributes = "";
+        $this->Petugas->HrefValue = "";
+        $this->Petugas->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1241,6 +1262,15 @@ SORTHTML;
         $this->webusers_id->EditCustomAttributes = "";
         $this->webusers_id->PlaceHolder = RemoveHtml($this->webusers_id->caption());
 
+        // Petugas
+        $this->Petugas->EditAttrs["class"] = "form-control";
+        $this->Petugas->EditCustomAttributes = "";
+        if (!$this->Petugas->Raw) {
+            $this->Petugas->CurrentValue = HtmlDecode($this->Petugas->CurrentValue);
+        }
+        $this->Petugas->EditValue = $this->Petugas->CurrentValue;
+        $this->Petugas->PlaceHolder = RemoveHtml($this->Petugas->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1277,7 +1307,7 @@ SORTHTML;
                     $doc->exportCaption($this->rumah_sakit_id);
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->keluhan_awal);
-                    $doc->exportCaption($this->webusers_id);
+                    $doc->exportCaption($this->Petugas);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->nomor_antrean);
@@ -1288,6 +1318,7 @@ SORTHTML;
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->keluhan_awal);
                     $doc->exportCaption($this->webusers_id);
+                    $doc->exportCaption($this->Petugas);
                 }
                 $doc->endExportRow();
             }
@@ -1325,7 +1356,7 @@ SORTHTML;
                         $doc->exportField($this->rumah_sakit_id);
                         $doc->exportField($this->status);
                         $doc->exportField($this->keluhan_awal);
-                        $doc->exportField($this->webusers_id);
+                        $doc->exportField($this->Petugas);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->nomor_antrean);
@@ -1336,6 +1367,7 @@ SORTHTML;
                         $doc->exportField($this->status);
                         $doc->exportField($this->keluhan_awal);
                         $doc->exportField($this->webusers_id);
+                        $doc->exportField($this->Petugas);
                     }
                     $doc->endExportRow($rowCnt);
                 }

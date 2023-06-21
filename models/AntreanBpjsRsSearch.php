@@ -475,6 +475,7 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
         $this->status->setVisibility();
         $this->keluhan_awal->setVisibility();
         $this->webusers_id->setVisibility();
+        $this->Petugas->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -566,6 +567,7 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
         $this->buildSearchUrl($srchUrl, $this->status); // status
         $this->buildSearchUrl($srchUrl, $this->keluhan_awal); // keluhan_awal
         $this->buildSearchUrl($srchUrl, $this->webusers_id); // webusers_id
+        $this->buildSearchUrl($srchUrl, $this->Petugas); // Petugas
         if ($srchUrl != "") {
             $srchUrl .= "&";
         }
@@ -673,6 +675,9 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
         if ($this->webusers_id->AdvancedSearch->post()) {
             $hasValue = true;
         }
+        if ($this->Petugas->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
         return $hasValue;
     }
 
@@ -705,6 +710,8 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
         // keluhan_awal
 
         // webusers_id
+
+        // Petugas
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -821,6 +828,10 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
             }
             $this->webusers_id->ViewCustomAttributes = "";
 
+            // Petugas
+            $this->Petugas->ViewValue = $this->Petugas->CurrentValue;
+            $this->Petugas->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -865,6 +876,11 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
             $this->webusers_id->LinkCustomAttributes = "";
             $this->webusers_id->HrefValue = "";
             $this->webusers_id->TooltipValue = "";
+
+            // Petugas
+            $this->Petugas->LinkCustomAttributes = "";
+            $this->Petugas->HrefValue = "";
+            $this->Petugas->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -1018,6 +1034,15 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
                 $this->webusers_id->EditValue = $arwrk;
             }
             $this->webusers_id->PlaceHolder = RemoveHtml($this->webusers_id->caption());
+
+            // Petugas
+            $this->Petugas->EditAttrs["class"] = "form-control";
+            $this->Petugas->EditCustomAttributes = "";
+            if (!$this->Petugas->Raw) {
+                $this->Petugas->AdvancedSearch->SearchValue = HtmlDecode($this->Petugas->AdvancedSearch->SearchValue);
+            }
+            $this->Petugas->EditValue = HtmlEncode($this->Petugas->AdvancedSearch->SearchValue);
+            $this->Petugas->PlaceHolder = RemoveHtml($this->Petugas->caption());
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1073,6 +1098,7 @@ class AntreanBpjsRsSearch extends AntreanBpjsRs
         $this->status->AdvancedSearch->load();
         $this->keluhan_awal->AdvancedSearch->load();
         $this->webusers_id->AdvancedSearch->load();
+        $this->Petugas->AdvancedSearch->load();
     }
 
     // Set up Breadcrumb

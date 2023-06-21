@@ -30,7 +30,8 @@ loadjs.ready("head", function () {
         ["rumah_sakit_id", [], fields.rumah_sakit_id.isInvalid],
         ["status", [], fields.status.isInvalid],
         ["keluhan_awal", [], fields.keluhan_awal.isInvalid],
-        ["webusers_id", [], fields.webusers_id.isInvalid]
+        ["webusers_id", [], fields.webusers_id.isInvalid],
+        ["Petugas", [], fields.Petugas.isInvalid]
     ]);
 
     // Set invalid fields
@@ -316,6 +317,22 @@ loadjs.ready("head", function() {
     ew.createSelect(options);
 });
 </script>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->Petugas->Visible) { // Petugas ?>
+    <div id="r_Petugas" class="form-group row">
+        <label for="x_Petugas" class="<?= $Page->LeftColumnClass ?>"><span id="elh_antrean_bpjs_rs_Petugas"><?= $Page->Petugas->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("LIKE") ?>
+<input type="hidden" name="z_Petugas" id="z_Petugas" value="LIKE">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->Petugas->cellAttributes() ?>>
+            <span id="el_antrean_bpjs_rs_Petugas" class="ew-search-field ew-search-field-single">
+<input type="<?= $Page->Petugas->getInputTextType() ?>" data-table="antrean_bpjs_rs" data-field="x_Petugas" name="x_Petugas" id="x_Petugas" size="30" maxlength="255" placeholder="<?= HtmlEncode($Page->Petugas->getPlaceHolder()) ?>" value="<?= $Page->Petugas->EditValue ?>"<?= $Page->Petugas->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->Petugas->getErrorMessage(false) ?></div>
 </span>
         </div></div>
     </div>

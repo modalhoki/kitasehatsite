@@ -475,6 +475,7 @@ class AntreanUmumRsSearch extends AntreanUmumRs
         $this->status->setVisibility();
         $this->keluhan_awal->setVisibility();
         $this->webusers_id->setVisibility();
+        $this->Petugas->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -705,6 +706,8 @@ class AntreanUmumRsSearch extends AntreanUmumRs
         // keluhan_awal
 
         // webusers_id
+
+        // Petugas
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -819,6 +822,10 @@ class AntreanUmumRsSearch extends AntreanUmumRs
                 $this->webusers_id->ViewValue = null;
             }
             $this->webusers_id->ViewCustomAttributes = "";
+
+            // Petugas
+            $this->Petugas->ViewValue = $this->Petugas->CurrentValue;
+            $this->Petugas->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";

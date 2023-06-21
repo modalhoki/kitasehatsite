@@ -584,7 +584,8 @@ class AntreanUmumRsList extends AntreanUmumRs
         $this->rumah_sakit_id->Visible = false;
         $this->status->setVisibility();
         $this->keluhan_awal->Visible = false;
-        $this->webusers_id->setVisibility();
+        $this->webusers_id->Visible = false;
+        $this->Petugas->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -666,7 +667,11 @@ class AntreanUmumRsList extends AntreanUmumRs
             }
 
             // Get default search criteria
+            AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
             AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
+
+            // Get basic search values
+            $this->loadBasicSearchValues();
 
             // Get and validate search values for advanced search
             $this->loadSearchValues(); // Get search values
@@ -691,6 +696,11 @@ class AntreanUmumRsList extends AntreanUmumRs
             // Set up sorting order
             $this->setupSortOrder();
 
+            // Get basic search criteria
+            if (!$this->hasInvalidFields()) {
+                $srchBasic = $this->basicSearchWhere();
+            }
+
             // Get search criteria for advanced search
             if (!$this->hasInvalidFields()) {
                 $srchAdvanced = $this->advancedSearchWhere();
@@ -712,6 +722,12 @@ class AntreanUmumRsList extends AntreanUmumRs
 
         // Load search default if no existing search criteria
         if (!$this->checkSearchParms()) {
+            // Load basic search from default
+            $this->BasicSearch->loadDefault();
+            if ($this->BasicSearch->Keyword != "") {
+                $srchBasic = $this->basicSearchWhere();
+            }
+
             // Load advanced search from default
             if ($this->loadAdvancedSearchDefault()) {
                 $srchAdvanced = $this->advancedSearchWhere();
@@ -902,6 +918,10 @@ class AntreanUmumRsList extends AntreanUmumRs
         $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->keluhan_awal->AdvancedSearch->toJson(), ","); // Field keluhan_awal
         $filterList = Concat($filterList, $this->webusers_id->AdvancedSearch->toJson(), ","); // Field webusers_id
+        if ($this->BasicSearch->Keyword != "") {
+            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
+            $filterList = Concat($filterList, $wrk, ",");
+        }
 
         // Return filter list in JSON
         if ($filterList != "") {
@@ -1009,6 +1029,8 @@ class AntreanUmumRsList extends AntreanUmumRs
         $this->webusers_id->AdvancedSearch->SearchValue2 = @$filter["y_webusers_id"];
         $this->webusers_id->AdvancedSearch->SearchOperator2 = @$filter["w_webusers_id"];
         $this->webusers_id->AdvancedSearch->save();
+        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
+        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
 
     // Advanced search WHERE clause based on QueryString
@@ -1108,9 +1130,132 @@ class AntreanUmumRsList extends AntreanUmumRs
         return $value;
     }
 
+    // Return basic search SQL
+    protected function basicSearchSql($arKeywords, $type)
+    {
+        $where = "";
+        $this->buildBasicSearchSql($where, $this->keluhan_awal, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->Petugas, $arKeywords, $type);
+        return $where;
+    }
+
+    // Build basic search SQL
+    protected function buildBasicSearchSql(&$where, &$fld, $arKeywords, $type)
+    {
+        $defCond = ($type == "OR") ? "OR" : "AND";
+        $arSql = []; // Array for SQL parts
+        $arCond = []; // Array for search conditions
+        $cnt = count($arKeywords);
+        $j = 0; // Number of SQL parts
+        for ($i = 0; $i < $cnt; $i++) {
+            $keyword = $arKeywords[$i];
+            $keyword = trim($keyword);
+            if (Config("BASIC_SEARCH_IGNORE_PATTERN") != "") {
+                $keyword = preg_replace(Config("BASIC_SEARCH_IGNORE_PATTERN"), "\\", $keyword);
+                $ar = explode("\\", $keyword);
+            } else {
+                $ar = [$keyword];
+            }
+            foreach ($ar as $keyword) {
+                if ($keyword != "") {
+                    $wrk = "";
+                    if ($keyword == "OR" && $type == "") {
+                        if ($j > 0) {
+                            $arCond[$j - 1] = "OR";
+                        }
+                    } elseif ($keyword == Config("NULL_VALUE")) {
+                        $wrk = $fld->Expression . " IS NULL";
+                    } elseif ($keyword == Config("NOT_NULL_VALUE")) {
+                        $wrk = $fld->Expression . " IS NOT NULL";
+                    } elseif ($fld->IsVirtual && $fld->Visible) {
+                        $wrk = $fld->VirtualExpression . Like(QuotedValue("%" . $keyword . "%", DATATYPE_STRING, $this->Dbid), $this->Dbid);
+                    } elseif ($fld->DataType != DATATYPE_NUMBER || is_numeric($keyword)) {
+                        $wrk = $fld->BasicSearchExpression . Like(QuotedValue("%" . $keyword . "%", DATATYPE_STRING, $this->Dbid), $this->Dbid);
+                    }
+                    if ($wrk != "") {
+                        $arSql[$j] = $wrk;
+                        $arCond[$j] = $defCond;
+                        $j += 1;
+                    }
+                }
+            }
+        }
+        $cnt = count($arSql);
+        $quoted = false;
+        $sql = "";
+        if ($cnt > 0) {
+            for ($i = 0; $i < $cnt - 1; $i++) {
+                if ($arCond[$i] == "OR") {
+                    if (!$quoted) {
+                        $sql .= "(";
+                    }
+                    $quoted = true;
+                }
+                $sql .= $arSql[$i];
+                if ($quoted && $arCond[$i] != "OR") {
+                    $sql .= ")";
+                    $quoted = false;
+                }
+                $sql .= " " . $arCond[$i] . " ";
+            }
+            $sql .= $arSql[$cnt - 1];
+            if ($quoted) {
+                $sql .= ")";
+            }
+        }
+        if ($sql != "") {
+            if ($where != "") {
+                $where .= " OR ";
+            }
+            $where .= "(" . $sql . ")";
+        }
+    }
+
+    // Return basic search WHERE clause based on search keyword and type
+    protected function basicSearchWhere($default = false)
+    {
+        global $Security;
+        $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $searchKeyword = ($default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
+        $searchType = ($default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
+
+        // Get search SQL
+        if ($searchKeyword != "") {
+            $ar = $this->BasicSearch->keywordList($default);
+            // Search keyword in any fields
+            if (($searchType == "OR" || $searchType == "AND") && $this->BasicSearch->BasicSearchAnyFields) {
+                foreach ($ar as $keyword) {
+                    if ($keyword != "") {
+                        if ($searchStr != "") {
+                            $searchStr .= " " . $searchType . " ";
+                        }
+                        $searchStr .= "(" . $this->basicSearchSql([$keyword], $searchType) . ")";
+                    }
+                }
+            } else {
+                $searchStr = $this->basicSearchSql($ar, $searchType);
+            }
+            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
+                $this->Command = "search";
+            }
+        }
+        if (!$default && $this->Command == "search") {
+            $this->BasicSearch->setKeyword($searchKeyword);
+            $this->BasicSearch->setType($searchType);
+        }
+        return $searchStr;
+    }
+
     // Check if search parm exists
     protected function checkSearchParms()
     {
+        // Check basic search
+        if ($this->BasicSearch->issetSession()) {
+            return true;
+        }
         if ($this->id->AdvancedSearch->issetSession()) {
             return true;
         }
@@ -1148,6 +1293,9 @@ class AntreanUmumRsList extends AntreanUmumRs
         $this->SearchWhere = "";
         $this->setSearchWhere($this->SearchWhere);
 
+        // Clear basic search parameters
+        $this->resetBasicSearchParms();
+
         // Clear advanced search parameters
         $this->resetAdvancedSearchParms();
     }
@@ -1156,6 +1304,12 @@ class AntreanUmumRsList extends AntreanUmumRs
     protected function loadAdvancedSearchDefault()
     {
         return false;
+    }
+
+    // Clear all basic search parameters
+    protected function resetBasicSearchParms()
+    {
+        $this->BasicSearch->unsetSession();
     }
 
     // Clear all advanced search parameters
@@ -1176,6 +1330,9 @@ class AntreanUmumRsList extends AntreanUmumRs
     protected function restoreSearchParms()
     {
         $this->RestoreSearch = true;
+
+        // Restore basic search values
+        $this->BasicSearch->load();
 
         // Restore advanced search values
                 $this->id->AdvancedSearch->load();
@@ -1201,7 +1358,7 @@ class AntreanUmumRsList extends AntreanUmumRs
             $this->updateSort($this->pasien_id); // pasien_id
             $this->updateSort($this->fasilitas_id); // fasilitas_id
             $this->updateSort($this->status); // status
-            $this->updateSort($this->webusers_id); // webusers_id
+            $this->updateSort($this->Petugas); // Petugas
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1250,6 +1407,7 @@ class AntreanUmumRsList extends AntreanUmumRs
                 $this->status->setSort("");
                 $this->keluhan_awal->setSort("");
                 $this->webusers_id->setSort("");
+                $this->Petugas->setSort("");
             }
 
             // Reset start position
@@ -1268,6 +1426,12 @@ class AntreanUmumRsList extends AntreanUmumRs
         $item->Body = "";
         $item->OnLeft = false;
         $item->Visible = false;
+
+        // "view"
+        $item = &$this->ListOptions->add("view");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canView();
+        $item->OnLeft = false;
 
         // "edit"
         $item = &$this->ListOptions->add("edit");
@@ -1318,6 +1482,19 @@ class AntreanUmumRsList extends AntreanUmumRs
         $this->listOptionsRendering();
         $pageUrl = $this->pageUrl();
         if ($this->CurrentMode == "view") {
+            // "view"
+            $opt = $this->ListOptions["view"];
+            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
+            if ($Security->canView()) {
+                if (IsMobile()) {
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
+                } else {
+                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"antrean_umum_rs\" data-caption=\"" . $viewcaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,url:'" . HtmlEncode(GetUrl($this->ViewUrl)) . "',btn:null});\">" . $Language->phrase("ViewLink") . "</a>";
+                }
+            } else {
+                $opt->Body = "";
+            }
+
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
@@ -1533,6 +1710,16 @@ class AntreanUmumRsList extends AntreanUmumRs
         global $Security, $Language;
     }
 
+    // Load basic search values
+    protected function loadBasicSearchValues()
+    {
+        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
+        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
+            $this->Command = "search";
+        }
+        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
+    }
+
     // Load search values for validation
     protected function loadSearchValues()
     {
@@ -1690,6 +1877,7 @@ class AntreanUmumRsList extends AntreanUmumRs
         $this->status->setDbValue($row['status']);
         $this->keluhan_awal->setDbValue($row['keluhan_awal']);
         $this->webusers_id->setDbValue($row['webusers_id']);
+        $this->Petugas->setDbValue($row['Petugas']);
     }
 
     // Return a row with default values
@@ -1705,6 +1893,7 @@ class AntreanUmumRsList extends AntreanUmumRs
         $row['status'] = null;
         $row['keluhan_awal'] = null;
         $row['webusers_id'] = null;
+        $row['Petugas'] = null;
         return $row;
     }
 
@@ -1759,6 +1948,8 @@ class AntreanUmumRsList extends AntreanUmumRs
         // keluhan_awal
 
         // webusers_id
+
+        // Petugas
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1874,6 +2065,10 @@ class AntreanUmumRsList extends AntreanUmumRs
             }
             $this->webusers_id->ViewCustomAttributes = "";
 
+            // Petugas
+            $this->Petugas->ViewValue = $this->Petugas->CurrentValue;
+            $this->Petugas->ViewCustomAttributes = "";
+
             // nomor_antrean
             $this->nomor_antrean->LinkCustomAttributes = "";
             $this->nomor_antrean->HrefValue = "";
@@ -1899,10 +2094,13 @@ class AntreanUmumRsList extends AntreanUmumRs
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
 
-            // webusers_id
-            $this->webusers_id->LinkCustomAttributes = "";
-            $this->webusers_id->HrefValue = "";
-            $this->webusers_id->TooltipValue = "";
+            // Petugas
+            $this->Petugas->LinkCustomAttributes = "";
+            $this->Petugas->HrefValue = "";
+            $this->Petugas->TooltipValue = "";
+            if (!$this->isExport()) {
+                $this->Petugas->ViewValue = $this->highlightValue($this->Petugas);
+            }
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
             // nomor_antrean
             $this->nomor_antrean->EditAttrs["class"] = "form-control";
@@ -1993,10 +2191,14 @@ class AntreanUmumRsList extends AntreanUmumRs
             $this->status->EditValue = $this->status->options(false);
             $this->status->PlaceHolder = RemoveHtml($this->status->caption());
 
-            // webusers_id
-            $this->webusers_id->EditAttrs["class"] = "form-control";
-            $this->webusers_id->EditCustomAttributes = "";
-            $this->webusers_id->PlaceHolder = RemoveHtml($this->webusers_id->caption());
+            // Petugas
+            $this->Petugas->EditAttrs["class"] = "form-control";
+            $this->Petugas->EditCustomAttributes = "";
+            if (!$this->Petugas->Raw) {
+                $this->Petugas->AdvancedSearch->SearchValue = HtmlDecode($this->Petugas->AdvancedSearch->SearchValue);
+            }
+            $this->Petugas->EditValue = HtmlEncode($this->Petugas->AdvancedSearch->SearchValue);
+            $this->Petugas->PlaceHolder = RemoveHtml($this->Petugas->caption());
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();

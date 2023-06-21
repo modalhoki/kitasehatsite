@@ -484,6 +484,7 @@ class AntreanBpjsRsEdit extends AntreanBpjsRs
         $this->status->setVisibility();
         $this->keluhan_awal->setVisibility();
         $this->webusers_id->setVisibility();
+        $this->Petugas->Visible = false;
         $this->hideFieldsForAddEdit();
         $this->pasien_id->Required = false;
         $this->fasilitas_id->Required = false;
@@ -832,6 +833,7 @@ class AntreanBpjsRsEdit extends AntreanBpjsRs
         $this->status->setDbValue($row['status']);
         $this->keluhan_awal->setDbValue($row['keluhan_awal']);
         $this->webusers_id->setDbValue($row['webusers_id']);
+        $this->Petugas->setDbValue($row['Petugas']);
     }
 
     // Return a row with default values
@@ -847,6 +849,7 @@ class AntreanBpjsRsEdit extends AntreanBpjsRs
         $row['status'] = null;
         $row['keluhan_awal'] = null;
         $row['webusers_id'] = null;
+        $row['Petugas'] = null;
         return $row;
     }
 
@@ -895,6 +898,8 @@ class AntreanBpjsRsEdit extends AntreanBpjsRs
         // keluhan_awal
 
         // webusers_id
+
+        // Petugas
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1010,6 +1015,10 @@ class AntreanBpjsRsEdit extends AntreanBpjsRs
                 $this->webusers_id->ViewValue = null;
             }
             $this->webusers_id->ViewCustomAttributes = "";
+
+            // Petugas
+            $this->Petugas->ViewValue = $this->Petugas->CurrentValue;
+            $this->Petugas->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";

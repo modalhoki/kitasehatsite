@@ -1438,6 +1438,9 @@
         <phrase id="fldcaption" value="Keluhan Awal" />
       </field>
       <field id="webusers_id">
+        <phrase id="fldcaption" value="Tanda Tangan" />
+      </field>
+      <field id="petugas">
         <phrase id="fldcaption" value="Petugas" />
       </field>
     </table>
@@ -1476,6 +1479,9 @@
         <phrase id="fldcaption" value="Keluhan Awal" />
       </field>
       <field id="webusers_id">
+        <phrase id="fldcaption" value="Tanda Tangan" />
+      </field>
+      <field id="petugas">
         <phrase id="fldcaption" value="Petugas" />
       </field>
     </table>
