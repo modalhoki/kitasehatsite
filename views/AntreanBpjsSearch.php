@@ -24,7 +24,7 @@ loadjs.ready("head", function () {
     fantrean_bpjssearch.addFields([
         ["id", [ew.Validators.integer], fields.id.isInvalid],
         ["nomor_antrean", [ew.Validators.integer], fields.nomor_antrean.isInvalid],
-        ["waktu", [ew.Validators.datetime(0)], fields.waktu.isInvalid],
+        ["waktu", [ew.Validators.datetime(1)], fields.waktu.isInvalid],
         ["pasien_id", [], fields.pasien_id.isInvalid],
         ["fasilitas_id", [], fields.fasilitas_id.isInvalid],
         ["rumah_sakit_id", [ew.Validators.integer], fields.rumah_sakit_id.isInvalid],
@@ -137,12 +137,12 @@ $Page->showMessage();
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->waktu->cellAttributes() ?>>
             <span id="el_antrean_bpjs_waktu" class="ew-search-field ew-search-field-single">
-<input type="<?= $Page->waktu->getInputTextType() ?>" data-table="antrean_bpjs" data-field="x_waktu" name="x_waktu" id="x_waktu" placeholder="<?= HtmlEncode($Page->waktu->getPlaceHolder()) ?>" value="<?= $Page->waktu->EditValue ?>"<?= $Page->waktu->editAttributes() ?>>
+<input type="<?= $Page->waktu->getInputTextType() ?>" data-table="antrean_bpjs" data-field="x_waktu" data-format="1" name="x_waktu" id="x_waktu" placeholder="<?= HtmlEncode($Page->waktu->getPlaceHolder()) ?>" value="<?= $Page->waktu->EditValue ?>"<?= $Page->waktu->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->waktu->getErrorMessage(false) ?></div>
 <?php if (!$Page->waktu->ReadOnly && !$Page->waktu->Disabled && !isset($Page->waktu->EditAttrs["readonly"]) && !isset($Page->waktu->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fantrean_bpjssearch", "datetimepicker"], function() {
-    ew.createDateTimePicker("fantrean_bpjssearch", "x_waktu", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+    ew.createDateTimePicker("fantrean_bpjssearch", "x_waktu", {"ignoreReadonly":true,"useCurrent":false,"format":1});
 });
 </script>
 <?php } ?>

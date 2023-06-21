@@ -800,7 +800,7 @@ class AntreanBpjsView extends AntreanBpjs
 
             // waktu
             $this->waktu->ViewValue = $this->waktu->CurrentValue;
-            $this->waktu->ViewValue = FormatDateTime($this->waktu->ViewValue, 0);
+            $this->waktu->ViewValue = FormatDateTime($this->waktu->ViewValue, 1);
             $this->waktu->ViewCustomAttributes = "";
 
             // pasien_id

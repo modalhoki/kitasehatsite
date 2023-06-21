@@ -697,7 +697,7 @@ class AntreanUmumRsEdit extends AntreanUmumRs
             } else {
                 $this->waktu->setFormValue($val);
             }
-            $this->waktu->CurrentValue = UnFormatDateTime($this->waktu->CurrentValue, 0);
+            $this->waktu->CurrentValue = UnFormatDateTime($this->waktu->CurrentValue, 1);
         }
 
         // Check field name 'pasien_id' first before field var 'x_pasien_id'
@@ -768,7 +768,7 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         $this->id->CurrentValue = $this->id->FormValue;
         $this->nomor_antrean->CurrentValue = $this->nomor_antrean->FormValue;
         $this->waktu->CurrentValue = $this->waktu->FormValue;
-        $this->waktu->CurrentValue = UnFormatDateTime($this->waktu->CurrentValue, 0);
+        $this->waktu->CurrentValue = UnFormatDateTime($this->waktu->CurrentValue, 1);
         $this->pasien_id->CurrentValue = $this->pasien_id->FormValue;
         $this->fasilitas_id->CurrentValue = $this->fasilitas_id->FormValue;
         $this->rumah_sakit_id->CurrentValue = $this->rumah_sakit_id->FormValue;
@@ -912,7 +912,7 @@ class AntreanUmumRsEdit extends AntreanUmumRs
 
             // waktu
             $this->waktu->ViewValue = $this->waktu->CurrentValue;
-            $this->waktu->ViewValue = FormatDateTime($this->waktu->ViewValue, 0);
+            $this->waktu->ViewValue = FormatDateTime($this->waktu->ViewValue, 1);
             $this->waktu->ViewCustomAttributes = "";
 
             // pasien_id
@@ -1081,7 +1081,7 @@ class AntreanUmumRsEdit extends AntreanUmumRs
             $this->waktu->EditAttrs["class"] = "form-control";
             $this->waktu->EditCustomAttributes = "";
             $this->waktu->EditValue = $this->waktu->CurrentValue;
-            $this->waktu->EditValue = FormatDateTime($this->waktu->EditValue, 0);
+            $this->waktu->EditValue = FormatDateTime($this->waktu->EditValue, 1);
             $this->waktu->ViewCustomAttributes = "";
 
             // pasien_id

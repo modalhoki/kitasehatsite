@@ -100,7 +100,7 @@ class AntreanBpjsRs extends DbTable
         $this->Fields['nomor_antrean'] = &$this->nomor_antrean;
 
         // waktu
-        $this->waktu = new DbField('antrean_bpjs_rs', 'antrean_bpjs_rs', 'x_waktu', 'waktu', '`waktu`', CastDateFieldForLike("`waktu`", 0, "DB"), 135, 19, 0, false, '`waktu`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->waktu = new DbField('antrean_bpjs_rs', 'antrean_bpjs_rs', 'x_waktu', 'waktu', '`waktu`', CastDateFieldForLike("`waktu`", 1, "DB"), 135, 19, 1, false, '`waktu`', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->waktu->Sortable = true; // Allow sort
         $this->waktu->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->waktu->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->waktu->Param, "CustomMsg");
@@ -979,7 +979,7 @@ SORTHTML;
 
         // waktu
         $this->waktu->ViewValue = $this->waktu->CurrentValue;
-        $this->waktu->ViewValue = FormatDateTime($this->waktu->ViewValue, 0);
+        $this->waktu->ViewValue = FormatDateTime($this->waktu->ViewValue, 1);
         $this->waktu->ViewCustomAttributes = "";
 
         // pasien_id
@@ -1169,7 +1169,7 @@ SORTHTML;
         $this->waktu->EditAttrs["class"] = "form-control";
         $this->waktu->EditCustomAttributes = "";
         $this->waktu->EditValue = $this->waktu->CurrentValue;
-        $this->waktu->EditValue = FormatDateTime($this->waktu->EditValue, 0);
+        $this->waktu->EditValue = FormatDateTime($this->waktu->EditValue, 1);
         $this->waktu->ViewCustomAttributes = "";
 
         // pasien_id

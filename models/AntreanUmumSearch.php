@@ -717,7 +717,7 @@ class AntreanUmumSearch extends AntreanUmum
 
             // waktu
             $this->waktu->ViewValue = $this->waktu->CurrentValue;
-            $this->waktu->ViewValue = FormatDateTime($this->waktu->ViewValue, 0);
+            $this->waktu->ViewValue = FormatDateTime($this->waktu->ViewValue, 1);
             $this->waktu->ViewCustomAttributes = "";
 
             // pasien_id
@@ -877,7 +877,7 @@ class AntreanUmumSearch extends AntreanUmum
             // waktu
             $this->waktu->EditAttrs["class"] = "form-control";
             $this->waktu->EditCustomAttributes = "";
-            $this->waktu->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->waktu->AdvancedSearch->SearchValue, 0), 8));
+            $this->waktu->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->waktu->AdvancedSearch->SearchValue, 1), 8));
             $this->waktu->PlaceHolder = RemoveHtml($this->waktu->caption());
 
             // pasien_id
