@@ -584,6 +584,7 @@ class AntreanBpjsList extends AntreanBpjs
         $this->rumah_sakit_id->setVisibility();
         $this->status->setVisibility();
         $this->keluhan_awal->Visible = false;
+        $this->webusers_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -614,6 +615,7 @@ class AntreanBpjsList extends AntreanBpjs
         $this->setupLookupOptions($this->pasien_id);
         $this->setupLookupOptions($this->fasilitas_id);
         $this->setupLookupOptions($this->rumah_sakit_id);
+        $this->setupLookupOptions($this->webusers_id);
 
         // Search filters
         $srchAdvanced = ""; // Advanced search filter
@@ -899,6 +901,7 @@ class AntreanBpjsList extends AntreanBpjs
         $filterList = Concat($filterList, $this->rumah_sakit_id->AdvancedSearch->toJson(), ","); // Field rumah_sakit_id
         $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         $filterList = Concat($filterList, $this->keluhan_awal->AdvancedSearch->toJson(), ","); // Field keluhan_awal
+        $filterList = Concat($filterList, $this->webusers_id->AdvancedSearch->toJson(), ","); // Field webusers_id
 
         // Return filter list in JSON
         if ($filterList != "") {
@@ -998,6 +1001,14 @@ class AntreanBpjsList extends AntreanBpjs
         $this->keluhan_awal->AdvancedSearch->SearchValue2 = @$filter["y_keluhan_awal"];
         $this->keluhan_awal->AdvancedSearch->SearchOperator2 = @$filter["w_keluhan_awal"];
         $this->keluhan_awal->AdvancedSearch->save();
+
+        // Field webusers_id
+        $this->webusers_id->AdvancedSearch->SearchValue = @$filter["x_webusers_id"];
+        $this->webusers_id->AdvancedSearch->SearchOperator = @$filter["z_webusers_id"];
+        $this->webusers_id->AdvancedSearch->SearchCondition = @$filter["v_webusers_id"];
+        $this->webusers_id->AdvancedSearch->SearchValue2 = @$filter["y_webusers_id"];
+        $this->webusers_id->AdvancedSearch->SearchOperator2 = @$filter["w_webusers_id"];
+        $this->webusers_id->AdvancedSearch->save();
     }
 
     // Advanced search WHERE clause based on QueryString
@@ -1016,6 +1027,7 @@ class AntreanBpjsList extends AntreanBpjs
         $this->buildSearchSql($where, $this->rumah_sakit_id, $default, false); // rumah_sakit_id
         $this->buildSearchSql($where, $this->status, $default, false); // status
         $this->buildSearchSql($where, $this->keluhan_awal, $default, false); // keluhan_awal
+        $this->buildSearchSql($where, $this->webusers_id, $default, false); // webusers_id
 
         // Set up search parm
         if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
@@ -1030,6 +1042,7 @@ class AntreanBpjsList extends AntreanBpjs
             $this->rumah_sakit_id->AdvancedSearch->save(); // rumah_sakit_id
             $this->status->AdvancedSearch->save(); // status
             $this->keluhan_awal->AdvancedSearch->save(); // keluhan_awal
+            $this->webusers_id->AdvancedSearch->save(); // webusers_id
         }
         return $where;
     }
@@ -1122,6 +1135,9 @@ class AntreanBpjsList extends AntreanBpjs
         if ($this->keluhan_awal->AdvancedSearch->issetSession()) {
             return true;
         }
+        if ($this->webusers_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
         return false;
     }
 
@@ -1153,6 +1169,7 @@ class AntreanBpjsList extends AntreanBpjs
                 $this->rumah_sakit_id->AdvancedSearch->unsetSession();
                 $this->status->AdvancedSearch->unsetSession();
                 $this->keluhan_awal->AdvancedSearch->unsetSession();
+                $this->webusers_id->AdvancedSearch->unsetSession();
     }
 
     // Restore all search parameters
@@ -1169,6 +1186,7 @@ class AntreanBpjsList extends AntreanBpjs
                 $this->rumah_sakit_id->AdvancedSearch->load();
                 $this->status->AdvancedSearch->load();
                 $this->keluhan_awal->AdvancedSearch->load();
+                $this->webusers_id->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -1184,6 +1202,7 @@ class AntreanBpjsList extends AntreanBpjs
             $this->updateSort($this->fasilitas_id); // fasilitas_id
             $this->updateSort($this->rumah_sakit_id); // rumah_sakit_id
             $this->updateSort($this->status); // status
+            $this->updateSort($this->webusers_id); // webusers_id
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1235,6 +1254,7 @@ class AntreanBpjsList extends AntreanBpjs
                 $this->rumah_sakit_id->setSort("");
                 $this->status->setSort("");
                 $this->keluhan_awal->setSort("");
+                $this->webusers_id->setSort("");
             }
 
             // Reset start position
@@ -1598,6 +1618,14 @@ class AntreanBpjsList extends AntreanBpjs
                 $this->Command = "search";
             }
         }
+
+        // webusers_id
+        if (!$this->isAddOrEdit() && $this->webusers_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->webusers_id->AdvancedSearch->SearchValue != "" || $this->webusers_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
         return $hasValue;
     }
 
@@ -1677,6 +1705,7 @@ class AntreanBpjsList extends AntreanBpjs
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
         $this->status->setDbValue($row['status']);
         $this->keluhan_awal->setDbValue($row['keluhan_awal']);
+        $this->webusers_id->setDbValue($row['webusers_id']);
     }
 
     // Return a row with default values
@@ -1691,6 +1720,7 @@ class AntreanBpjsList extends AntreanBpjs
         $row['rumah_sakit_id'] = null;
         $row['status'] = null;
         $row['keluhan_awal'] = null;
+        $row['webusers_id'] = null;
         return $row;
     }
 
@@ -1743,6 +1773,8 @@ class AntreanBpjsList extends AntreanBpjs
         // status
 
         // keluhan_awal
+
+        // webusers_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1834,6 +1866,31 @@ class AntreanBpjsList extends AntreanBpjs
             $this->keluhan_awal->ViewValue = $this->keluhan_awal->CurrentValue;
             $this->keluhan_awal->ViewCustomAttributes = "";
 
+            // webusers_id
+            $curVal = trim(strval($this->webusers_id->CurrentValue));
+            if ($curVal != "") {
+                $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
+                if ($this->webusers_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $lookupFilter = function() {
+                        return "`id` = ".CurrentUserID();
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->webusers_id->ViewValue = $this->webusers_id->displayValue($arwrk);
+                    } else {
+                        $this->webusers_id->ViewValue = $this->webusers_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->webusers_id->ViewValue = null;
+            }
+            $this->webusers_id->ViewCustomAttributes = "";
+
             // nomor_antrean
             $this->nomor_antrean->LinkCustomAttributes = "";
             $this->nomor_antrean->HrefValue = "";
@@ -1863,6 +1920,11 @@ class AntreanBpjsList extends AntreanBpjs
             $this->status->LinkCustomAttributes = "";
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
+
+            // webusers_id
+            $this->webusers_id->LinkCustomAttributes = "";
+            $this->webusers_id->HrefValue = "";
+            $this->webusers_id->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
             // nomor_antrean
             $this->nomor_antrean->EditAttrs["class"] = "form-control";
@@ -1954,6 +2016,11 @@ class AntreanBpjsList extends AntreanBpjs
             $this->status->EditCustomAttributes = "";
             $this->status->EditValue = $this->status->options(false);
             $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
+            // webusers_id
+            $this->webusers_id->EditAttrs["class"] = "form-control";
+            $this->webusers_id->EditCustomAttributes = "";
+            $this->webusers_id->PlaceHolder = RemoveHtml($this->webusers_id->caption());
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1996,6 +2063,7 @@ class AntreanBpjsList extends AntreanBpjs
         $this->rumah_sakit_id->AdvancedSearch->load();
         $this->status->AdvancedSearch->load();
         $this->keluhan_awal->AdvancedSearch->load();
+        $this->webusers_id->AdvancedSearch->load();
     }
 
     // Set up search options
@@ -2081,6 +2149,12 @@ class AntreanBpjsList extends AntreanBpjs
                 case "x_rumah_sakit_id":
                     break;
                 case "x_status":
+                    break;
+                case "x_webusers_id":
+                    $lookupFilter = function () {
+                        return "`id` = ".CurrentUserID();
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 default:
                     $lookupFilter = "";

@@ -44,6 +44,7 @@ class AntreanBpjs extends DbTable
     public $rumah_sakit_id;
     public $status;
     public $keluhan_awal;
+    public $webusers_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -155,6 +156,18 @@ class AntreanBpjs extends DbTable
         $this->keluhan_awal->Sortable = true; // Allow sort
         $this->keluhan_awal->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->keluhan_awal->Param, "CustomMsg");
         $this->Fields['keluhan_awal'] = &$this->keluhan_awal;
+
+        // webusers_id
+        $this->webusers_id = new DbField('antrean_bpjs', 'antrean_bpjs', 'x_webusers_id', 'webusers_id', '`webusers_id`', '`webusers_id`', 20, 20, -1, false, '`webusers_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->webusers_id->Nullable = false; // NOT NULL field
+        $this->webusers_id->Required = true; // Required field
+        $this->webusers_id->Sortable = true; // Allow sort
+        $this->webusers_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->webusers_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->webusers_id->Lookup = new Lookup('webusers_id', 'webusers', false, 'id', ["username","","",""], [], [], [], [], [], [], '', '');
+        $this->webusers_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->webusers_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->webusers_id->Param, "CustomMsg");
+        $this->Fields['webusers_id'] = &$this->webusers_id;
     }
 
     // Field Visibility
@@ -584,6 +597,7 @@ class AntreanBpjs extends DbTable
         $this->rumah_sakit_id->DbValue = $row['rumah_sakit_id'];
         $this->status->DbValue = $row['status'];
         $this->keluhan_awal->DbValue = $row['keluhan_awal'];
+        $this->webusers_id->DbValue = $row['webusers_id'];
     }
 
     // Delete uploaded files
@@ -912,6 +926,7 @@ SORTHTML;
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
         $this->status->setDbValue($row['status']);
         $this->keluhan_awal->setDbValue($row['keluhan_awal']);
+        $this->webusers_id->setDbValue($row['webusers_id']);
     }
 
     // Render list row values
@@ -939,6 +954,8 @@ SORTHTML;
         // status
 
         // keluhan_awal
+
+        // webusers_id
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1030,6 +1047,31 @@ SORTHTML;
         $this->keluhan_awal->ViewValue = $this->keluhan_awal->CurrentValue;
         $this->keluhan_awal->ViewCustomAttributes = "";
 
+        // webusers_id
+        $curVal = trim(strval($this->webusers_id->CurrentValue));
+        if ($curVal != "") {
+            $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
+            if ($this->webusers_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $lookupFilter = function() {
+                    return "`id` = ".CurrentUserID();
+                };
+                $lookupFilter = $lookupFilter->bindTo($this);
+                $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->webusers_id->ViewValue = $this->webusers_id->displayValue($arwrk);
+                } else {
+                    $this->webusers_id->ViewValue = $this->webusers_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->webusers_id->ViewValue = null;
+        }
+        $this->webusers_id->ViewCustomAttributes = "";
+
         // id
         $this->id->LinkCustomAttributes = "";
         $this->id->HrefValue = "";
@@ -1069,6 +1111,11 @@ SORTHTML;
         $this->keluhan_awal->LinkCustomAttributes = "";
         $this->keluhan_awal->HrefValue = "";
         $this->keluhan_awal->TooltipValue = "";
+
+        // webusers_id
+        $this->webusers_id->LinkCustomAttributes = "";
+        $this->webusers_id->HrefValue = "";
+        $this->webusers_id->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1186,6 +1233,11 @@ SORTHTML;
         $this->keluhan_awal->EditValue = $this->keluhan_awal->CurrentValue;
         $this->keluhan_awal->ViewCustomAttributes = "";
 
+        // webusers_id
+        $this->webusers_id->EditAttrs["class"] = "form-control";
+        $this->webusers_id->EditCustomAttributes = "";
+        $this->webusers_id->PlaceHolder = RemoveHtml($this->webusers_id->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1222,6 +1274,7 @@ SORTHTML;
                     $doc->exportCaption($this->rumah_sakit_id);
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->keluhan_awal);
+                    $doc->exportCaption($this->webusers_id);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->nomor_antrean);
@@ -1231,6 +1284,7 @@ SORTHTML;
                     $doc->exportCaption($this->rumah_sakit_id);
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->keluhan_awal);
+                    $doc->exportCaption($this->webusers_id);
                 }
                 $doc->endExportRow();
             }
@@ -1268,6 +1322,7 @@ SORTHTML;
                         $doc->exportField($this->rumah_sakit_id);
                         $doc->exportField($this->status);
                         $doc->exportField($this->keluhan_awal);
+                        $doc->exportField($this->webusers_id);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->nomor_antrean);
@@ -1277,6 +1332,7 @@ SORTHTML;
                         $doc->exportField($this->rumah_sakit_id);
                         $doc->exportField($this->status);
                         $doc->exportField($this->keluhan_awal);
+                        $doc->exportField($this->webusers_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1425,8 +1481,8 @@ SORTHTML;
         //Log("Row Updated");
         $waktu = $rsold['waktu'];
         $insert_data_durasi = ExecuteQuery("
-        	Insert into data_durasi (waktu_daftar)
-        	values (date(\"".$waktu."\"));
+        	Insert into data_durasi (waktu_daftar, jalur)
+        	values (date(\"".$waktu."\"), \"BPJS\");
         ");
     }
 

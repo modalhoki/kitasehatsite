@@ -572,6 +572,7 @@ class DataDurasiList extends DataDurasi
         $this->waktu_daftar->setVisibility();
         $this->waktu_edit->setVisibility();
         $this->durasi->setVisibility();
+        $this->jalur->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -815,6 +816,7 @@ class DataDurasiList extends DataDurasi
             $this->updateSort($this->waktu_daftar); // waktu_daftar
             $this->updateSort($this->waktu_edit); // waktu_edit
             $this->updateSort($this->durasi); // durasi
+            $this->updateSort($this->jalur); // jalur
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -853,6 +855,7 @@ class DataDurasiList extends DataDurasi
                 $this->waktu_daftar->setSort("");
                 $this->waktu_edit->setSort("");
                 $this->durasi->setSort("");
+                $this->jalur->setSort("");
             }
 
             // Reset start position
@@ -1226,6 +1229,7 @@ class DataDurasiList extends DataDurasi
         $this->waktu_daftar->setDbValue($row['waktu_daftar']);
         $this->waktu_edit->setDbValue($row['waktu_edit']);
         $this->durasi->setDbValue($row['durasi']);
+        $this->jalur->setDbValue($row['jalur']);
     }
 
     // Return a row with default values
@@ -1236,6 +1240,7 @@ class DataDurasiList extends DataDurasi
         $row['waktu_daftar'] = null;
         $row['waktu_edit'] = null;
         $row['durasi'] = null;
+        $row['jalur'] = null;
         return $row;
     }
 
@@ -1280,6 +1285,8 @@ class DataDurasiList extends DataDurasi
         // waktu_edit
 
         // durasi
+
+        // jalur
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1300,6 +1307,14 @@ class DataDurasiList extends DataDurasi
             $this->durasi->ViewValue = FormatNumber($this->durasi->ViewValue, 0, -2, -2, -2);
             $this->durasi->ViewCustomAttributes = "";
 
+            // jalur
+            if (strval($this->jalur->CurrentValue) != "") {
+                $this->jalur->ViewValue = $this->jalur->optionCaption($this->jalur->CurrentValue);
+            } else {
+                $this->jalur->ViewValue = null;
+            }
+            $this->jalur->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -1319,6 +1334,11 @@ class DataDurasiList extends DataDurasi
             $this->durasi->LinkCustomAttributes = "";
             $this->durasi->HrefValue = "";
             $this->durasi->TooltipValue = "";
+
+            // jalur
+            $this->jalur->LinkCustomAttributes = "";
+            $this->jalur->HrefValue = "";
+            $this->jalur->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1378,6 +1398,8 @@ class DataDurasiList extends DataDurasi
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_jalur":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

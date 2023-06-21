@@ -32,6 +32,7 @@ class DataDurasi extends DbTable
     public $waktu_daftar;
     public $waktu_edit;
     public $durasi;
+    public $jalur;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -97,6 +98,16 @@ class DataDurasi extends DbTable
         $this->durasi->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->durasi->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->durasi->Param, "CustomMsg");
         $this->Fields['durasi'] = &$this->durasi;
+
+        // jalur
+        $this->jalur = new DbField('data_durasi', 'data_durasi', 'x_jalur', 'jalur', '`jalur`', '`jalur`', 202, 4, -1, false, '`jalur`', false, false, false, 'FORMATTED TEXT', 'RADIO');
+        $this->jalur->Nullable = false; // NOT NULL field
+        $this->jalur->Required = true; // Required field
+        $this->jalur->Sortable = true; // Allow sort
+        $this->jalur->Lookup = new Lookup('jalur', 'data_durasi', false, '', ["","","",""], [], [], [], [], [], [], '', '');
+        $this->jalur->OptionCount = 2;
+        $this->jalur->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->jalur->Param, "CustomMsg");
+        $this->Fields['jalur'] = &$this->jalur;
     }
 
     // Field Visibility
@@ -514,6 +525,7 @@ class DataDurasi extends DbTable
         $this->waktu_daftar->DbValue = $row['waktu_daftar'];
         $this->waktu_edit->DbValue = $row['waktu_edit'];
         $this->durasi->DbValue = $row['durasi'];
+        $this->jalur->DbValue = $row['jalur'];
     }
 
     // Delete uploaded files
@@ -838,6 +850,7 @@ SORTHTML;
         $this->waktu_daftar->setDbValue($row['waktu_daftar']);
         $this->waktu_edit->setDbValue($row['waktu_edit']);
         $this->durasi->setDbValue($row['durasi']);
+        $this->jalur->setDbValue($row['jalur']);
     }
 
     // Render list row values
@@ -858,6 +871,8 @@ SORTHTML;
 
         // durasi
 
+        // jalur
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
         $this->id->ViewCustomAttributes = "";
@@ -876,6 +891,14 @@ SORTHTML;
         $this->durasi->ViewValue = $this->durasi->CurrentValue;
         $this->durasi->ViewValue = FormatNumber($this->durasi->ViewValue, 0, -2, -2, -2);
         $this->durasi->ViewCustomAttributes = "";
+
+        // jalur
+        if (strval($this->jalur->CurrentValue) != "") {
+            $this->jalur->ViewValue = $this->jalur->optionCaption($this->jalur->CurrentValue);
+        } else {
+            $this->jalur->ViewValue = null;
+        }
+        $this->jalur->ViewCustomAttributes = "";
 
         // id
         $this->id->LinkCustomAttributes = "";
@@ -896,6 +919,11 @@ SORTHTML;
         $this->durasi->LinkCustomAttributes = "";
         $this->durasi->HrefValue = "";
         $this->durasi->TooltipValue = "";
+
+        // jalur
+        $this->jalur->LinkCustomAttributes = "";
+        $this->jalur->HrefValue = "";
+        $this->jalur->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -936,6 +964,11 @@ SORTHTML;
         $this->durasi->EditValue = $this->durasi->CurrentValue;
         $this->durasi->PlaceHolder = RemoveHtml($this->durasi->caption());
 
+        // jalur
+        $this->jalur->EditCustomAttributes = "";
+        $this->jalur->EditValue = $this->jalur->options(false);
+        $this->jalur->PlaceHolder = RemoveHtml($this->jalur->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -968,11 +1001,13 @@ SORTHTML;
                     $doc->exportCaption($this->waktu_daftar);
                     $doc->exportCaption($this->waktu_edit);
                     $doc->exportCaption($this->durasi);
+                    $doc->exportCaption($this->jalur);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->waktu_daftar);
                     $doc->exportCaption($this->waktu_edit);
                     $doc->exportCaption($this->durasi);
+                    $doc->exportCaption($this->jalur);
                 }
                 $doc->endExportRow();
             }
@@ -1006,11 +1041,13 @@ SORTHTML;
                         $doc->exportField($this->waktu_daftar);
                         $doc->exportField($this->waktu_edit);
                         $doc->exportField($this->durasi);
+                        $doc->exportField($this->jalur);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->waktu_daftar);
                         $doc->exportField($this->waktu_edit);
                         $doc->exportField($this->durasi);
+                        $doc->exportField($this->jalur);
                     }
                     $doc->endExportRow($rowCnt);
                 }

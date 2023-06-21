@@ -534,6 +534,7 @@ class AntreanBpjsView extends AntreanBpjs
         $this->rumah_sakit_id->setVisibility();
         $this->status->setVisibility();
         $this->keluhan_awal->setVisibility();
+        $this->webusers_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -551,6 +552,7 @@ class AntreanBpjsView extends AntreanBpjs
         $this->setupLookupOptions($this->pasien_id);
         $this->setupLookupOptions($this->fasilitas_id);
         $this->setupLookupOptions($this->rumah_sakit_id);
+        $this->setupLookupOptions($this->webusers_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -732,6 +734,7 @@ class AntreanBpjsView extends AntreanBpjs
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
         $this->status->setDbValue($row['status']);
         $this->keluhan_awal->setDbValue($row['keluhan_awal']);
+        $this->webusers_id->setDbValue($row['webusers_id']);
     }
 
     // Return a row with default values
@@ -746,6 +749,7 @@ class AntreanBpjsView extends AntreanBpjs
         $row['rumah_sakit_id'] = null;
         $row['status'] = null;
         $row['keluhan_awal'] = null;
+        $row['webusers_id'] = null;
         return $row;
     }
 
@@ -782,6 +786,8 @@ class AntreanBpjsView extends AntreanBpjs
         // status
 
         // keluhan_awal
+
+        // webusers_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -873,6 +879,31 @@ class AntreanBpjsView extends AntreanBpjs
             $this->keluhan_awal->ViewValue = $this->keluhan_awal->CurrentValue;
             $this->keluhan_awal->ViewCustomAttributes = "";
 
+            // webusers_id
+            $curVal = trim(strval($this->webusers_id->CurrentValue));
+            if ($curVal != "") {
+                $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
+                if ($this->webusers_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $lookupFilter = function() {
+                        return "`id` = ".CurrentUserID();
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->webusers_id->ViewValue = $this->webusers_id->displayValue($arwrk);
+                    } else {
+                        $this->webusers_id->ViewValue = $this->webusers_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->webusers_id->ViewValue = null;
+            }
+            $this->webusers_id->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -912,6 +943,11 @@ class AntreanBpjsView extends AntreanBpjs
             $this->keluhan_awal->LinkCustomAttributes = "";
             $this->keluhan_awal->HrefValue = "";
             $this->keluhan_awal->TooltipValue = "";
+
+            // webusers_id
+            $this->webusers_id->LinkCustomAttributes = "";
+            $this->webusers_id->HrefValue = "";
+            $this->webusers_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -951,6 +987,12 @@ class AntreanBpjsView extends AntreanBpjs
                 case "x_rumah_sakit_id":
                     break;
                 case "x_status":
+                    break;
+                case "x_webusers_id":
+                    $lookupFilter = function () {
+                        return "`id` = ".CurrentUserID();
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 default:
                     $lookupFilter = "";

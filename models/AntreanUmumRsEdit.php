@@ -483,6 +483,7 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         $this->rumah_sakit_id->setVisibility();
         $this->status->setVisibility();
         $this->keluhan_awal->setVisibility();
+        $this->webusers_id->setVisibility();
         $this->hideFieldsForAddEdit();
         $this->pasien_id->Required = false;
         $this->fasilitas_id->Required = false;
@@ -504,6 +505,7 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         $this->setupLookupOptions($this->pasien_id);
         $this->setupLookupOptions($this->fasilitas_id);
         $this->setupLookupOptions($this->rumah_sakit_id);
+        $this->setupLookupOptions($this->webusers_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -746,6 +748,16 @@ class AntreanUmumRsEdit extends AntreanUmumRs
                 $this->keluhan_awal->setFormValue($val);
             }
         }
+
+        // Check field name 'webusers_id' first before field var 'x_webusers_id'
+        $val = $CurrentForm->hasValue("webusers_id") ? $CurrentForm->getValue("webusers_id") : $CurrentForm->getValue("x_webusers_id");
+        if (!$this->webusers_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->webusers_id->Visible = false; // Disable update for API request
+            } else {
+                $this->webusers_id->setFormValue($val);
+            }
+        }
     }
 
     // Restore form values
@@ -761,6 +773,7 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         $this->rumah_sakit_id->CurrentValue = $this->rumah_sakit_id->FormValue;
         $this->status->CurrentValue = $this->status->FormValue;
         $this->keluhan_awal->CurrentValue = $this->keluhan_awal->FormValue;
+        $this->webusers_id->CurrentValue = $this->webusers_id->FormValue;
     }
 
     /**
@@ -818,6 +831,7 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         $this->rumah_sakit_id->setDbValue($row['rumah_sakit_id']);
         $this->status->setDbValue($row['status']);
         $this->keluhan_awal->setDbValue($row['keluhan_awal']);
+        $this->webusers_id->setDbValue($row['webusers_id']);
     }
 
     // Return a row with default values
@@ -832,6 +846,7 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         $row['rumah_sakit_id'] = null;
         $row['status'] = null;
         $row['keluhan_awal'] = null;
+        $row['webusers_id'] = null;
         return $row;
     }
 
@@ -878,6 +893,8 @@ class AntreanUmumRsEdit extends AntreanUmumRs
         // status
 
         // keluhan_awal
+
+        // webusers_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -972,6 +989,31 @@ class AntreanUmumRsEdit extends AntreanUmumRs
             $this->keluhan_awal->ViewValue = $this->keluhan_awal->CurrentValue;
             $this->keluhan_awal->ViewCustomAttributes = "";
 
+            // webusers_id
+            $curVal = trim(strval($this->webusers_id->CurrentValue));
+            if ($curVal != "") {
+                $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
+                if ($this->webusers_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "`id`" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $lookupFilter = function() {
+                        return "`id` = ".CurrentUserID();
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->webusers_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->webusers_id->ViewValue = $this->webusers_id->displayValue($arwrk);
+                    } else {
+                        $this->webusers_id->ViewValue = $this->webusers_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->webusers_id->ViewValue = null;
+            }
+            $this->webusers_id->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -1011,6 +1053,11 @@ class AntreanUmumRsEdit extends AntreanUmumRs
             $this->keluhan_awal->LinkCustomAttributes = "";
             $this->keluhan_awal->HrefValue = "";
             $this->keluhan_awal->TooltipValue = "";
+
+            // webusers_id
+            $this->webusers_id->LinkCustomAttributes = "";
+            $this->webusers_id->HrefValue = "";
+            $this->webusers_id->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -1116,6 +1163,43 @@ class AntreanUmumRsEdit extends AntreanUmumRs
             $this->keluhan_awal->EditValue = $this->keluhan_awal->CurrentValue;
             $this->keluhan_awal->ViewCustomAttributes = "";
 
+            // webusers_id
+            $this->webusers_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->webusers_id->CurrentValue));
+            if ($curVal != "") {
+                $this->webusers_id->ViewValue = $this->webusers_id->lookupCacheOption($curVal);
+            } else {
+                $this->webusers_id->ViewValue = $this->webusers_id->Lookup !== null && is_array($this->webusers_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->webusers_id->ViewValue !== null) { // Load from cache
+                $this->webusers_id->EditValue = array_values($this->webusers_id->Lookup->Options);
+                if ($this->webusers_id->ViewValue == "") {
+                    $this->webusers_id->ViewValue = $Language->phrase("PleaseSelect");
+                }
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "`id`" . SearchString("=", $this->webusers_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $lookupFilter = function() {
+                    return "`id` = ".CurrentUserID();
+                };
+                $lookupFilter = $lookupFilter->bindTo($this);
+                $sqlWrk = $this->webusers_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->webusers_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->webusers_id->ViewValue = $this->webusers_id->displayValue($arwrk);
+                } else {
+                    $this->webusers_id->ViewValue = $Language->phrase("PleaseSelect");
+                }
+                $arwrk = $rswrk;
+                $this->webusers_id->EditValue = $arwrk;
+            }
+            $this->webusers_id->PlaceHolder = RemoveHtml($this->webusers_id->caption());
+
             // Edit refer script
 
             // id
@@ -1156,6 +1240,10 @@ class AntreanUmumRsEdit extends AntreanUmumRs
             $this->keluhan_awal->LinkCustomAttributes = "";
             $this->keluhan_awal->HrefValue = "";
             $this->keluhan_awal->TooltipValue = "";
+
+            // webusers_id
+            $this->webusers_id->LinkCustomAttributes = "";
+            $this->webusers_id->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1216,6 +1304,11 @@ class AntreanUmumRsEdit extends AntreanUmumRs
                 $this->keluhan_awal->addErrorMessage(str_replace("%s", $this->keluhan_awal->caption(), $this->keluhan_awal->RequiredErrorMessage));
             }
         }
+        if ($this->webusers_id->Required) {
+            if (!$this->webusers_id->IsDetailKey && EmptyValue($this->webusers_id->FormValue)) {
+                $this->webusers_id->addErrorMessage(str_replace("%s", $this->webusers_id->caption(), $this->webusers_id->RequiredErrorMessage));
+            }
+        }
 
         // Return validate result
         $validateForm = !$this->hasInvalidFields();
@@ -1250,6 +1343,9 @@ class AntreanUmumRsEdit extends AntreanUmumRs
 
             // status
             $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, "", $this->status->ReadOnly);
+
+            // webusers_id
+            $this->webusers_id->setDbValueDef($rsnew, $this->webusers_id->CurrentValue, 0, $this->webusers_id->ReadOnly);
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
@@ -1330,6 +1426,12 @@ class AntreanUmumRsEdit extends AntreanUmumRs
                 case "x_rumah_sakit_id":
                     break;
                 case "x_status":
+                    break;
+                case "x_webusers_id":
+                    $lookupFilter = function () {
+                        return "`id` = ".CurrentUserID();
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 default:
                     $lookupFilter = "";

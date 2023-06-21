@@ -77,6 +77,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->durasi->Visible) { // durasi ?>
         <th data-name="durasi" class="<?= $Page->durasi->headerCellClass() ?>"><div id="elh_data_durasi_durasi" class="data_durasi_durasi"><?= $Page->renderSort($Page->durasi) ?></div></th>
 <?php } ?>
+<?php if ($Page->jalur->Visible) { // jalur ?>
+        <th data-name="jalur" class="<?= $Page->jalur->headerCellClass() ?>"><div id="elh_data_durasi_jalur" class="data_durasi_jalur"><?= $Page->renderSort($Page->jalur) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -173,6 +176,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_data_durasi_durasi">
 <span<?= $Page->durasi->viewAttributes() ?>>
 <?= $Page->durasi->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->jalur->Visible) { // jalur ?>
+        <td data-name="jalur" <?= $Page->jalur->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_data_durasi_jalur">
+<span<?= $Page->jalur->viewAttributes() ?>>
+<?= $Page->jalur->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

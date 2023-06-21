@@ -31,7 +31,8 @@ loadjs.ready("head", function () {
         ["waktu", [], fields.waktu.isInvalid],
         ["pasien_id", [], fields.pasien_id.isInvalid],
         ["fasilitas_id", [ew.Validators.integer], fields.fasilitas_id.isInvalid],
-        ["status", [], fields.status.isInvalid]
+        ["status", [], fields.status.isInvalid],
+        ["webusers_id", [], fields.webusers_id.isInvalid]
     ]);
 
     // Set invalid fields
@@ -316,6 +317,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->status->Visible) { // status ?>
         <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_antrean_bpjs_rs_status" class="antrean_bpjs_rs_status"><?= $Page->renderSort($Page->status) ?></div></th>
 <?php } ?>
+<?php if ($Page->webusers_id->Visible) { // webusers_id ?>
+        <th data-name="webusers_id" class="<?= $Page->webusers_id->headerCellClass() ?>"><div id="elh_antrean_bpjs_rs_webusers_id" class="antrean_bpjs_rs_webusers_id"><?= $Page->renderSort($Page->webusers_id) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -420,6 +424,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_antrean_bpjs_rs_status">
 <span<?= $Page->status->viewAttributes() ?>>
 <?= $Page->status->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->webusers_id->Visible) { // webusers_id ?>
+        <td data-name="webusers_id" <?= $Page->webusers_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_antrean_bpjs_rs_webusers_id">
+<span<?= $Page->webusers_id->viewAttributes() ?>>
+<?= $Page->webusers_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -20,7 +20,8 @@ loadjs.ready("head", function () {
     if (!ew.vars.tables.data_durasi)
         ew.vars.tables.data_durasi = currentTable;
     fdata_durasiadd.addFields([
-        ["waktu_daftar", [fields.waktu_daftar.visible && fields.waktu_daftar.required ? ew.Validators.required(fields.waktu_daftar.caption) : null, ew.Validators.datetime(0)], fields.waktu_daftar.isInvalid]
+        ["waktu_daftar", [fields.waktu_daftar.visible && fields.waktu_daftar.required ? ew.Validators.required(fields.waktu_daftar.caption) : null, ew.Validators.datetime(0)], fields.waktu_daftar.isInvalid],
+        ["jalur", [fields.jalur.visible && fields.jalur.required ? ew.Validators.required(fields.jalur.caption) : null], fields.jalur.isInvalid]
     ]);
 
     // Set invalid fields
@@ -87,6 +88,7 @@ loadjs.ready("head", function () {
     fdata_durasiadd.validateRequired = <?= Config("CLIENT_VALIDATE") ? "true" : "false" ?>;
 
     // Dynamic selection lists
+    fdata_durasiadd.lists.jalur = <?= $Page->jalur->toClientList($Page) ?>;
     loadjs.done("fdata_durasiadd");
 });
 </script>
@@ -124,6 +126,38 @@ loadjs.ready(["fdata_durasiadd", "datetimepicker"], function() {
 });
 </script>
 <?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->jalur->Visible) { // jalur ?>
+    <div id="r_jalur" class="form-group row">
+        <label id="elh_data_durasi_jalur" class="<?= $Page->LeftColumnClass ?>"><?= $Page->jalur->caption() ?><?= $Page->jalur->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->jalur->cellAttributes() ?>>
+<span id="el_data_durasi_jalur">
+<template id="tp_x_jalur">
+    <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" data-table="data_durasi" data-field="x_jalur" name="x_jalur" id="x_jalur"<?= $Page->jalur->editAttributes() ?>>
+        <label class="custom-control-label"></label>
+    </div>
+</template>
+<div id="dsl_x_jalur" class="ew-item-list"></div>
+<input type="hidden"
+    is="selection-list"
+    id="x_jalur"
+    name="x_jalur"
+    value="<?= HtmlEncode($Page->jalur->CurrentValue) ?>"
+    data-type="select-one"
+    data-template="tp_x_jalur"
+    data-target="dsl_x_jalur"
+    data-repeatcolumn="5"
+    class="form-control<?= $Page->jalur->isInvalidClass() ?>"
+    data-table="data_durasi"
+    data-field="x_jalur"
+    data-value-separator="<?= $Page->jalur->displayValueSeparatorAttribute() ?>"
+    <?= $Page->jalur->editAttributes() ?>>
+<?= $Page->jalur->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->jalur->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

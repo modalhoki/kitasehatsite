@@ -29,7 +29,8 @@ loadjs.ready("head", function () {
         ["fasilitas_id", [], fields.fasilitas_id.isInvalid],
         ["rumah_sakit_id", [ew.Validators.integer], fields.rumah_sakit_id.isInvalid],
         ["status", [], fields.status.isInvalid],
-        ["keluhan_awal", [], fields.keluhan_awal.isInvalid]
+        ["keluhan_awal", [], fields.keluhan_awal.isInvalid],
+        ["webusers_id", [], fields.webusers_id.isInvalid]
     ]);
 
     // Set invalid fields
@@ -72,6 +73,7 @@ loadjs.ready("head", function () {
     fantrean_umumsearch.lists.fasilitas_id = <?= $Page->fasilitas_id->toClientList($Page) ?>;
     fantrean_umumsearch.lists.rumah_sakit_id = <?= $Page->rumah_sakit_id->toClientList($Page) ?>;
     fantrean_umumsearch.lists.status = <?= $Page->status->toClientList($Page) ?>;
+    fantrean_umumsearch.lists.webusers_id = <?= $Page->webusers_id->toClientList($Page) ?>;
     loadjs.done("fantrean_umumsearch");
 });
 </script>
@@ -272,6 +274,29 @@ loadjs.ready(["fantrean_umumsearch"], function() {
             <span id="el_antrean_umum_keluhan_awal" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->keluhan_awal->getInputTextType() ?>" data-table="antrean_umum" data-field="x_keluhan_awal" name="x_keluhan_awal" id="x_keluhan_awal" size="30" maxlength="255" placeholder="<?= HtmlEncode($Page->keluhan_awal->getPlaceHolder()) ?>" value="<?= $Page->keluhan_awal->EditValue ?>"<?= $Page->keluhan_awal->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->keluhan_awal->getErrorMessage(false) ?></div>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->webusers_id->Visible) { // webusers_id ?>
+    <div id="r_webusers_id" class="form-group row">
+        <label for="x_webusers_id" class="<?= $Page->LeftColumnClass ?>"><span id="elh_antrean_umum_webusers_id"><?= $Page->webusers_id->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_webusers_id" id="z_webusers_id" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->webusers_id->cellAttributes() ?>>
+            <span id="el_antrean_umum_webusers_id" class="ew-search-field ew-search-field-single">
+<div class="input-group ew-lookup-list">
+    <div class="form-control ew-lookup-text" tabindex="-1" id="lu_x_webusers_id"><?= EmptyValue(strval($Page->webusers_id->AdvancedSearch->ViewValue)) ? $Language->phrase("PleaseSelect") : $Page->webusers_id->AdvancedSearch->ViewValue ?></div>
+    <div class="input-group-append">
+        <button type="button" title="<?= HtmlEncode(str_replace("%s", RemoveHtml($Page->webusers_id->caption()), $Language->phrase("LookupLink", true))) ?>" class="ew-lookup-btn btn btn-default"<?= ($Page->webusers_id->ReadOnly || $Page->webusers_id->Disabled) ? " disabled" : "" ?> onclick="ew.modalLookupShow({lnk:this,el:'x_webusers_id',m:0,n:10});"><i class="fas fa-search ew-icon"></i></button>
+    </div>
+</div>
+<div class="invalid-feedback"><?= $Page->webusers_id->getErrorMessage(false) ?></div>
+<?= $Page->webusers_id->Lookup->getParamTag($Page, "p_x_webusers_id") ?>
+<input type="hidden" is="selection-list" data-table="antrean_umum" data-field="x_webusers_id" data-type="text" data-multiple="0" data-lookup="1" data-value-separator="<?= $Page->webusers_id->displayValueSeparatorAttribute() ?>" name="x_webusers_id" id="x_webusers_id" value="<?= $Page->webusers_id->AdvancedSearch->SearchValue ?>"<?= $Page->webusers_id->editAttributes() ?>>
 </span>
         </div></div>
     </div>

@@ -468,6 +468,7 @@ class DataDurasiAdd extends DataDurasi
         $this->waktu_daftar->setVisibility();
         $this->waktu_edit->Visible = false;
         $this->durasi->Visible = false;
+        $this->jalur->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -622,6 +623,8 @@ class DataDurasiAdd extends DataDurasi
         $this->waktu_edit->OldValue = $this->waktu_edit->CurrentValue;
         $this->durasi->CurrentValue = null;
         $this->durasi->OldValue = $this->durasi->CurrentValue;
+        $this->jalur->CurrentValue = null;
+        $this->jalur->OldValue = $this->jalur->CurrentValue;
     }
 
     // Load form values
@@ -641,6 +644,16 @@ class DataDurasiAdd extends DataDurasi
             $this->waktu_daftar->CurrentValue = UnFormatDateTime($this->waktu_daftar->CurrentValue, 0);
         }
 
+        // Check field name 'jalur' first before field var 'x_jalur'
+        $val = $CurrentForm->hasValue("jalur") ? $CurrentForm->getValue("jalur") : $CurrentForm->getValue("x_jalur");
+        if (!$this->jalur->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->jalur->Visible = false; // Disable update for API request
+            } else {
+                $this->jalur->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -651,6 +664,7 @@ class DataDurasiAdd extends DataDurasi
         global $CurrentForm;
         $this->waktu_daftar->CurrentValue = $this->waktu_daftar->FormValue;
         $this->waktu_daftar->CurrentValue = UnFormatDateTime($this->waktu_daftar->CurrentValue, 0);
+        $this->jalur->CurrentValue = $this->jalur->FormValue;
     }
 
     /**
@@ -704,6 +718,7 @@ class DataDurasiAdd extends DataDurasi
         $this->waktu_daftar->setDbValue($row['waktu_daftar']);
         $this->waktu_edit->setDbValue($row['waktu_edit']);
         $this->durasi->setDbValue($row['durasi']);
+        $this->jalur->setDbValue($row['jalur']);
     }
 
     // Return a row with default values
@@ -715,6 +730,7 @@ class DataDurasiAdd extends DataDurasi
         $row['waktu_daftar'] = $this->waktu_daftar->CurrentValue;
         $row['waktu_edit'] = $this->waktu_edit->CurrentValue;
         $row['durasi'] = $this->durasi->CurrentValue;
+        $row['jalur'] = $this->jalur->CurrentValue;
         return $row;
     }
 
@@ -753,6 +769,8 @@ class DataDurasiAdd extends DataDurasi
         // waktu_edit
 
         // durasi
+
+        // jalur
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -773,10 +791,23 @@ class DataDurasiAdd extends DataDurasi
             $this->durasi->ViewValue = FormatNumber($this->durasi->ViewValue, 0, -2, -2, -2);
             $this->durasi->ViewCustomAttributes = "";
 
+            // jalur
+            if (strval($this->jalur->CurrentValue) != "") {
+                $this->jalur->ViewValue = $this->jalur->optionCaption($this->jalur->CurrentValue);
+            } else {
+                $this->jalur->ViewValue = null;
+            }
+            $this->jalur->ViewCustomAttributes = "";
+
             // waktu_daftar
             $this->waktu_daftar->LinkCustomAttributes = "";
             $this->waktu_daftar->HrefValue = "";
             $this->waktu_daftar->TooltipValue = "";
+
+            // jalur
+            $this->jalur->LinkCustomAttributes = "";
+            $this->jalur->HrefValue = "";
+            $this->jalur->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // waktu_daftar
             $this->waktu_daftar->EditAttrs["class"] = "form-control";
@@ -784,11 +815,20 @@ class DataDurasiAdd extends DataDurasi
             $this->waktu_daftar->EditValue = HtmlEncode(FormatDateTime($this->waktu_daftar->CurrentValue, 8));
             $this->waktu_daftar->PlaceHolder = RemoveHtml($this->waktu_daftar->caption());
 
+            // jalur
+            $this->jalur->EditCustomAttributes = "";
+            $this->jalur->EditValue = $this->jalur->options(false);
+            $this->jalur->PlaceHolder = RemoveHtml($this->jalur->caption());
+
             // Add refer script
 
             // waktu_daftar
             $this->waktu_daftar->LinkCustomAttributes = "";
             $this->waktu_daftar->HrefValue = "";
+
+            // jalur
+            $this->jalur->LinkCustomAttributes = "";
+            $this->jalur->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -817,6 +857,11 @@ class DataDurasiAdd extends DataDurasi
         if (!CheckDate($this->waktu_daftar->FormValue)) {
             $this->waktu_daftar->addErrorMessage($this->waktu_daftar->getErrorMessage(false));
         }
+        if ($this->jalur->Required) {
+            if ($this->jalur->FormValue == "") {
+                $this->jalur->addErrorMessage(str_replace("%s", $this->jalur->caption(), $this->jalur->RequiredErrorMessage));
+            }
+        }
 
         // Return validate result
         $validateForm = !$this->hasInvalidFields();
@@ -844,6 +889,9 @@ class DataDurasiAdd extends DataDurasi
 
         // waktu_daftar
         $this->waktu_daftar->setDbValueDef($rsnew, UnFormatDateTime($this->waktu_daftar->CurrentValue, 0), null, false);
+
+        // jalur
+        $this->jalur->setDbValueDef($rsnew, $this->jalur->CurrentValue, "", false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
@@ -908,6 +956,8 @@ class DataDurasiAdd extends DataDurasi
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_jalur":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

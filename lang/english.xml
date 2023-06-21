@@ -1023,7 +1023,10 @@
         <phrase id="fldtagcaption4" value="DIBATALKAN" />
       </field>
       <field id="keluhan_awal">
-        <phrase id="fldcaption" value="keluhan awal" />
+        <phrase id="fldcaption" value="Keluhan Awal" />
+      </field>
+      <field id="webusers_id">
+        <phrase id="fldcaption" value="Petugas" />
       </field>
     </table>
     <table id="antrean_umum">
@@ -1059,6 +1062,9 @@
       </field>
       <field id="keluhan_awal">
         <phrase id="fldcaption" value="Keluhan Awal" />
+      </field>
+      <field id="webusers_id">
+        <phrase id="fldcaption" value="Petugas" />
       </field>
     </table>
     <table id="daerah">
@@ -1368,6 +1374,13 @@
       <field id="durasi">
         <phrase id="fldcaption" value="durasi" />
       </field>
+      <field id="jalur">
+        <phrase id="fldcaption" value="jalur" />
+        <phrase id="fldtagvalue1" value="UMUM" />
+        <phrase id="fldtagcaption1" value="UMUM" />
+        <phrase id="fldtagvalue2" value="BPJS" />
+        <phrase id="fldtagcaption2" value="BPJS" />
+      </field>
     </table>
     <table id="userlevelpermissions">
       <phrase id="tblcaption" value="userlevelpermissions" />
@@ -1424,6 +1437,9 @@
       <field id="keluhan_awal">
         <phrase id="fldcaption" value="Keluhan Awal" />
       </field>
+      <field id="webusers_id">
+        <phrase id="fldcaption" value="Petugas" />
+      </field>
     </table>
     <table id="antrean_umum_rs">
       <phrase id="tblcaption" value="Antrean Umum" />
@@ -1458,6 +1474,9 @@
       </field>
       <field id="keluhan_awal">
         <phrase id="fldcaption" value="Keluhan Awal" />
+      </field>
+      <field id="webusers_id">
+        <phrase id="fldcaption" value="Petugas" />
       </field>
     </table>
   </project>

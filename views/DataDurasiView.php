@@ -89,6 +89,17 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->jalur->Visible) { // jalur ?>
+    <tr id="r_jalur">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_data_durasi_jalur"><?= $Page->jalur->caption() ?></span></td>
+        <td data-name="jalur" <?= $Page->jalur->cellAttributes() ?>>
+<span id="el_data_durasi_jalur">
+<span<?= $Page->jalur->viewAttributes() ?>>
+<?= $Page->jalur->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 <?php

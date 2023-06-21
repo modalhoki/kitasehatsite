@@ -522,6 +522,7 @@ class DataDurasiView extends DataDurasi
         $this->waktu_daftar->setVisibility();
         $this->waktu_edit->setVisibility();
         $this->durasi->setVisibility();
+        $this->jalur->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -720,6 +721,7 @@ class DataDurasiView extends DataDurasi
         $this->waktu_daftar->setDbValue($row['waktu_daftar']);
         $this->waktu_edit->setDbValue($row['waktu_edit']);
         $this->durasi->setDbValue($row['durasi']);
+        $this->jalur->setDbValue($row['jalur']);
     }
 
     // Return a row with default values
@@ -730,6 +732,7 @@ class DataDurasiView extends DataDurasi
         $row['waktu_daftar'] = null;
         $row['waktu_edit'] = null;
         $row['durasi'] = null;
+        $row['jalur'] = null;
         return $row;
     }
 
@@ -758,6 +761,8 @@ class DataDurasiView extends DataDurasi
         // waktu_edit
 
         // durasi
+
+        // jalur
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -778,6 +783,14 @@ class DataDurasiView extends DataDurasi
             $this->durasi->ViewValue = FormatNumber($this->durasi->ViewValue, 0, -2, -2, -2);
             $this->durasi->ViewCustomAttributes = "";
 
+            // jalur
+            if (strval($this->jalur->CurrentValue) != "") {
+                $this->jalur->ViewValue = $this->jalur->optionCaption($this->jalur->CurrentValue);
+            } else {
+                $this->jalur->ViewValue = null;
+            }
+            $this->jalur->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -797,6 +810,11 @@ class DataDurasiView extends DataDurasi
             $this->durasi->LinkCustomAttributes = "";
             $this->durasi->HrefValue = "";
             $this->durasi->TooltipValue = "";
+
+            // jalur
+            $this->jalur->LinkCustomAttributes = "";
+            $this->jalur->HrefValue = "";
+            $this->jalur->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -829,6 +847,8 @@ class DataDurasiView extends DataDurasi
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_jalur":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;
