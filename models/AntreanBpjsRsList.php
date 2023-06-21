@@ -449,9 +449,6 @@ class AntreanBpjsRsList extends AntreanBpjsRs
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
-        if ($this->isAddOrEdit()) {
-            $this->webusers_id->Visible = false;
-        }
     }
 
     // Lookup data

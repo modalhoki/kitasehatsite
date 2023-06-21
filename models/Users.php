@@ -45,7 +45,7 @@ class Users extends DbTable
         $Language = Container("language");
         $this->TableVar = 'users';
         $this->TableName = 'users';
-        $this->TableType = 'CUSTOMVIEW';
+        $this->TableType = 'VIEW';
 
         // Update Table
         $this->UpdateTable = "webusers";
@@ -68,15 +68,16 @@ class Users extends DbTable
         $this->BasicSearch = new BasicSearch($this->TableVar);
 
         // id
-        $this->id = new DbField('users', 'users', 'x_id', 'id', 'webusers.id', 'webusers.id', 20, 20, -1, false, 'webusers.id', false, false, false, 'FORMATTED TEXT', 'NO');
+        $this->id = new DbField('users', 'users', 'x_id', 'id', '`id`', '`id`', 20, 20, -1, false, '`id`', false, false, false, 'FORMATTED TEXT', 'NO');
         $this->id->IsAutoIncrement = true; // Autoincrement field
+        $this->id->IsPrimaryKey = true; // Primary key field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // username
-        $this->_username = new DbField('users', 'users', 'x__username', 'username', 'webusers.username', 'webusers.username', 200, 255, -1, false, 'webusers.username', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->_username = new DbField('users', 'users', 'x__username', 'username', '`username`', '`username`', 200, 255, -1, false, '`username`', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->_username->Nullable = false; // NOT NULL field
         $this->_username->Required = true; // Required field
         $this->_username->Sortable = true; // Allow sort
@@ -84,7 +85,7 @@ class Users extends DbTable
         $this->Fields['username'] = &$this->_username;
 
         // rumah_sakit_id
-        $this->rumah_sakit_id = new DbField('users', 'users', 'x_rumah_sakit_id', 'rumah_sakit_id', 'webusers.rumah_sakit_id', 'webusers.rumah_sakit_id', 20, 20, -1, false, 'webusers.rumah_sakit_id', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->rumah_sakit_id = new DbField('users', 'users', 'x_rumah_sakit_id', 'rumah_sakit_id', '`rumah_sakit_id`', '`rumah_sakit_id`', 20, 20, -1, false, '`rumah_sakit_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
         $this->rumah_sakit_id->Sortable = true; // Allow sort
         $this->rumah_sakit_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->rumah_sakit_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
@@ -134,7 +135,7 @@ class Users extends DbTable
     // Table level SQL
     public function getSqlFrom() // From
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "webusers";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "`users`";
     }
 
     public function sqlFrom() // For backward compatibility
@@ -149,7 +150,7 @@ class Users extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("webusers.id, webusers.username, webusers.rumah_sakit_id");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -480,6 +481,9 @@ class Users extends DbTable
             $where = $this->arrayToFilter($where);
         }
         if ($rs) {
+            if (array_key_exists('id', $rs)) {
+                AddFilter($where, QuotedName('id', $this->Dbid) . '=' . QuotedValue($rs['id'], $this->id->DataType, $this->Dbid));
+            }
         }
         $filter = ($curfilter) ? $this->CurrentFilter : "";
         AddFilter($filter, $where);
@@ -516,13 +520,19 @@ class Users extends DbTable
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
-        return "";
+        return "`id` = @id@";
     }
 
     // Get Key
     public function getKey($current = false)
     {
         $keys = [];
+        $val = $current ? $this->id->CurrentValue : $this->id->OldValue;
+        if (EmptyValue($val)) {
+            return "";
+        } else {
+            $keys[] = $val;
+        }
         return implode(Config("COMPOSITE_KEY_SEPARATOR"), $keys);
     }
 
@@ -531,7 +541,12 @@ class Users extends DbTable
     {
         $this->OldKey = strval($key);
         $keys = explode(Config("COMPOSITE_KEY_SEPARATOR"), $this->OldKey);
-        if (count($keys) == 0) {
+        if (count($keys) == 1) {
+            if ($current) {
+                $this->id->CurrentValue = $keys[0];
+            } else {
+                $this->id->OldValue = $keys[0];
+            }
         }
     }
 
@@ -539,6 +554,19 @@ class Users extends DbTable
     public function getRecordFilter($row = null)
     {
         $keyFilter = $this->sqlKeyFilter();
+        if (is_array($row)) {
+            $val = array_key_exists('id', $row) ? $row['id'] : null;
+        } else {
+            $val = $this->id->OldValue !== null ? $this->id->OldValue : $this->id->CurrentValue;
+        }
+        if (!is_numeric($val)) {
+            return "0=1"; // Invalid key
+        }
+        if ($val === null) {
+            return "0=1"; // Invalid key
+        } else {
+            $keyFilter = str_replace("@id@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
+        }
         return $keyFilter;
     }
 
@@ -666,6 +694,7 @@ class Users extends DbTable
     public function keyToJson($htmlEncode = false)
     {
         $json = "";
+        $json .= "id:" . JsonEncode($this->id->CurrentValue, "number");
         $json = "{" . $json . "}";
         if ($htmlEncode) {
             $json = HtmlEncode($json);
@@ -676,6 +705,11 @@ class Users extends DbTable
     // Add key value to URL
     public function keyUrl($url, $parm = "")
     {
+        if ($this->id->CurrentValue !== null) {
+            $url .= "/" . rawurlencode($this->id->CurrentValue);
+        } else {
+            return "javascript:ew.alert(ew.language.phrase('InvalidRecord'));";
+        }
         if ($parm != "") {
             $url .= "?" . $parm;
         }
@@ -734,12 +768,23 @@ SORTHTML;
             $arKeys = Param("key_m");
             $cnt = count($arKeys);
         } else {
+            if (($keyValue = Param("id") ?? Route("id")) !== null) {
+                $arKeys[] = $keyValue;
+            } elseif (IsApi() && (($keyValue = Key(0) ?? Route(2)) !== null)) {
+                $arKeys[] = $keyValue;
+            } else {
+                $arKeys = null; // Do not setup
+            }
+
             //return $arKeys; // Do not return yet, so the values will also be checked by the following code
         }
         // Check keys
         $ar = [];
         if (is_array($arKeys)) {
             foreach ($arKeys as $key) {
+                if (!is_numeric($key)) {
+                    continue;
+                }
                 $ar[] = $key;
             }
         }
@@ -754,6 +799,11 @@ SORTHTML;
         foreach ($arKeys as $key) {
             if ($keyFilter != "") {
                 $keyFilter .= " OR ";
+            }
+            if ($setCurrent) {
+                $this->id->CurrentValue = $key;
+            } else {
+                $this->id->OldValue = $key;
             }
             $keyFilter .= "(" . $this->getRecordFilter() . ")";
         }
@@ -863,7 +913,7 @@ SORTHTML;
         $this->id->EditAttrs["class"] = "form-control";
         $this->id->EditCustomAttributes = "";
         $this->id->EditValue = $this->id->CurrentValue;
-        $this->id->PlaceHolder = RemoveHtml($this->id->caption());
+        $this->id->ViewCustomAttributes = "";
 
         // username
         $this->_username->EditAttrs["class"] = "form-control";

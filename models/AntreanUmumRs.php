@@ -161,6 +161,7 @@ class AntreanUmumRs extends DbTable
 
         // webusers_id
         $this->webusers_id = new DbField('antrean_umum_rs', 'antrean_umum_rs', 'x_webusers_id', 'webusers_id', '`webusers_id`', '`webusers_id`', 20, 20, -1, false, '`webusers_id`', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->webusers_id->Required = true; // Required field
         $this->webusers_id->Sortable = true; // Allow sort
         $this->webusers_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->webusers_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
@@ -1236,6 +1237,9 @@ SORTHTML;
         $this->keluhan_awal->ViewCustomAttributes = "";
 
         // webusers_id
+        $this->webusers_id->EditAttrs["class"] = "form-control";
+        $this->webusers_id->EditCustomAttributes = "";
+        $this->webusers_id->PlaceHolder = RemoveHtml($this->webusers_id->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1547,6 +1551,9 @@ SORTHTML;
     {
         //var_dump($fld->Name, $fld->Lookup, $filter); // Uncomment to view the filter
         // Enter your code here
+        if ($fld->Name == "webusers_id" && CurrentUserLevel() != -1) {
+        	$fld->Lookup->UserFilter = "id = ".CurrentUserID();
+        }
     }
 
     // Row Rendering event

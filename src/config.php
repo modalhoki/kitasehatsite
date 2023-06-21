@@ -171,7 +171,7 @@ $CONFIG = [
 
     // General
     "UNFORMAT_YEAR" => 50, // Unformat year
-    "RANDOM_KEY" => 'DmGeEF7jK4tn4DVK', // Random key for encryption
+    "RANDOM_KEY" => 'gxmytKCWb7q04C8j', // Random key for encryption
     "ENCRYPTION_KEY" => '', // Encryption key for data protection
     "PROJECT_STYLESHEET_FILENAME" => "css/kitasehat.css", // Project stylesheet file name
     "PROJECT_CHARSET" => "utf-8", // Project charset
