@@ -1514,7 +1514,7 @@ SORTHTML;
     public function rowUpdated($rsold, &$rsnew)
     {
         //Log("Row Updated");
-        $waktu = $rsold['waktu'];
+        $waktu = ExecuteScalar("SELECT waktu FROM antrean_bpjs WHERE id = ".$rsold['id']);
         $insert_data_durasi = ExecuteQuery("
         	Insert into data_durasi (waktu_daftar, jalur)
         	values (date(\"".$waktu."\"), \"BPJS\");
