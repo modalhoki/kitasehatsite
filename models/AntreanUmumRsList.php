@@ -2436,6 +2436,8 @@ class AntreanUmumRsList extends AntreanUmumRs
     public function pageRender()
     {
         //Log("Page Render");
+        $waktu = ExecuteScalar("SELECT waktu FROM antrean_umum WHERE id = ".$rsold['id']);
+        var_dump($waktu);
     }
 
     // Page Data Rendering event
