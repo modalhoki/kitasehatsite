@@ -588,7 +588,7 @@ class PraktikPoliEdit extends PraktikPoli
                 }
                 break;
             case "update": // Update
-                $returnUrl = $this->getReturnUrl();
+                $returnUrl = "praktikpolilist";
                 if (GetPageName($returnUrl) == "praktikpolilist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }

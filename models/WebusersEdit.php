@@ -587,7 +587,7 @@ class WebusersEdit extends Webusers
                 }
                 break;
             case "update": // Update
-                $returnUrl = $this->getReturnUrl();
+                $returnUrl = "webuserslist";
                 if (GetPageName($returnUrl) == "webuserslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }

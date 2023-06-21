@@ -559,7 +559,7 @@ class PraktikPoliAdd extends PraktikPoli
                     if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
-                    $returnUrl = $this->getReturnUrl();
+                    $returnUrl = "praktikpolilist";
                     if (GetPageName($returnUrl) == "praktikpolilist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                     } elseif (GetPageName($returnUrl) == "praktikpoliview") {

@@ -601,7 +601,7 @@ class AntreanUmumRsEdit extends AntreanUmumRs
                 }
                 break;
             case "update": // Update
-                $returnUrl = $this->getReturnUrl();
+                $returnUrl = "antreanumumrslist";
                 if (GetPageName($returnUrl) == "antreanumumrslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }

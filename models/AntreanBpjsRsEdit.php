@@ -601,7 +601,7 @@ class AntreanBpjsRsEdit extends AntreanBpjsRs
                 }
                 break;
             case "update": // Update
-                $returnUrl = $this->getReturnUrl();
+                $returnUrl = "antreanbpjsrslist";
                 if (GetPageName($returnUrl) == "antreanbpjsrslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }

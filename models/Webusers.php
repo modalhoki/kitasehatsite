@@ -1277,11 +1277,14 @@ SORTHTML;
     }
 
     // Table level events
-
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
         // Enter your code here
+        $column = "rumah_sakit_id = ".CurrentUserInfo('rumah_sakit_id');
+        if (CurrentUserLevel() != -1) {
+        	AddFilter($filter, $column);
+        }
     }
 
     // Recordset Selected event

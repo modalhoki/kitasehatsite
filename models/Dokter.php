@@ -1188,6 +1188,9 @@ SORTHTML;
     {
         //var_dump($fld->Name, $fld->Lookup, $filter); // Uncomment to view the filter
         // Enter your code here
+        if ($fld->Name == "webusers_id") {
+        	$fld->Lookup->UserFilter = "rumah_sakit_id = ".CurrentUserInfo('rumah_sakit_id');
+        }
     }
 
     // Row Rendering event
