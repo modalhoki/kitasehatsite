@@ -20,9 +20,15 @@ class DataDurasiController extends ControllerBase
         return $this->runPage($request, $response, $args, "DataDurasiAdd");
     }
 
-    // view
-    public function view(Request $request, Response $response, array $args): Response
+    // edit
+    public function edit(Request $request, Response $response, array $args): Response
     {
-        return $this->runPage($request, $response, $args, "DataDurasiView");
+        return $this->runPage($request, $response, $args, "DataDurasiEdit");
+    }
+
+    // delete
+    public function delete(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "DataDurasiDelete");
     }
 }

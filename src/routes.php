@@ -220,13 +220,15 @@ return function (App $app) {
     // data_durasi
     $app->any('/datadurasilist[/{id}]', DataDurasiController::class . ':list')->add(PermissionMiddleware::class)->setName('datadurasilist-data_durasi-list'); // list
     $app->any('/datadurasiadd[/{id}]', DataDurasiController::class . ':add')->add(PermissionMiddleware::class)->setName('datadurasiadd-data_durasi-add'); // add
-    $app->any('/datadurasiview[/{id}]', DataDurasiController::class . ':view')->add(PermissionMiddleware::class)->setName('datadurasiview-data_durasi-view'); // view
+    $app->any('/datadurasiedit[/{id}]', DataDurasiController::class . ':edit')->add(PermissionMiddleware::class)->setName('datadurasiedit-data_durasi-edit'); // edit
+    $app->any('/datadurasidelete[/{id}]', DataDurasiController::class . ':delete')->add(PermissionMiddleware::class)->setName('datadurasidelete-data_durasi-delete'); // delete
     $app->group(
         '/data_durasi',
         function (RouteCollectorProxy $group) {
             $group->any('/' . Config("LIST_ACTION") . '[/{id}]', DataDurasiController::class . ':list')->add(PermissionMiddleware::class)->setName('data_durasi/list-data_durasi-list-2'); // list
             $group->any('/' . Config("ADD_ACTION") . '[/{id}]', DataDurasiController::class . ':add')->add(PermissionMiddleware::class)->setName('data_durasi/add-data_durasi-add-2'); // add
-            $group->any('/' . Config("VIEW_ACTION") . '[/{id}]', DataDurasiController::class . ':view')->add(PermissionMiddleware::class)->setName('data_durasi/view-data_durasi-view-2'); // view
+            $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', DataDurasiController::class . ':edit')->add(PermissionMiddleware::class)->setName('data_durasi/edit-data_durasi-edit-2'); // edit
+            $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', DataDurasiController::class . ':delete')->add(PermissionMiddleware::class)->setName('data_durasi/delete-data_durasi-delete-2'); // delete
         }
     );
 
