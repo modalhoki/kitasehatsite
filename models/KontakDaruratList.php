@@ -2610,6 +2610,25 @@ class KontakDaruratList extends KontakDarurat
             // no_hp
             $this->no_hp->setDbValueDef($rsnew, $this->no_hp->CurrentValue, "", $this->no_hp->ReadOnly);
 
+            // Check referential integrity for master table 'pasien'
+            $validMasterRecord = true;
+            $masterFilter = $this->sqlMasterFilter_pasien();
+            $keyValue = $rsnew['pasien_id'] ?? $rsold['pasien_id'];
+            if (strval($keyValue) != "") {
+                $masterFilter = str_replace("@id@", AdjustSql($keyValue), $masterFilter);
+            } else {
+                $validMasterRecord = false;
+            }
+            if ($validMasterRecord) {
+                $rsmaster = Container("pasien")->loadRs($masterFilter)->fetch();
+                $validMasterRecord = $rsmaster !== false;
+            }
+            if (!$validMasterRecord) {
+                $relatedRecordMsg = str_replace("%t", "pasien", $Language->phrase("RelatedRecordRequired"));
+                $this->setFailureMessage($relatedRecordMsg);
+                return false;
+            }
+
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
             if ($updateRow) {
@@ -2685,6 +2704,24 @@ class KontakDaruratList extends KontakDarurat
     protected function addRow($rsold = null)
     {
         global $Language, $Security;
+
+        // Check referential integrity for master table 'kontak_darurat'
+        $validMasterRecord = true;
+        $masterFilter = $this->sqlMasterFilter_pasien();
+        if (strval($this->pasien_id->CurrentValue) != "") {
+            $masterFilter = str_replace("@id@", AdjustSql($this->pasien_id->CurrentValue, "DB"), $masterFilter);
+        } else {
+            $validMasterRecord = false;
+        }
+        if ($validMasterRecord) {
+            $rsmaster = Container("pasien")->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "pasien", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
         $conn = $this->getConnection();
 
         // Load db values from rsold

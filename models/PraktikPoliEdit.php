@@ -596,7 +596,7 @@ class PraktikPoliEdit extends PraktikPoli
                 }
                 break;
             case "update": // Update
-                $returnUrl = "praktikpolilist";
+                $returnUrl = $this->getReturnUrl();
                 if (GetPageName($returnUrl) == "praktikpolilist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
@@ -1151,6 +1151,44 @@ class PraktikPoliEdit extends PraktikPoli
 
             // jam_praktik
             $this->jam_praktik->setDbValueDef($rsnew, $this->jam_praktik->CurrentValue, null, $this->jam_praktik->ReadOnly);
+
+            // Check referential integrity for master table 'fasilitas_rumah_sakit'
+            $validMasterRecord = true;
+            $masterFilter = $this->sqlMasterFilter_fasilitas_rumah_sakit();
+            $keyValue = $rsnew['fasilitas_rumah_sakit_id'] ?? $rsold['fasilitas_rumah_sakit_id'];
+            if (strval($keyValue) != "") {
+                $masterFilter = str_replace("@id@", AdjustSql($keyValue), $masterFilter);
+            } else {
+                $validMasterRecord = false;
+            }
+            if ($validMasterRecord) {
+                $rsmaster = Container("fasilitas_rumah_sakit")->loadRs($masterFilter)->fetch();
+                $validMasterRecord = $rsmaster !== false;
+            }
+            if (!$validMasterRecord) {
+                $relatedRecordMsg = str_replace("%t", "fasilitas_rumah_sakit", $Language->phrase("RelatedRecordRequired"));
+                $this->setFailureMessage($relatedRecordMsg);
+                return false;
+            }
+
+            // Check referential integrity for master table 'dokter'
+            $validMasterRecord = true;
+            $masterFilter = $this->sqlMasterFilter_dokter();
+            $keyValue = $rsnew['dokter_id'] ?? $rsold['dokter_id'];
+            if (strval($keyValue) != "") {
+                $masterFilter = str_replace("@id@", AdjustSql($keyValue), $masterFilter);
+            } else {
+                $validMasterRecord = false;
+            }
+            if ($validMasterRecord) {
+                $rsmaster = Container("dokter")->loadRs($masterFilter)->fetch();
+                $validMasterRecord = $rsmaster !== false;
+            }
+            if (!$validMasterRecord) {
+                $relatedRecordMsg = str_replace("%t", "dokter", $Language->phrase("RelatedRecordRequired"));
+                $this->setFailureMessage($relatedRecordMsg);
+                return false;
+            }
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);

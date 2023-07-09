@@ -567,7 +567,7 @@ class PraktikPoliAdd extends PraktikPoli
                     if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
-                    $returnUrl = "praktikpolilist";
+                    $returnUrl = $this->getReturnUrl();
                     if (GetPageName($returnUrl) == "praktikpolilist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                     } elseif (GetPageName($returnUrl) == "praktikpoliview") {
@@ -1098,6 +1098,42 @@ class PraktikPoliAdd extends PraktikPoli
     protected function addRow($rsold = null)
     {
         global $Language, $Security;
+
+        // Check referential integrity for master table 'praktik_poli'
+        $validMasterRecord = true;
+        $masterFilter = $this->sqlMasterFilter_fasilitas_rumah_sakit();
+        if (strval($this->fasilitas_rumah_sakit_id->CurrentValue) != "") {
+            $masterFilter = str_replace("@id@", AdjustSql($this->fasilitas_rumah_sakit_id->CurrentValue, "DB"), $masterFilter);
+        } else {
+            $validMasterRecord = false;
+        }
+        if ($validMasterRecord) {
+            $rsmaster = Container("fasilitas_rumah_sakit")->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "fasilitas_rumah_sakit", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
+
+        // Check referential integrity for master table 'praktik_poli'
+        $validMasterRecord = true;
+        $masterFilter = $this->sqlMasterFilter_dokter();
+        if (strval($this->dokter_id->CurrentValue) != "") {
+            $masterFilter = str_replace("@id@", AdjustSql($this->dokter_id->CurrentValue, "DB"), $masterFilter);
+        } else {
+            $validMasterRecord = false;
+        }
+        if ($validMasterRecord) {
+            $rsmaster = Container("dokter")->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "dokter", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
         $conn = $this->getConnection();
 
         // Load db values from rsold

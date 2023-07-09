@@ -602,7 +602,11 @@ class FasilitasRumahSakitEdit extends FasilitasRumahSakit
                 $this->setupDetailParms();
                 break;
             case "update": // Update
-                $returnUrl = "fasilitasrumahsakitlist";
+                if ($this->getCurrentDetailTable() != "") { // Master/detail edit
+                    $returnUrl = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
+                } else {
+                    $returnUrl = $this->getReturnUrl();
+                }
                 if (GetPageName($returnUrl) == "fasilitasrumahsakitlist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }

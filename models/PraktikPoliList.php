@@ -2678,6 +2678,44 @@ class PraktikPoliList extends PraktikPoli
             // jam_praktik
             $this->jam_praktik->setDbValueDef($rsnew, $this->jam_praktik->CurrentValue, null, $this->jam_praktik->ReadOnly);
 
+            // Check referential integrity for master table 'fasilitas_rumah_sakit'
+            $validMasterRecord = true;
+            $masterFilter = $this->sqlMasterFilter_fasilitas_rumah_sakit();
+            $keyValue = $rsnew['fasilitas_rumah_sakit_id'] ?? $rsold['fasilitas_rumah_sakit_id'];
+            if (strval($keyValue) != "") {
+                $masterFilter = str_replace("@id@", AdjustSql($keyValue), $masterFilter);
+            } else {
+                $validMasterRecord = false;
+            }
+            if ($validMasterRecord) {
+                $rsmaster = Container("fasilitas_rumah_sakit")->loadRs($masterFilter)->fetch();
+                $validMasterRecord = $rsmaster !== false;
+            }
+            if (!$validMasterRecord) {
+                $relatedRecordMsg = str_replace("%t", "fasilitas_rumah_sakit", $Language->phrase("RelatedRecordRequired"));
+                $this->setFailureMessage($relatedRecordMsg);
+                return false;
+            }
+
+            // Check referential integrity for master table 'dokter'
+            $validMasterRecord = true;
+            $masterFilter = $this->sqlMasterFilter_dokter();
+            $keyValue = $rsnew['dokter_id'] ?? $rsold['dokter_id'];
+            if (strval($keyValue) != "") {
+                $masterFilter = str_replace("@id@", AdjustSql($keyValue), $masterFilter);
+            } else {
+                $validMasterRecord = false;
+            }
+            if ($validMasterRecord) {
+                $rsmaster = Container("dokter")->loadRs($masterFilter)->fetch();
+                $validMasterRecord = $rsmaster !== false;
+            }
+            if (!$validMasterRecord) {
+                $relatedRecordMsg = str_replace("%t", "dokter", $Language->phrase("RelatedRecordRequired"));
+                $this->setFailureMessage($relatedRecordMsg);
+                return false;
+            }
+
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
             if ($updateRow) {
@@ -2753,6 +2791,42 @@ class PraktikPoliList extends PraktikPoli
     protected function addRow($rsold = null)
     {
         global $Language, $Security;
+
+        // Check referential integrity for master table 'praktik_poli'
+        $validMasterRecord = true;
+        $masterFilter = $this->sqlMasterFilter_fasilitas_rumah_sakit();
+        if ($this->fasilitas_rumah_sakit_id->getSessionValue() != "") {
+        $masterFilter = str_replace("@id@", AdjustSql($this->fasilitas_rumah_sakit_id->getSessionValue(), "DB"), $masterFilter);
+        } else {
+            $validMasterRecord = false;
+        }
+        if ($validMasterRecord) {
+            $rsmaster = Container("fasilitas_rumah_sakit")->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "fasilitas_rumah_sakit", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
+
+        // Check referential integrity for master table 'praktik_poli'
+        $validMasterRecord = true;
+        $masterFilter = $this->sqlMasterFilter_dokter();
+        if (strval($this->dokter_id->CurrentValue) != "") {
+            $masterFilter = str_replace("@id@", AdjustSql($this->dokter_id->CurrentValue, "DB"), $masterFilter);
+        } else {
+            $validMasterRecord = false;
+        }
+        if ($validMasterRecord) {
+            $rsmaster = Container("dokter")->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "dokter", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
         $conn = $this->getConnection();
 
         // Load db values from rsold
