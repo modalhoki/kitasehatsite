@@ -151,7 +151,7 @@ class Pasien extends DbTable
         $this->Fields['status_perkawinan'] = &$this->status_perkawinan;
 
         // no_bpjs
-        $this->no_bpjs = new DbField('pasien', 'pasien', 'x_no_bpjs', 'no_bpjs', '`no_bpjs`', '`no_bpjs`', 200, 13, -1, false, '`no_bpjs`', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->no_bpjs = new DbField('pasien', 'pasien', 'x_no_bpjs', 'no_bpjs', '`no_bpjs`', '`no_bpjs`', 200, 14, -1, false, '`no_bpjs`', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->no_bpjs->Sortable = true; // Allow sort
         $this->no_bpjs->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->no_bpjs->Param, "CustomMsg");
         $this->Fields['no_bpjs'] = &$this->no_bpjs;

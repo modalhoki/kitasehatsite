@@ -361,7 +361,7 @@ loadjs.ready(["fpasiensearch", "datetimepicker"], function() {
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->no_bpjs->cellAttributes() ?>>
             <span id="el_pasien_no_bpjs" class="ew-search-field ew-search-field-single">
-<input type="<?= $Page->no_bpjs->getInputTextType() ?>" data-table="pasien" data-field="x_no_bpjs" name="x_no_bpjs" id="x_no_bpjs" size="30" maxlength="13" placeholder="<?= HtmlEncode($Page->no_bpjs->getPlaceHolder()) ?>" value="<?= $Page->no_bpjs->EditValue ?>"<?= $Page->no_bpjs->editAttributes() ?>>
+<input type="<?= $Page->no_bpjs->getInputTextType() ?>" data-table="pasien" data-field="x_no_bpjs" name="x_no_bpjs" id="x_no_bpjs" size="30" maxlength="14" placeholder="<?= HtmlEncode($Page->no_bpjs->getPlaceHolder()) ?>" value="<?= $Page->no_bpjs->EditValue ?>"<?= $Page->no_bpjs->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->no_bpjs->getErrorMessage(false) ?></div>
 </span>
         </div></div>

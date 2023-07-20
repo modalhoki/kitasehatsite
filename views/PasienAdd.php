@@ -332,7 +332,7 @@ loadjs.ready(["fpasienadd", "datetimepicker"], function() {
         <label id="elh_pasien_no_bpjs" for="x_no_bpjs" class="<?= $Page->LeftColumnClass ?>"><?= $Page->no_bpjs->caption() ?><?= $Page->no_bpjs->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->no_bpjs->cellAttributes() ?>>
 <span id="el_pasien_no_bpjs">
-<input type="<?= $Page->no_bpjs->getInputTextType() ?>" data-table="pasien" data-field="x_no_bpjs" name="x_no_bpjs" id="x_no_bpjs" size="30" maxlength="13" placeholder="<?= HtmlEncode($Page->no_bpjs->getPlaceHolder()) ?>" value="<?= $Page->no_bpjs->EditValue ?>"<?= $Page->no_bpjs->editAttributes() ?> aria-describedby="x_no_bpjs_help">
+<input type="<?= $Page->no_bpjs->getInputTextType() ?>" data-table="pasien" data-field="x_no_bpjs" name="x_no_bpjs" id="x_no_bpjs" size="30" maxlength="14" placeholder="<?= HtmlEncode($Page->no_bpjs->getPlaceHolder()) ?>" value="<?= $Page->no_bpjs->EditValue ?>"<?= $Page->no_bpjs->editAttributes() ?> aria-describedby="x_no_bpjs_help">
 <?= $Page->no_bpjs->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->no_bpjs->getErrorMessage() ?></div>
 </span>
