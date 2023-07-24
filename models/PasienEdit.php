@@ -472,6 +472,7 @@ class PasienEdit extends Pasien
         $this->nama->setVisibility();
         $this->jenis_kelamin->setVisibility();
         $this->tanggal_lahir->setVisibility();
+        $this->Umum->setVisibility();
         $this->agama->setVisibility();
         $this->pekerjaan->setVisibility();
         $this->pendidikan->setVisibility();
@@ -715,6 +716,16 @@ class PasienEdit extends Pasien
             $this->tanggal_lahir->CurrentValue = UnFormatDateTime($this->tanggal_lahir->CurrentValue, 0);
         }
 
+        // Check field name 'Umum' first before field var 'x_Umum'
+        $val = $CurrentForm->hasValue("Umum") ? $CurrentForm->getValue("Umum") : $CurrentForm->getValue("x_Umum");
+        if (!$this->Umum->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->Umum->Visible = false; // Disable update for API request
+            } else {
+                $this->Umum->setFormValue($val);
+            }
+        }
+
         // Check field name 'agama' first before field var 'x_agama'
         $val = $CurrentForm->hasValue("agama") ? $CurrentForm->getValue("agama") : $CurrentForm->getValue("x_agama");
         if (!$this->agama->IsDetailKey) {
@@ -802,6 +813,7 @@ class PasienEdit extends Pasien
         $this->jenis_kelamin->CurrentValue = $this->jenis_kelamin->FormValue;
         $this->tanggal_lahir->CurrentValue = $this->tanggal_lahir->FormValue;
         $this->tanggal_lahir->CurrentValue = UnFormatDateTime($this->tanggal_lahir->CurrentValue, 0);
+        $this->Umum->CurrentValue = $this->Umum->FormValue;
         $this->agama->CurrentValue = $this->agama->FormValue;
         $this->pekerjaan->CurrentValue = $this->pekerjaan->FormValue;
         $this->pendidikan->CurrentValue = $this->pendidikan->FormValue;
@@ -863,6 +875,7 @@ class PasienEdit extends Pasien
         $this->nama->setDbValue($row['nama']);
         $this->jenis_kelamin->setDbValue($row['jenis_kelamin']);
         $this->tanggal_lahir->setDbValue($row['tanggal_lahir']);
+        $this->Umum->setDbValue($row['Umum']);
         $this->agama->setDbValue($row['agama']);
         $this->pekerjaan->setDbValue($row['pekerjaan']);
         $this->pendidikan->setDbValue($row['pendidikan']);
@@ -883,6 +896,7 @@ class PasienEdit extends Pasien
         $row['nama'] = null;
         $row['jenis_kelamin'] = null;
         $row['tanggal_lahir'] = null;
+        $row['Umum'] = null;
         $row['agama'] = null;
         $row['pekerjaan'] = null;
         $row['pendidikan'] = null;
@@ -933,6 +947,8 @@ class PasienEdit extends Pasien
 
         // tanggal_lahir
 
+        // Umum
+
         // agama
 
         // pekerjaan
@@ -975,6 +991,11 @@ class PasienEdit extends Pasien
             $this->tanggal_lahir->ViewValue = $this->tanggal_lahir->CurrentValue;
             $this->tanggal_lahir->ViewValue = FormatDateTime($this->tanggal_lahir->ViewValue, 0);
             $this->tanggal_lahir->ViewCustomAttributes = "";
+
+            // Umum
+            $this->Umum->ViewValue = $this->Umum->CurrentValue;
+            $this->Umum->ViewValue = FormatNumber($this->Umum->ViewValue, 0, -2, -2, -2);
+            $this->Umum->ViewCustomAttributes = "";
 
             // agama
             if (strval($this->agama->CurrentValue) != "") {
@@ -1044,6 +1065,11 @@ class PasienEdit extends Pasien
             $this->tanggal_lahir->HrefValue = "";
             $this->tanggal_lahir->TooltipValue = "";
 
+            // Umum
+            $this->Umum->LinkCustomAttributes = "";
+            $this->Umum->HrefValue = "";
+            $this->Umum->TooltipValue = "";
+
             // agama
             $this->agama->LinkCustomAttributes = "";
             $this->agama->HrefValue = "";
@@ -1108,6 +1134,12 @@ class PasienEdit extends Pasien
             $this->tanggal_lahir->EditValue = HtmlEncode(FormatDateTime($this->tanggal_lahir->CurrentValue, 8));
             $this->tanggal_lahir->PlaceHolder = RemoveHtml($this->tanggal_lahir->caption());
 
+            // Umum
+            $this->Umum->EditAttrs["class"] = "form-control";
+            $this->Umum->EditCustomAttributes = "";
+            $this->Umum->EditValue = HtmlEncode($this->Umum->CurrentValue);
+            $this->Umum->PlaceHolder = RemoveHtml($this->Umum->caption());
+
             // agama
             $this->agama->EditCustomAttributes = "";
             $this->agama->EditValue = $this->agama->options(false);
@@ -1169,6 +1201,10 @@ class PasienEdit extends Pasien
             // tanggal_lahir
             $this->tanggal_lahir->LinkCustomAttributes = "";
             $this->tanggal_lahir->HrefValue = "";
+
+            // Umum
+            $this->Umum->LinkCustomAttributes = "";
+            $this->Umum->HrefValue = "";
 
             // agama
             $this->agama->LinkCustomAttributes = "";
@@ -1239,6 +1275,14 @@ class PasienEdit extends Pasien
         }
         if (!CheckDate($this->tanggal_lahir->FormValue)) {
             $this->tanggal_lahir->addErrorMessage($this->tanggal_lahir->getErrorMessage(false));
+        }
+        if ($this->Umum->Required) {
+            if (!$this->Umum->IsDetailKey && EmptyValue($this->Umum->FormValue)) {
+                $this->Umum->addErrorMessage(str_replace("%s", $this->Umum->caption(), $this->Umum->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->Umum->FormValue)) {
+            $this->Umum->addErrorMessage($this->Umum->getErrorMessage(false));
         }
         if ($this->agama->Required) {
             if ($this->agama->FormValue == "") {
@@ -1350,6 +1394,9 @@ class PasienEdit extends Pasien
 
             // tanggal_lahir
             $this->tanggal_lahir->setDbValueDef($rsnew, UnFormatDateTime($this->tanggal_lahir->CurrentValue, 0), null, $this->tanggal_lahir->ReadOnly);
+
+            // Umum
+            $this->Umum->setDbValueDef($rsnew, $this->Umum->CurrentValue, null, $this->Umum->ReadOnly);
 
             // agama
             $this->agama->setDbValueDef($rsnew, $this->agama->CurrentValue, null, $this->agama->ReadOnly);

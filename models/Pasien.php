@@ -33,6 +33,7 @@ class Pasien extends DbTable
     public $nama;
     public $jenis_kelamin;
     public $tanggal_lahir;
+    public $Umum;
     public $agama;
     public $pekerjaan;
     public $pendidikan;
@@ -117,6 +118,14 @@ class Pasien extends DbTable
         $this->tanggal_lahir->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->tanggal_lahir->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->tanggal_lahir->Param, "CustomMsg");
         $this->Fields['tanggal_lahir'] = &$this->tanggal_lahir;
+
+        // Umum
+        $this->Umum = new DbField('pasien', 'pasien', 'x_Umum', 'Umum', 'FLOOR(DATEDIFF(Now(), tanggal_lahir)/365)', 'FLOOR(DATEDIFF(Now(), tanggal_lahir)/365)', 20, 21, -1, false, 'FLOOR(DATEDIFF(Now(), tanggal_lahir)/365)', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->Umum->IsCustom = true; // Custom field
+        $this->Umum->Sortable = true; // Allow sort
+        $this->Umum->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Umum->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->Umum->Param, "CustomMsg");
+        $this->Fields['Umum'] = &$this->Umum;
 
         // agama
         $this->agama = new DbField('pasien', 'pasien', 'x_agama', 'agama', '`agama`', '`agama`', 200, 9, -1, false, '`agama`', false, false, false, 'FORMATTED TEXT', 'RADIO');
@@ -264,7 +273,7 @@ class Pasien extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, FLOOR(DATEDIFF(Now(), tanggal_lahir)/365) AS `Umum`");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -649,6 +658,7 @@ class Pasien extends DbTable
         $this->nama->DbValue = $row['nama'];
         $this->jenis_kelamin->DbValue = $row['jenis_kelamin'];
         $this->tanggal_lahir->DbValue = $row['tanggal_lahir'];
+        $this->Umum->DbValue = $row['Umum'];
         $this->agama->DbValue = $row['agama'];
         $this->pekerjaan->DbValue = $row['pekerjaan'];
         $this->pendidikan->DbValue = $row['pendidikan'];
@@ -991,6 +1001,7 @@ SORTHTML;
         $this->nama->setDbValue($row['nama']);
         $this->jenis_kelamin->setDbValue($row['jenis_kelamin']);
         $this->tanggal_lahir->setDbValue($row['tanggal_lahir']);
+        $this->Umum->setDbValue($row['Umum']);
         $this->agama->setDbValue($row['agama']);
         $this->pekerjaan->setDbValue($row['pekerjaan']);
         $this->pendidikan->setDbValue($row['pendidikan']);
@@ -1021,6 +1032,8 @@ SORTHTML;
         // jenis_kelamin
 
         // tanggal_lahir
+
+        // Umum
 
         // agama
 
@@ -1064,6 +1077,11 @@ SORTHTML;
         $this->tanggal_lahir->ViewValue = $this->tanggal_lahir->CurrentValue;
         $this->tanggal_lahir->ViewValue = FormatDateTime($this->tanggal_lahir->ViewValue, 0);
         $this->tanggal_lahir->ViewCustomAttributes = "";
+
+        // Umum
+        $this->Umum->ViewValue = $this->Umum->CurrentValue;
+        $this->Umum->ViewValue = FormatNumber($this->Umum->ViewValue, 0, -2, -2, -2);
+        $this->Umum->ViewCustomAttributes = "";
 
         // agama
         if (strval($this->agama->CurrentValue) != "") {
@@ -1141,6 +1159,11 @@ SORTHTML;
         $this->tanggal_lahir->LinkCustomAttributes = "";
         $this->tanggal_lahir->HrefValue = "";
         $this->tanggal_lahir->TooltipValue = "";
+
+        // Umum
+        $this->Umum->LinkCustomAttributes = "";
+        $this->Umum->HrefValue = "";
+        $this->Umum->TooltipValue = "";
 
         // agama
         $this->agama->LinkCustomAttributes = "";
@@ -1245,6 +1268,12 @@ SORTHTML;
         $this->tanggal_lahir->EditValue = FormatDateTime($this->tanggal_lahir->CurrentValue, 8);
         $this->tanggal_lahir->PlaceHolder = RemoveHtml($this->tanggal_lahir->caption());
 
+        // Umum
+        $this->Umum->EditAttrs["class"] = "form-control";
+        $this->Umum->EditCustomAttributes = "";
+        $this->Umum->EditValue = $this->Umum->CurrentValue;
+        $this->Umum->PlaceHolder = RemoveHtml($this->Umum->caption());
+
         // agama
         $this->agama->EditCustomAttributes = "";
         $this->agama->EditValue = $this->agama->options(false);
@@ -1340,6 +1369,7 @@ SORTHTML;
                     $doc->exportCaption($this->nama);
                     $doc->exportCaption($this->jenis_kelamin);
                     $doc->exportCaption($this->tanggal_lahir);
+                    $doc->exportCaption($this->Umum);
                     $doc->exportCaption($this->agama);
                     $doc->exportCaption($this->pekerjaan);
                     $doc->exportCaption($this->pendidikan);
@@ -1354,6 +1384,7 @@ SORTHTML;
                     $doc->exportCaption($this->nama);
                     $doc->exportCaption($this->jenis_kelamin);
                     $doc->exportCaption($this->tanggal_lahir);
+                    $doc->exportCaption($this->Umum);
                     $doc->exportCaption($this->agama);
                     $doc->exportCaption($this->pekerjaan);
                     $doc->exportCaption($this->pendidikan);
@@ -1396,6 +1427,7 @@ SORTHTML;
                         $doc->exportField($this->nama);
                         $doc->exportField($this->jenis_kelamin);
                         $doc->exportField($this->tanggal_lahir);
+                        $doc->exportField($this->Umum);
                         $doc->exportField($this->agama);
                         $doc->exportField($this->pekerjaan);
                         $doc->exportField($this->pendidikan);
@@ -1410,6 +1442,7 @@ SORTHTML;
                         $doc->exportField($this->nama);
                         $doc->exportField($this->jenis_kelamin);
                         $doc->exportField($this->tanggal_lahir);
+                        $doc->exportField($this->Umum);
                         $doc->exportField($this->agama);
                         $doc->exportField($this->pekerjaan);
                         $doc->exportField($this->pendidikan);

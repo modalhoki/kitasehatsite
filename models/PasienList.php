@@ -573,6 +573,7 @@ class PasienList extends Pasien
         $this->nama->setVisibility();
         $this->jenis_kelamin->setVisibility();
         $this->tanggal_lahir->setVisibility();
+        $this->Umum->setVisibility();
         $this->agama->setVisibility();
         $this->pekerjaan->setVisibility();
         $this->pendidikan->setVisibility();
@@ -899,6 +900,7 @@ class PasienList extends Pasien
         $filterList = Concat($filterList, $this->nama->AdvancedSearch->toJson(), ","); // Field nama
         $filterList = Concat($filterList, $this->jenis_kelamin->AdvancedSearch->toJson(), ","); // Field jenis_kelamin
         $filterList = Concat($filterList, $this->tanggal_lahir->AdvancedSearch->toJson(), ","); // Field tanggal_lahir
+        $filterList = Concat($filterList, $this->Umum->AdvancedSearch->toJson(), ","); // Field Umum
         $filterList = Concat($filterList, $this->agama->AdvancedSearch->toJson(), ","); // Field agama
         $filterList = Concat($filterList, $this->pekerjaan->AdvancedSearch->toJson(), ","); // Field pekerjaan
         $filterList = Concat($filterList, $this->pendidikan->AdvancedSearch->toJson(), ","); // Field pendidikan
@@ -988,6 +990,14 @@ class PasienList extends Pasien
         $this->tanggal_lahir->AdvancedSearch->SearchOperator2 = @$filter["w_tanggal_lahir"];
         $this->tanggal_lahir->AdvancedSearch->save();
 
+        // Field Umum
+        $this->Umum->AdvancedSearch->SearchValue = @$filter["x_Umum"];
+        $this->Umum->AdvancedSearch->SearchOperator = @$filter["z_Umum"];
+        $this->Umum->AdvancedSearch->SearchCondition = @$filter["v_Umum"];
+        $this->Umum->AdvancedSearch->SearchValue2 = @$filter["y_Umum"];
+        $this->Umum->AdvancedSearch->SearchOperator2 = @$filter["w_Umum"];
+        $this->Umum->AdvancedSearch->save();
+
         // Field agama
         $this->agama->AdvancedSearch->SearchValue = @$filter["x_agama"];
         $this->agama->AdvancedSearch->SearchOperator = @$filter["z_agama"];
@@ -1076,6 +1086,7 @@ class PasienList extends Pasien
         $this->buildSearchSql($where, $this->nama, $default, false); // nama
         $this->buildSearchSql($where, $this->jenis_kelamin, $default, false); // jenis_kelamin
         $this->buildSearchSql($where, $this->tanggal_lahir, $default, false); // tanggal_lahir
+        $this->buildSearchSql($where, $this->Umum, $default, false); // Umum
         $this->buildSearchSql($where, $this->agama, $default, false); // agama
         $this->buildSearchSql($where, $this->pekerjaan, $default, false); // pekerjaan
         $this->buildSearchSql($where, $this->pendidikan, $default, false); // pendidikan
@@ -1096,6 +1107,7 @@ class PasienList extends Pasien
             $this->nama->AdvancedSearch->save(); // nama
             $this->jenis_kelamin->AdvancedSearch->save(); // jenis_kelamin
             $this->tanggal_lahir->AdvancedSearch->save(); // tanggal_lahir
+            $this->Umum->AdvancedSearch->save(); // Umum
             $this->agama->AdvancedSearch->save(); // agama
             $this->pekerjaan->AdvancedSearch->save(); // pekerjaan
             $this->pendidikan->AdvancedSearch->save(); // pendidikan
@@ -1311,6 +1323,9 @@ class PasienList extends Pasien
         if ($this->tanggal_lahir->AdvancedSearch->issetSession()) {
             return true;
         }
+        if ($this->Umum->AdvancedSearch->issetSession()) {
+            return true;
+        }
         if ($this->agama->AdvancedSearch->issetSession()) {
             return true;
         }
@@ -1375,6 +1390,7 @@ class PasienList extends Pasien
                 $this->nama->AdvancedSearch->unsetSession();
                 $this->jenis_kelamin->AdvancedSearch->unsetSession();
                 $this->tanggal_lahir->AdvancedSearch->unsetSession();
+                $this->Umum->AdvancedSearch->unsetSession();
                 $this->agama->AdvancedSearch->unsetSession();
                 $this->pekerjaan->AdvancedSearch->unsetSession();
                 $this->pendidikan->AdvancedSearch->unsetSession();
@@ -1400,6 +1416,7 @@ class PasienList extends Pasien
                 $this->nama->AdvancedSearch->load();
                 $this->jenis_kelamin->AdvancedSearch->load();
                 $this->tanggal_lahir->AdvancedSearch->load();
+                $this->Umum->AdvancedSearch->load();
                 $this->agama->AdvancedSearch->load();
                 $this->pekerjaan->AdvancedSearch->load();
                 $this->pendidikan->AdvancedSearch->load();
@@ -1422,6 +1439,7 @@ class PasienList extends Pasien
             $this->updateSort($this->nama); // nama
             $this->updateSort($this->jenis_kelamin); // jenis_kelamin
             $this->updateSort($this->tanggal_lahir); // tanggal_lahir
+            $this->updateSort($this->Umum); // Umum
             $this->updateSort($this->agama); // agama
             $this->updateSort($this->pekerjaan); // pekerjaan
             $this->updateSort($this->pendidikan); // pendidikan
@@ -1474,6 +1492,7 @@ class PasienList extends Pasien
                 $this->nama->setSort("");
                 $this->jenis_kelamin->setSort("");
                 $this->tanggal_lahir->setSort("");
+                $this->Umum->setSort("");
                 $this->agama->setSort("");
                 $this->pekerjaan->setSort("");
                 $this->pendidikan->setSort("");
@@ -1988,6 +2007,14 @@ class PasienList extends Pasien
             }
         }
 
+        // Umum
+        if (!$this->isAddOrEdit() && $this->Umum->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->Umum->AdvancedSearch->SearchValue != "" || $this->Umum->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
         // agama
         if (!$this->isAddOrEdit() && $this->agama->AdvancedSearch->get()) {
             $hasValue = true;
@@ -2135,6 +2162,7 @@ class PasienList extends Pasien
         $this->nama->setDbValue($row['nama']);
         $this->jenis_kelamin->setDbValue($row['jenis_kelamin']);
         $this->tanggal_lahir->setDbValue($row['tanggal_lahir']);
+        $this->Umum->setDbValue($row['Umum']);
         $this->agama->setDbValue($row['agama']);
         $this->pekerjaan->setDbValue($row['pekerjaan']);
         $this->pendidikan->setDbValue($row['pendidikan']);
@@ -2155,6 +2183,7 @@ class PasienList extends Pasien
         $row['nama'] = null;
         $row['jenis_kelamin'] = null;
         $row['tanggal_lahir'] = null;
+        $row['Umum'] = null;
         $row['agama'] = null;
         $row['pekerjaan'] = null;
         $row['pendidikan'] = null;
@@ -2211,6 +2240,8 @@ class PasienList extends Pasien
 
         // tanggal_lahir
 
+        // Umum
+
         // agama
 
         // pekerjaan
@@ -2253,6 +2284,11 @@ class PasienList extends Pasien
             $this->tanggal_lahir->ViewValue = $this->tanggal_lahir->CurrentValue;
             $this->tanggal_lahir->ViewValue = FormatDateTime($this->tanggal_lahir->ViewValue, 0);
             $this->tanggal_lahir->ViewCustomAttributes = "";
+
+            // Umum
+            $this->Umum->ViewValue = $this->Umum->CurrentValue;
+            $this->Umum->ViewValue = FormatNumber($this->Umum->ViewValue, 0, -2, -2, -2);
+            $this->Umum->ViewCustomAttributes = "";
 
             // agama
             if (strval($this->agama->CurrentValue) != "") {
@@ -2327,6 +2363,11 @@ class PasienList extends Pasien
             $this->tanggal_lahir->LinkCustomAttributes = "";
             $this->tanggal_lahir->HrefValue = "";
             $this->tanggal_lahir->TooltipValue = "";
+
+            // Umum
+            $this->Umum->LinkCustomAttributes = "";
+            $this->Umum->HrefValue = "";
+            $this->Umum->TooltipValue = "";
 
             // agama
             $this->agama->LinkCustomAttributes = "";
@@ -2413,6 +2454,12 @@ class PasienList extends Pasien
             $this->tanggal_lahir->EditCustomAttributes = "";
             $this->tanggal_lahir->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->tanggal_lahir->AdvancedSearch->SearchValue, 0), 8));
             $this->tanggal_lahir->PlaceHolder = RemoveHtml($this->tanggal_lahir->caption());
+
+            // Umum
+            $this->Umum->EditAttrs["class"] = "form-control";
+            $this->Umum->EditCustomAttributes = "";
+            $this->Umum->EditValue = HtmlEncode($this->Umum->AdvancedSearch->SearchValue);
+            $this->Umum->PlaceHolder = RemoveHtml($this->Umum->caption());
 
             // agama
             $this->agama->EditCustomAttributes = "";
@@ -2504,6 +2551,7 @@ class PasienList extends Pasien
         $this->nama->AdvancedSearch->load();
         $this->jenis_kelamin->AdvancedSearch->load();
         $this->tanggal_lahir->AdvancedSearch->load();
+        $this->Umum->AdvancedSearch->load();
         $this->agama->AdvancedSearch->load();
         $this->pekerjaan->AdvancedSearch->load();
         $this->pendidikan->AdvancedSearch->load();

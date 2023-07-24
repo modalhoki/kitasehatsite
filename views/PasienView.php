@@ -100,6 +100,17 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->Umum->Visible) { // Umum ?>
+    <tr id="r_Umum">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_pasien_Umum"><?= $Page->Umum->caption() ?></span></td>
+        <td data-name="Umum" <?= $Page->Umum->cellAttributes() ?>>
+<span id="el_pasien_Umum">
+<span<?= $Page->Umum->viewAttributes() ?>>
+<?= $Page->Umum->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->agama->Visible) { // agama ?>
     <tr id="r_agama">
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_pasien_agama"><?= $Page->agama->caption() ?></span></td>

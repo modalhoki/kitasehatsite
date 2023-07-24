@@ -31,6 +31,7 @@ loadjs.ready("head", function () {
         ["nama", [], fields.nama.isInvalid],
         ["jenis_kelamin", [], fields.jenis_kelamin.isInvalid],
         ["tanggal_lahir", [], fields.tanggal_lahir.isInvalid],
+        ["Umum", [], fields.Umum.isInvalid],
         ["agama", [], fields.agama.isInvalid],
         ["pekerjaan", [], fields.pekerjaan.isInvalid],
         ["pendidikan", [], fields.pendidikan.isInvalid],
@@ -285,6 +286,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->tanggal_lahir->Visible) { // tanggal_lahir ?>
         <th data-name="tanggal_lahir" class="<?= $Page->tanggal_lahir->headerCellClass() ?>"><div id="elh_pasien_tanggal_lahir" class="pasien_tanggal_lahir"><?= $Page->renderSort($Page->tanggal_lahir) ?></div></th>
 <?php } ?>
+<?php if ($Page->Umum->Visible) { // Umum ?>
+        <th data-name="Umum" class="<?= $Page->Umum->headerCellClass() ?>"><div id="elh_pasien_Umum" class="pasien_Umum"><?= $Page->renderSort($Page->Umum) ?></div></th>
+<?php } ?>
 <?php if ($Page->agama->Visible) { // agama ?>
         <th data-name="agama" class="<?= $Page->agama->headerCellClass() ?>"><div id="elh_pasien_agama" class="pasien_agama"><?= $Page->renderSort($Page->agama) ?></div></th>
 <?php } ?>
@@ -405,6 +409,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_pasien_tanggal_lahir">
 <span<?= $Page->tanggal_lahir->viewAttributes() ?>>
 <?= $Page->tanggal_lahir->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->Umum->Visible) { // Umum ?>
+        <td data-name="Umum" <?= $Page->Umum->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_pasien_Umum">
+<span<?= $Page->Umum->viewAttributes() ?>>
+<?= $Page->Umum->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

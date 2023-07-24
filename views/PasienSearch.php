@@ -27,6 +27,7 @@ loadjs.ready("head", function () {
         ["nama", [], fields.nama.isInvalid],
         ["jenis_kelamin", [], fields.jenis_kelamin.isInvalid],
         ["tanggal_lahir", [ew.Validators.datetime(0)], fields.tanggal_lahir.isInvalid],
+        ["Umum", [ew.Validators.integer], fields.Umum.isInvalid],
         ["agama", [], fields.agama.isInvalid],
         ["pekerjaan", [], fields.pekerjaan.isInvalid],
         ["pendidikan", [], fields.pendidikan.isInvalid],
@@ -203,6 +204,22 @@ loadjs.ready(["fpasiensearch", "datetimepicker"], function() {
 });
 </script>
 <?php } ?>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->Umum->Visible) { // Umum ?>
+    <div id="r_Umum" class="form-group row">
+        <label for="x_Umum" class="<?= $Page->LeftColumnClass ?>"><span id="elh_pasien_Umum"><?= $Page->Umum->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_Umum" id="z_Umum" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->Umum->cellAttributes() ?>>
+            <span id="el_pasien_Umum" class="ew-search-field ew-search-field-single">
+<input type="<?= $Page->Umum->getInputTextType() ?>" data-table="pasien" data-field="x_Umum" name="x_Umum" id="x_Umum" size="30" maxlength="21" placeholder="<?= HtmlEncode($Page->Umum->getPlaceHolder()) ?>" value="<?= $Page->Umum->EditValue ?>"<?= $Page->Umum->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->Umum->getErrorMessage(false) ?></div>
 </span>
         </div></div>
     </div>

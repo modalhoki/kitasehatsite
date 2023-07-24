@@ -463,6 +463,7 @@ class PasienSearch extends Pasien
         $this->nama->setVisibility();
         $this->jenis_kelamin->setVisibility();
         $this->tanggal_lahir->setVisibility();
+        $this->Umum->setVisibility();
         $this->agama->setVisibility();
         $this->pekerjaan->setVisibility();
         $this->pendidikan->setVisibility();
@@ -555,6 +556,7 @@ class PasienSearch extends Pasien
         $this->buildSearchUrl($srchUrl, $this->nama); // nama
         $this->buildSearchUrl($srchUrl, $this->jenis_kelamin); // jenis_kelamin
         $this->buildSearchUrl($srchUrl, $this->tanggal_lahir); // tanggal_lahir
+        $this->buildSearchUrl($srchUrl, $this->Umum); // Umum
         $this->buildSearchUrl($srchUrl, $this->agama); // agama
         $this->buildSearchUrl($srchUrl, $this->pekerjaan); // pekerjaan
         $this->buildSearchUrl($srchUrl, $this->pendidikan); // pendidikan
@@ -659,6 +661,9 @@ class PasienSearch extends Pasien
         if ($this->tanggal_lahir->AdvancedSearch->post()) {
             $hasValue = true;
         }
+        if ($this->Umum->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
         if ($this->agama->AdvancedSearch->post()) {
             $hasValue = true;
         }
@@ -711,6 +716,8 @@ class PasienSearch extends Pasien
 
         // tanggal_lahir
 
+        // Umum
+
         // agama
 
         // pekerjaan
@@ -753,6 +760,11 @@ class PasienSearch extends Pasien
             $this->tanggal_lahir->ViewValue = $this->tanggal_lahir->CurrentValue;
             $this->tanggal_lahir->ViewValue = FormatDateTime($this->tanggal_lahir->ViewValue, 0);
             $this->tanggal_lahir->ViewCustomAttributes = "";
+
+            // Umum
+            $this->Umum->ViewValue = $this->Umum->CurrentValue;
+            $this->Umum->ViewValue = FormatNumber($this->Umum->ViewValue, 0, -2, -2, -2);
+            $this->Umum->ViewCustomAttributes = "";
 
             // agama
             if (strval($this->agama->CurrentValue) != "") {
@@ -830,6 +842,11 @@ class PasienSearch extends Pasien
             $this->tanggal_lahir->LinkCustomAttributes = "";
             $this->tanggal_lahir->HrefValue = "";
             $this->tanggal_lahir->TooltipValue = "";
+
+            // Umum
+            $this->Umum->LinkCustomAttributes = "";
+            $this->Umum->HrefValue = "";
+            $this->Umum->TooltipValue = "";
 
             // agama
             $this->agama->LinkCustomAttributes = "";
@@ -919,6 +936,12 @@ class PasienSearch extends Pasien
             $this->tanggal_lahir->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->tanggal_lahir->AdvancedSearch->SearchValue, 0), 8));
             $this->tanggal_lahir->PlaceHolder = RemoveHtml($this->tanggal_lahir->caption());
 
+            // Umum
+            $this->Umum->EditAttrs["class"] = "form-control";
+            $this->Umum->EditCustomAttributes = "";
+            $this->Umum->EditValue = HtmlEncode($this->Umum->AdvancedSearch->SearchValue);
+            $this->Umum->PlaceHolder = RemoveHtml($this->Umum->caption());
+
             // agama
             $this->agama->EditCustomAttributes = "";
             $this->agama->EditValue = $this->agama->options(false);
@@ -1003,6 +1026,9 @@ class PasienSearch extends Pasien
         if (!CheckDate($this->tanggal_lahir->AdvancedSearch->SearchValue)) {
             $this->tanggal_lahir->addErrorMessage($this->tanggal_lahir->getErrorMessage(false));
         }
+        if (!CheckInteger($this->Umum->AdvancedSearch->SearchValue)) {
+            $this->Umum->addErrorMessage($this->Umum->getErrorMessage(false));
+        }
 
         // Return validate result
         $validateSearch = !$this->hasInvalidFields();
@@ -1024,6 +1050,7 @@ class PasienSearch extends Pasien
         $this->nama->AdvancedSearch->load();
         $this->jenis_kelamin->AdvancedSearch->load();
         $this->tanggal_lahir->AdvancedSearch->load();
+        $this->Umum->AdvancedSearch->load();
         $this->agama->AdvancedSearch->load();
         $this->pekerjaan->AdvancedSearch->load();
         $this->pendidikan->AdvancedSearch->load();

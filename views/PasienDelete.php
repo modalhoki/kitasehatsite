@@ -56,6 +56,9 @@ $Page->showMessage();
 <?php if ($Page->tanggal_lahir->Visible) { // tanggal_lahir ?>
         <th class="<?= $Page->tanggal_lahir->headerCellClass() ?>"><span id="elh_pasien_tanggal_lahir" class="pasien_tanggal_lahir"><?= $Page->tanggal_lahir->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->Umum->Visible) { // Umum ?>
+        <th class="<?= $Page->Umum->headerCellClass() ?>"><span id="elh_pasien_Umum" class="pasien_Umum"><?= $Page->Umum->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->agama->Visible) { // agama ?>
         <th class="<?= $Page->agama->headerCellClass() ?>"><span id="elh_pasien_agama" class="pasien_agama"><?= $Page->agama->caption() ?></span></th>
 <?php } ?>
@@ -130,6 +133,14 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_pasien_tanggal_lahir" class="pasien_tanggal_lahir">
 <span<?= $Page->tanggal_lahir->viewAttributes() ?>>
 <?= $Page->tanggal_lahir->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->Umum->Visible) { // Umum ?>
+        <td <?= $Page->Umum->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_pasien_Umum" class="pasien_Umum">
+<span<?= $Page->Umum->viewAttributes() ?>>
+<?= $Page->Umum->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -379,6 +379,7 @@ class PasienDelete extends Pasien
         $this->nama->setVisibility();
         $this->jenis_kelamin->setVisibility();
         $this->tanggal_lahir->setVisibility();
+        $this->Umum->setVisibility();
         $this->agama->setVisibility();
         $this->pekerjaan->setVisibility();
         $this->pendidikan->setVisibility();
@@ -555,6 +556,7 @@ class PasienDelete extends Pasien
         $this->nama->setDbValue($row['nama']);
         $this->jenis_kelamin->setDbValue($row['jenis_kelamin']);
         $this->tanggal_lahir->setDbValue($row['tanggal_lahir']);
+        $this->Umum->setDbValue($row['Umum']);
         $this->agama->setDbValue($row['agama']);
         $this->pekerjaan->setDbValue($row['pekerjaan']);
         $this->pendidikan->setDbValue($row['pendidikan']);
@@ -575,6 +577,7 @@ class PasienDelete extends Pasien
         $row['nama'] = null;
         $row['jenis_kelamin'] = null;
         $row['tanggal_lahir'] = null;
+        $row['Umum'] = null;
         $row['agama'] = null;
         $row['pekerjaan'] = null;
         $row['pendidikan'] = null;
@@ -608,6 +611,8 @@ class PasienDelete extends Pasien
         // jenis_kelamin
 
         // tanggal_lahir
+
+        // Umum
 
         // agama
 
@@ -651,6 +656,11 @@ class PasienDelete extends Pasien
             $this->tanggal_lahir->ViewValue = $this->tanggal_lahir->CurrentValue;
             $this->tanggal_lahir->ViewValue = FormatDateTime($this->tanggal_lahir->ViewValue, 0);
             $this->tanggal_lahir->ViewCustomAttributes = "";
+
+            // Umum
+            $this->Umum->ViewValue = $this->Umum->CurrentValue;
+            $this->Umum->ViewValue = FormatNumber($this->Umum->ViewValue, 0, -2, -2, -2);
+            $this->Umum->ViewCustomAttributes = "";
 
             // agama
             if (strval($this->agama->CurrentValue) != "") {
@@ -719,6 +729,11 @@ class PasienDelete extends Pasien
             $this->tanggal_lahir->LinkCustomAttributes = "";
             $this->tanggal_lahir->HrefValue = "";
             $this->tanggal_lahir->TooltipValue = "";
+
+            // Umum
+            $this->Umum->LinkCustomAttributes = "";
+            $this->Umum->HrefValue = "";
+            $this->Umum->TooltipValue = "";
 
             // agama
             $this->agama->LinkCustomAttributes = "";

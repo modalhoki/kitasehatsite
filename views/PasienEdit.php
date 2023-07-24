@@ -24,6 +24,7 @@ loadjs.ready("head", function () {
         ["nama", [fields.nama.visible && fields.nama.required ? ew.Validators.required(fields.nama.caption) : null], fields.nama.isInvalid],
         ["jenis_kelamin", [fields.jenis_kelamin.visible && fields.jenis_kelamin.required ? ew.Validators.required(fields.jenis_kelamin.caption) : null], fields.jenis_kelamin.isInvalid],
         ["tanggal_lahir", [fields.tanggal_lahir.visible && fields.tanggal_lahir.required ? ew.Validators.required(fields.tanggal_lahir.caption) : null, ew.Validators.datetime(0)], fields.tanggal_lahir.isInvalid],
+        ["Umum", [fields.Umum.visible && fields.Umum.required ? ew.Validators.required(fields.Umum.caption) : null, ew.Validators.integer], fields.Umum.isInvalid],
         ["agama", [fields.agama.visible && fields.agama.required ? ew.Validators.required(fields.agama.caption) : null], fields.agama.isInvalid],
         ["pekerjaan", [fields.pekerjaan.visible && fields.pekerjaan.required ? ew.Validators.required(fields.pekerjaan.caption) : null], fields.pekerjaan.isInvalid],
         ["pendidikan", [fields.pendidikan.visible && fields.pendidikan.required ? ew.Validators.required(fields.pendidikan.caption) : null], fields.pendidikan.isInvalid],
@@ -195,6 +196,18 @@ loadjs.ready(["fpasienedit", "datetimepicker"], function() {
 });
 </script>
 <?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->Umum->Visible) { // Umum ?>
+    <div id="r_Umum" class="form-group row">
+        <label id="elh_pasien_Umum" for="x_Umum" class="<?= $Page->LeftColumnClass ?>"><?= $Page->Umum->caption() ?><?= $Page->Umum->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->Umum->cellAttributes() ?>>
+<span id="el_pasien_Umum">
+<input type="<?= $Page->Umum->getInputTextType() ?>" data-table="pasien" data-field="x_Umum" name="x_Umum" id="x_Umum" size="30" maxlength="21" placeholder="<?= HtmlEncode($Page->Umum->getPlaceHolder()) ?>" value="<?= $Page->Umum->EditValue ?>"<?= $Page->Umum->editAttributes() ?> aria-describedby="x_Umum_help">
+<?= $Page->Umum->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->Umum->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

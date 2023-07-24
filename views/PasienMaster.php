@@ -53,6 +53,17 @@ $pasien = Container("pasien");
 </td>
         </tr>
 <?php } ?>
+<?php if ($pasien->Umum->Visible) { // Umum ?>
+        <tr id="r_Umum">
+            <td class="<?= $pasien->TableLeftColumnClass ?>"><?= $pasien->Umum->caption() ?></td>
+            <td <?= $pasien->Umum->cellAttributes() ?>>
+<span id="el_pasien_Umum">
+<span<?= $pasien->Umum->viewAttributes() ?>>
+<?= $pasien->Umum->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($pasien->agama->Visible) { // agama ?>
         <tr id="r_agama">
             <td class="<?= $pasien->TableLeftColumnClass ?>"><?= $pasien->agama->caption() ?></td>
